@@ -53,54 +53,38 @@
  * contact PARC at cipo@parc.com for more information or visit http://www.ccnx.org
  */
 /**
- * @author Nacho Solis, Christopher A. Wood, Palo Alto Research Center (Xerox PARC)
+ * @author Kevin Fox, Palo Alto Research Center (Xerox PARC)
  * @copyright (c) 2016, Xerox Corporation (Xerox) and Palo Alto Research Center, Inc (PARC).  All rights reserved.
  */
-#include <stdio.h>
+#ifndef libathena_TransportLinkModuleUDP_h
+#define libathena_TransportLinkModuleUDP_h
 
-#include "ccnxPing_Common.h"
+/**
+ * @abstract initialize UDP specific link module
+ * @discussion
+ *
+ * @return list of modules
+ *
+ * Example:
+ * @code
+ * {
+ *
+ * }
+ * @endcode
+ */
+PARCArrayList *athenaTransportLinkModuleUDP_Init();
 
-#include <LongBow/runtime.h>
+/**
+ * @abstract finalize UDP specific link module
+ * @discussion
+ *
+ * Example:
+ * @code
+ * {
+ *
+ * }
+ * @endcode
+ */
+void athenaTransportLinkModuleUDP_Fini();
 
-#include <parc/security/parc_Security.h>
-#include <parc/security/parc_Pkcs12KeyStore.h>
-#include <parc/security/parc_IdentityFile.h>
-
-const size_t ccnxPing_DefaultReceiveTimeoutInUs = 1000000; // 1 second
-const size_t ccnxPing_DefaultPayloadSize = 4096;
-const size_t mediumNumberOfPings = 100;
-const size_t smallNumberOfPings = 10;
-
-static PARCIdentity *
-_ccnxPingCommon_CreateAndGetIdentity(const char *keystoreName,
-                                     const char *keystorePassword,
-                                     const char *subjectName)
-{
-    parcSecurity_Init();
-
-    unsigned int keyLength = 1024;
-    unsigned int validityDays = 30;
-
-    bool success = parcPkcs12KeyStore_CreateFile(keystoreName, keystorePassword, subjectName, keyLength, validityDays);
-    assertTrue(success,
-               "parcPkcs12KeyStore_CreateFile('%s', '%s', '%s', %d, %d) failed.",
-               keystoreName, keystorePassword, subjectName, keyLength, validityDays);
-
-    PARCIdentityFile *identityFile = parcIdentityFile_Create(keystoreName, keystorePassword);
-    PARCIdentity *result = parcIdentity_Create(identityFile, PARCIdentityFileAsPARCIdentity);
-    parcIdentityFile_Release(&identityFile);
-
-    parcSecurity_Fini();
-
-    return result;
-}
-
-CCNxPortalFactory *
-ccnxPingCommon_SetupPortalFactory(const char *keystoreName, const char *keystorePassword, const char *subjectName)
-{
-    PARCIdentity *identity = _ccnxPingCommon_CreateAndGetIdentity(keystoreName, keystorePassword, subjectName);
-    CCNxPortalFactory *result = ccnxPortalFactory_Create(identity);
-    parcIdentity_Release(&identity);
-
-    return result;
-}
+#endif // libathena_TransportLinkModuleUDP_h

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Xerox Corporation (Xerox) and Palo Alto Research Center, Inc (PARC)
+ * Copyright (c) 2015-2016, Xerox Corporation (Xerox) and Palo Alto Research Center, Inc (PARC)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,60 +53,52 @@
  * contact PARC at cipo@parc.com for more information or visit http://www.ccnx.org
  */
 /**
- * @author Christopher A. Wood, Palo Alto Research Center (Xerox PARC)
- * @copyright (c) 2016, Xerox Corporation (Xerox) and Palo Alto Research Center, Inc (PARC).  All rights reserved.
+ * @author Kevin Fox, Palo Alto Research Center (Xerox PARC)
+ * @copyright (c) 2015-2016, Xerox Corporation (Xerox) and Palo Alto Research Center, Inc (PARC).  All rights reserved.
  */
+#ifndef libathena_Control_h
+#define libathena_Control_h
 
-#ifndef ccnxPingCommon_h
-#define ccnxPingCommon_h
-
-#include <stdint.h>
-
-#include <ccnx/api/ccnx_Portal/ccnx_Portal.h>
+#include <ccnx/forwarder/athena/athena.h>
+#include <ccnx/common/ccnx_Interest.h>
+#include <parc/algol/parc_BitVector.h>
 
 /**
- * The `CCNxName` prefix for the server.
- */
-#define ccnxPing_DefaultPrefix "ccnx:/localhost"
-
-/**
- * The default client receive timeout (in microseconds).
- */
-extern const size_t ccnxPing_DefaultReceiveTimeoutInUs;
-
-/**
- * The default size of a content object payload.
- */
-extern const size_t ccnxPing_DefaultPayloadSize;
-
-/**
- * The maximum size of a content object payload.
- * 64KB is the limit imposed by the packet structure
- */
-#define ccnxPing_MaxPayloadSize 64000
-
-/**
- * A default "medium" number of messages to send.
- */
-extern const size_t mediumNumberOfPings;
-
-/**
- * A default "small" number of messages to send.
- */
-extern const size_t smallNumberOfPings;
-
-/**
- * Initialize and return a new instance of CCNxPortalFactory. A randomly generated identity is
- * used to initialize the factory. The returned instance must eventually be released by calling
- * ccnxPortalFactory_Release().
+ * @abstract process a CCNx control message
+ * @discussion
  *
- * @param [in] keystoreName The name of the file to save the new identity.
- * @param [in] keystorePassword The password of the file holding the identity.
- * @param [in] subjectName The name of the owner of the identity.
+ * @param [in] athena forwarder context
+ * @param [in] control pointer to control message to process
+ * @param [in] ingressVector link message was received from
+ * @return 0 on success
  *
- * @return A new instance of a CCNxPortalFactory initialized with a randomly created identity.
+ * Example:
+ * @code
+ * {
+ *     Athena *athena = athena_Create();
+ *     PARCBitVector *ingressVector;
+ *     CCNxMetaMessage *ccnxMessage = athenaTransportLinkAdapter_Receive(athena->athenaTransportLinkAdapter, &ingressVector, -1)
+ *
+ *     athenaControl(athena, ccnxMessage, ingressVector);
+ *
+ *     ccnxMetaMessage_Release(&ccnxMessage);
+ *     parcBitVector_Release(&ingressVector);
+ *     athena_Release(&athena);
+ * }
+ * @endcode
  */
-CCNxPortalFactory *ccnxPingCommon_SetupPortalFactory(const char *keystoreName,
-                                                     const char *keystorePassword,
-                                                     const char *subjectName);
-#endif // ccnxPingCommon_h.h
+int athenaControl(Athena *athena, CCNxControl *control, PARCBitVector *ingressVector);
+
+/**
+ * Process a message (e.g. an Interest) addressed to this module. For example, it might be a
+ * message asking for a particular statistic or a control message. The response can be NULL,
+ * or a response. A response to a query message might be a ContentObject with the requested data.
+ * The function should return NULL if the interest request is unknown and the caller should handle the response.
+ *
+ * @param athena instance
+ * @param message the message addressed to this instance of the store
+ * @return NULL if message request is unknown.
+ * @return a `CCNxMetaMessage` instance containing a response.
+ */
+CCNxMetaMessage *athenaControl_ProcessMessage(Athena *athena, const CCNxMetaMessage *message);
+#endif // libathena_Control_h

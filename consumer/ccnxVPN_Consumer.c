@@ -72,20 +72,20 @@
 #include <parc/security/parc_IdentityFile.h>
 #include <parc/algol/parc_DisplayIndented.h>
 
-#include "ccnxPing_Stats.h"
-#include "ccnxPing_Common.h"
+#include "../ccnxVPN_Common.h"
+#include "../ccnxVPN_Stats.h"
 
 typedef enum {
-    CCNxPingClientMode_None = 0,
-    CCNxPingClientMode_Flood,
-    CCNxPingClientMode_PingPong,
-    CCNxPingClientMode_All
-} CCNxPingClientMode;
+    CCNxVPNConsumerMode_None = 0,
+    CCNxVPNConsumerMode_Flood,
+    CCNxVPNConsumerMode_VPNPong,
+    CCNxVPNConsumerMode_All
+} CCNxVPNConsumerMode;
 
-typedef struct ccnx_Ping_client {
+typedef struct ccnx_VPN_client {
     CCNxPortal *portal;
-    CCNxPingStats *stats;
-    CCNxPingClientMode mode;
+    CCNxVPNStats *stats;
+    CCNxVPNConsumerMode mode;
 
     CCNxName *prefix;
 
@@ -96,7 +96,7 @@ typedef struct ccnx_Ping_client {
     uint64_t intervalInMs;
     int payloadSize;
     int nonce;
-} CCNxPingClient;
+} CCNxVPNConsumer;
 
 /**
  * Create a new CCNxPortalFactory instance using a randomly generated identity saved to
@@ -105,22 +105,22 @@ typedef struct ccnx_Ping_client {
  * @return A new CCNxPortalFactory instance which must eventually be released by calling ccnxPortalFactory_Release().
  */
 static CCNxPortalFactory *
-_setupClientPortalFactory(void)
+_setupConsumerPortalFactory(void)
 {
     const char *keystoreName = "client.keystore";
     const char *keystorePassword = "keystore_password";
     const char *subjectName = "client";
 
-    return ccnxPingCommon_SetupPortalFactory(keystoreName, keystorePassword, subjectName);
+    return ccnxVPNCommon_SetupPortalFactory(keystoreName, keystorePassword, subjectName);
 }
 
 /**
- * Release the references held by the `CCNxPingClient`.
+ * Release the references held by the `CCNxVPNConsumer`.
  */
 static bool
-_ccnxPingClient_Destructor(CCNxPingClient **clientPtr)
+_ccnxVPN_Destructor(CCNxVPNConsumer **clientPtr)
 {
-    CCNxPingClient *client = *clientPtr;
+    CCNxVPNConsumer *client = *clientPtr;
     if (client->portal != NULL) {
         ccnxPortal_Release(&(client->portal));
     }
@@ -130,24 +130,24 @@ _ccnxPingClient_Destructor(CCNxPingClient **clientPtr)
     return true;
 }
 
-parcObject_Override(CCNxPingClient, PARCObject,
-                    .destructor = (PARCObjectDestructor *) _ccnxPingClient_Destructor);
+parcObject_Override(CCNxVPNConsumer, PARCObject,
+                    .destructor = (PARCObjectDestructor *) _ccnxVPN_Destructor);
 
-parcObject_ImplementAcquire(ccnxPingClient, CCNxPingClient);
-parcObject_ImplementRelease(ccnxPingClient, CCNxPingClient);
+parcObject_ImplementAcquire(ccnxVPN, CCNxVPNConsumer);
+parcObject_ImplementRelease(ccnxVPN, CCNxVPNConsumer);
 
 /**
- * Create a new empty `CCNxPingClient` instance.
+ * Create a new empty `CCNxVPNConsumer` instance.
  */
-static CCNxPingClient *
-ccnxPingClient_Create(void)
+static CCNxVPNConsumer *
+ccnxVPN_Create(void)
 {
-    CCNxPingClient *client = parcObject_CreateInstance(CCNxPingClient);
+    CCNxVPNConsumer *client = parcObject_CreateInstance(CCNxVPNConsumer);
 
-    client->stats = ccnxPingStats_Create();
+    client->stats = ccnxVPNStats_Create();
     client->interestCounter = 100;
-    client->prefix = ccnxName_CreateFromCString(ccnxPing_DefaultPrefix);
-    client->receiveTimeoutInUs = ccnxPing_DefaultReceiveTimeoutInUs;
+    client->prefix = ccnxName_CreateFromCString(ccnxVPN_DefaultPrefix);
+    client->receiveTimeoutInUs = ccnxVPN_DefaultReceiveTimeoutInUs;
     client->count = 10;
     client->intervalInMs = 1000;
     client->nonce = rand();
@@ -161,7 +161,7 @@ ccnxPingClient_Create(void)
  * for the client.
  */
 static CCNxName *
-_ccnxPingClient_CreateNextName(CCNxPingClient *client)
+_ccnxVPN_CreateNextName(CCNxVPNConsumer *client)
 {
     client->interestCounter++;
     char *suffixBuffer = NULL;
@@ -186,7 +186,7 @@ _ccnxPingClient_CreateNextName(CCNxPingClient *client)
  * Convert a timeval struct to a single microsecond count.
  */
 static uint64_t
-_ccnxPingClient_CurrentTimeInUs(PARCClock *clock)
+_ccnxVPN_CurrentTimeInUs(PARCClock *clock)
 {
     struct timeval currentTimeVal;
     parcClock_GetTimeval(clock, &currentTimeVal);
@@ -198,39 +198,39 @@ _ccnxPingClient_CurrentTimeInUs(PARCClock *clock)
  * Run a single ping test.
  */
 static void
-_ccnxPingClient_RunPing(CCNxPingClient *client, size_t totalPings, uint64_t delayInUs)
+_ccnxVPN_RunVPN(CCNxVPNConsumer *client, size_t totalVPNs, uint64_t delayInUs)
 {
     PARCClock *clock = parcClock_Wallclock();
 
-    CCNxPortalFactory *factory = _setupClientPortalFactory();
+    CCNxPortalFactory *factory = _setupConsumerPortalFactory();
     client->portal = ccnxPortalFactory_CreatePortal(factory, ccnxPortalRTA_Message);
     ccnxPortalFactory_Release(&factory);
 
     size_t outstanding = 0;
     bool checkOustanding = client->numberOfOutstanding > 0;
 
-    for (int pings = 0; pings <= totalPings; pings++) {
+    for (int pings = 0; pings <= totalVPNs; pings++) {
         uint64_t nextPacketSendTime = 0;
         uint64_t currentTimeInUs = 0;
 
         // Continue to send ping messages until we've reached the capacity
-        if (pings < totalPings && (!checkOustanding || (checkOustanding && outstanding < client->numberOfOutstanding))) {
-            CCNxName *name = _ccnxPingClient_CreateNextName(client);
+        if (pings < totalVPNs && (!checkOustanding || (checkOustanding && outstanding < client->numberOfOutstanding))) {
+            CCNxName *name = _ccnxVPN_CreateNextName(client);
             CCNxInterest *interest = ccnxInterest_CreateSimple(name);
             CCNxMetaMessage *message = ccnxMetaMessage_CreateFromInterest(interest);
 
             if (ccnxPortal_Send(client->portal, message, CCNxStackTimeout_Never)) {
-                currentTimeInUs = _ccnxPingClient_CurrentTimeInUs(clock);
+                currentTimeInUs = _ccnxVPN_CurrentTimeInUs(clock);
                 nextPacketSendTime = currentTimeInUs + delayInUs;
 
-                ccnxPingStats_RecordRequest(client->stats, name, currentTimeInUs);
+                ccnxVPNStats_RecordRequest(client->stats, name, currentTimeInUs);
             }
 
             outstanding++;
             ccnxName_Release(&name);
         } else {
             // We're done with pings, so let's wait to see if we have any stragglers
-            currentTimeInUs = _ccnxPingClient_CurrentTimeInUs(clock);
+            currentTimeInUs = _ccnxVPN_CurrentTimeInUs(clock);
             nextPacketSendTime = currentTimeInUs + client->receiveTimeoutInUs;
         }
 
@@ -238,15 +238,15 @@ _ccnxPingClient_RunPing(CCNxPingClient *client, size_t totalPings, uint64_t dela
         uint64_t receiveDelay = nextPacketSendTime - currentTimeInUs;
         CCNxMetaMessage *response = ccnxPortal_Receive(client->portal, &receiveDelay);
         while (response != NULL && (!checkOustanding || (checkOustanding && outstanding < client->numberOfOutstanding))) {
-            uint64_t currentTimeInUs = _ccnxPingClient_CurrentTimeInUs(clock);
+            uint64_t currentTimeInUs = _ccnxVPN_CurrentTimeInUs(clock);
             if (ccnxMetaMessage_IsContentObject(response)) {
                 CCNxContentObject *contentObject = ccnxMetaMessage_GetContentObject(response);
 
                 CCNxName *responseName = ccnxContentObject_GetName(contentObject);
-                size_t delta = ccnxPingStats_RecordResponse(client->stats, responseName, currentTimeInUs, response);
+                size_t delta = ccnxVPNStats_RecordResponse(client->stats, responseName, currentTimeInUs, response);
 
                 // Only display output if we're in ping mode
-                if (client->mode == CCNxPingClientMode_PingPong) {
+                if (client->mode == CCNxVPNConsumerMode_VPNPong) {
                     size_t contentSize = parcBuffer_Remaining(ccnxContentObject_GetPayload(contentObject));
                     char *nameString = ccnxName_ToString(responseName);
                     printf("%zu bytes from %s: time=%zu us\n", contentSize, nameString, delta);
@@ -255,7 +255,7 @@ _ccnxPingClient_RunPing(CCNxPingClient *client, size_t totalPings, uint64_t dela
             }
             ccnxMetaMessage_Release(&response);
 
-            if (pings < totalPings) {
+            if (pings < totalVPNs) {
                 receiveDelay = nextPacketSendTime - currentTimeInUs;
             } else {
                 receiveDelay = client->receiveTimeoutInUs;
@@ -273,15 +273,15 @@ _ccnxPingClient_RunPing(CCNxPingClient *client, size_t totalPings, uint64_t dela
 static void
 _displayUsage(char *progName)
 {
-    printf("CCNx Simple Ping Performance Test\n");
-    printf("   (you must have ccnxPing_Server running)\n");
+    printf("CCNx Simple VPN Performance Test\n");
+    printf("   (you must have ccnxVPN_Server running)\n");
     printf("\n");
     printf("Usage: %s -p [ -c count ] [ -s size ] [ -i interval ]\n", progName);
     printf("       %s -f [ -c count ] [ -s size ]\n", progName);
     printf("       %s -h\n", progName);
     printf("\n");
     printf("Example:\n");
-    printf("    ccnxPing_Client -l ccnx:/some/prefix -c 100 -f\n");
+    printf("    ccnxVPN_Consumer -l ccnx:/some/prefix -c 100 -f\n");
     printf("\n");
     printf("Options:\n");
     printf("     -h (--help) Show this help message\n");
@@ -297,7 +297,7 @@ _displayUsage(char *progName)
  * Parse the command lines to initialize the state of the
  */
 static bool
-_ccnxPingClient_ParseCommandline(CCNxPingClient *client, int argc, char *argv[argc])
+_ccnxVPN_ParseCommandline(CCNxVPNConsumer *client, int argc, char *argv[argc])
 {
     static struct option longopts[] = {
         { "ping",        no_argument,       NULL, 'p' },
@@ -311,22 +311,22 @@ _ccnxPingClient_ParseCommandline(CCNxPingClient *client, int argc, char *argv[ar
         { NULL,          0,                 NULL, 0   }
     };
 
-    client->payloadSize = ccnxPing_DefaultPayloadSize;
+    client->payloadSize = ccnxVPN_DefaultPayloadSize;
 
     int c;
     while ((c = getopt_long(argc, argv, "phfc:s:i:l:o:", longopts, NULL)) != -1) {
         switch (c) {
             case 'p':
-                if (client->mode != CCNxPingClientMode_None) {
+                if (client->mode != CCNxVPNConsumerMode_None) {
                     return false;
                 }
-                client->mode = CCNxPingClientMode_PingPong;
+                client->mode = CCNxVPNConsumerMode_VPNPong;
                 break;
             case 'f':
-                if (client->mode != CCNxPingClientMode_None) {
+                if (client->mode != CCNxVPNConsumerMode_None) {
                     return false;
                 }
-                client->mode = CCNxPingClientMode_Flood;
+                client->mode = CCNxVPNConsumerMode_Flood;
                 break;
             case 'c':
                 sscanf(optarg, "%u", &(client->count));
@@ -351,7 +351,7 @@ _ccnxPingClient_ParseCommandline(CCNxPingClient *client, int argc, char *argv[ar
         }
     }
 
-    if (client->mode == CCNxPingClientMode_None) {
+    if (client->mode == CCNxVPNConsumerMode_None) {
         _displayUsage(argv[0]);
         return false;
     }
@@ -360,37 +360,37 @@ _ccnxPingClient_ParseCommandline(CCNxPingClient *client, int argc, char *argv[ar
 };
 
 static void
-_ccnxPingClient_DisplayStatistics(CCNxPingClient *client)
+_ccnxVPN_DisplayStatistics(CCNxVPNConsumer *client)
 {
-    bool ableToCompute = ccnxPingStats_Display(client->stats);
+    bool ableToCompute = ccnxVPNStats_Display(client->stats);
     if (!ableToCompute) {
         parcDisplayIndented_PrintLine(0, "No packets were received. Check to make sure the client and server are configured correctly and that the forwarder is running.\n");
     }
 }
 
 static void
-_ccnxPingClient_RunPingormanceTest(CCNxPingClient *client)
+_ccnxVPN_RunVPNPerformanceTest(CCNxVPNConsumer *client)
 {
     switch (client->mode) {
-        case CCNxPingClientMode_All:
-            _ccnxPingClient_RunPing(client, mediumNumberOfPings, 0);
-            _ccnxPingClient_DisplayStatistics(client);
+        case CCNxVPNConsumerMode_All:
+            _ccnxVPN_RunVPN(client, mediumNumberOfVPNs, 0);
+            _ccnxVPN_DisplayStatistics(client);
 
-            ccnxPingStats_Release(&client->stats);
-            client->stats = ccnxPingStats_Create();
+            ccnxVPNStats_Release(&client->stats);
+            client->stats = ccnxVPNStats_Create();
 
-            _ccnxPingClient_RunPing(client, smallNumberOfPings, ccnxPing_DefaultReceiveTimeoutInUs);
-            _ccnxPingClient_DisplayStatistics(client);
+            _ccnxVPN_RunVPN(client, smallNumberOfVPNs, ccnxVPN_DefaultReceiveTimeoutInUs);
+            _ccnxVPN_DisplayStatistics(client);
             break;
-        case CCNxPingClientMode_Flood:
-            _ccnxPingClient_RunPing(client, client->count, 0);
-            _ccnxPingClient_DisplayStatistics(client);
+        case CCNxVPNConsumerMode_Flood:
+            _ccnxVPN_RunVPN(client, client->count, 0);
+            _ccnxVPN_DisplayStatistics(client);
             break;
-        case CCNxPingClientMode_PingPong:
-            _ccnxPingClient_RunPing(client, client->count, client->intervalInMs * 1000);
-            _ccnxPingClient_DisplayStatistics(client);
+        case CCNxVPNConsumerMode_VPNPong:
+            _ccnxVPN_RunVPN(client, client->count, client->intervalInMs * 1000);
+            _ccnxVPN_DisplayStatistics(client);
             break;
-        case CCNxPingClientMode_None:
+        case CCNxVPNConsumerMode_None:
         default:
             fprintf(stderr, "Error, unknown mode");
             break;
@@ -402,14 +402,14 @@ main(int argc, char *argv[argc])
 {
     parcSecurity_Init();
 
-    CCNxPingClient *client = ccnxPingClient_Create();
+    CCNxVPNConsumer *client = ccnxVPN_Create();
 
-    bool runPing = _ccnxPingClient_ParseCommandline(client, argc, argv);
-    if (runPing) {
-        _ccnxPingClient_RunPingormanceTest(client);
+    bool runVPN = _ccnxVPN_ParseCommandline(client, argc, argv);
+    if (runVPN) {
+        _ccnxVPN_RunVPNPerformanceTest(client);
     }
 
-    ccnxPingClient_Release(&client);
+    ccnxVPN_Release(&client);
 
     parcSecurity_Fini();
 

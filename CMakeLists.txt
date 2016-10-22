@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-project(ccnxPing)
+project(ccnxVPN)
 include( CTest )
 
 set(CMAKE_C_STANDARD 99)
@@ -13,25 +13,27 @@ set(CCNX_LIBRARIES longbow longbow-ansiterm parc ccnx_common ccnx_api_portal ccn
 
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
-set(CCNX_PING_CLIENT_SOURCE_FILES
-        ccnxPing_Client.c
-        ccnxPing_Common.c
-        ccnxPing_Stats.c)
+set(CONSUMER_SOURCES
+        consumer/ccnxVPN_Consumer.c
+        ccnxVPN_Common.c
+        ccnxVPN_Stats.c)
 
-set(CCNX_PING_SERVER_SOURCE_FILES
-        ccnxPing_Server.c
-        ccnxPing_Common.c)
+set(PRODUCER_SOURCES
+        producer/ccnxVPN_Producer.c
+        ccnxVPN_Common.c)
 
 include_directories(${CCNX_HOME}/include)
 
 link_directories(${CCNX_HOME}/lib)
 
-add_executable(ccnxPing_Client ${CCNX_PING_CLIENT_SOURCE_FILES})
-target_link_libraries(ccnxPing_Client ${CCNX_LIBRARIES})
-install(TARGETS ccnxPing_Client RUNTIME DESTINATION bin)
+add_executable(ccnxVPN_Client ${CONSUMER_SOURCES})
+target_link_libraries(ccnxVPN_Client ${CCNX_LIBRARIES})
+install(TARGETS ccnxVPN_Client RUNTIME DESTINATION bin)
 
-add_executable(ccnxPing_Server ${CCNX_PING_SERVER_SOURCE_FILES})
-target_link_libraries(ccnxPing_Server ${CCNX_LIBRARIES})
-install(TARGETS ccnxPing_Server RUNTIME DESTINATION bin)
+add_executable(ccnxVPN_Server ${PRODUCER_SOURCES})
+target_link_libraries(ccnxVPN_Server ${CCNX_LIBRARIES})
+install(TARGETS ccnxVPN_Server RUNTIME DESTINATION bin)
+
+add_subdirectory(gateway)
 
 add_test(EmptyTest, echo "OK")

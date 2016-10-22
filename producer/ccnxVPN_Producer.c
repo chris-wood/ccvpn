@@ -72,15 +72,15 @@
 #include <ccnx/api/ccnx_Portal/ccnx_Portal.h>
 #include <ccnx/api/ccnx_Portal/ccnx_PortalRTA.h>
 
-#include "ccnxPing_Common.h"
+#include "../ccnxVPN_Common.h"
 
 typedef struct ccnx_ping_server {
     CCNxPortal *portal;
     CCNxName *prefix;
     size_t payloadSize;
 
-    uint8_t generalPayload[ccnxPing_MaxPayloadSize];
-} CCNxPingServer;
+    uint8_t generalPayload[ccnxVPN_MaxPayloadSize];
+} CCNxVPNServer;
 
 /**
  * Create a new CCNxPortalFactory instance using a randomly generated identity saved to
@@ -95,16 +95,16 @@ _setupServerPortalFactory(void)
     const char *keystorePassword = "keystore_password";
     const char *subjectName = "server";
 
-    return ccnxPingCommon_SetupPortalFactory(keystoreName, keystorePassword, subjectName);
+    return ccnxVPNCommon_SetupPortalFactory(keystoreName, keystorePassword, subjectName);
 }
 
 /**
- * Release the references held by the `CCNxPingClient`.
+ * Release the references held by the `CCNxVPNClient`.
  */
 static bool
-_ccnxPingServer_Destructor(CCNxPingServer **serverPtr)
+_ccnxVPNServer_Destructor(CCNxVPNServer **serverPtr)
 {
-    CCNxPingServer *server = *serverPtr;
+    CCNxVPNServer *server = *serverPtr;
     if (server->portal != NULL) {
         ccnxPortal_Release(&(server->portal));
     }
@@ -114,22 +114,22 @@ _ccnxPingServer_Destructor(CCNxPingServer **serverPtr)
     return true;
 }
 
-parcObject_Override(CCNxPingServer, PARCObject,
-                    .destructor = (PARCObjectDestructor *) _ccnxPingServer_Destructor);
+parcObject_Override(CCNxVPNServer, PARCObject,
+                    .destructor = (PARCObjectDestructor *) _ccnxVPNServer_Destructor);
 
-parcObject_ImplementAcquire(ccnxPingServer, CCNxPingServer);
-parcObject_ImplementRelease(ccnxPingServer, CCNxPingServer);
+parcObject_ImplementAcquire(ccnxVPNServer, CCNxVPNServer);
+parcObject_ImplementRelease(ccnxVPNServer, CCNxVPNServer);
 
 /**
- * Create a new empty `CCNxPingServer` instance.
+ * Create a new empty `CCNxVPNServer` instance.
  */
-static CCNxPingServer *
-ccnxPingServer_Create(void)
+static CCNxVPNServer *
+ccnxVPNServer_Create(void)
 {
-    CCNxPingServer *server = parcObject_CreateInstance(CCNxPingServer);
+    CCNxVPNServer *server = parcObject_CreateInstance(CCNxVPNServer);
 
-    server->prefix = ccnxName_CreateFromCString(ccnxPing_DefaultPrefix);
-    server->payloadSize = ccnxPing_DefaultPayloadSize;
+    server->prefix = ccnxName_CreateFromCString(ccnxVPN_DefaultPrefix);
+    server->payloadSize = ccnxVPN_DefaultPayloadSize;
 
     return server;
 }
@@ -138,17 +138,17 @@ ccnxPingServer_Create(void)
  * Create a `PARCBuffer` payload of the server-configured size.
  */
 PARCBuffer *
-_ccnxPingServer_MakePayload(CCNxPingServer *server, int size)
+_ccnxVPNServer_MakePayload(CCNxVPNServer *server, int size)
 {
     PARCBuffer *payload = parcBuffer_Wrap(server->generalPayload, size, 0, size);
     return payload;
 }
 
 /**
- * Run the `CCNxPingServer` indefinitely.
+ * Run the `CCNxVPNServer` indefinitely.
  */
 static void
-_ccnxPingServer_Run(CCNxPingServer *server)
+_ccnxVPNServer_Run(CCNxVPNServer *server)
 {
     CCNxPortalFactory *factory = _setupServerPortalFactory();
     server->portal = ccnxPortalFactory_CreatePortal(factory, ccnxPortalRTA_Message);
@@ -175,9 +175,9 @@ _ccnxPingServer_Run(CCNxPingServer *server)
                 CCNxNameSegment *sizeSegment = ccnxName_GetSegment(interestName, sizeIndex);
                 char *segmentString = ccnxNameSegment_ToString(sizeSegment);
                 int size = atoi(segmentString);
-                size = size > ccnxPing_MaxPayloadSize ? ccnxPing_MaxPayloadSize : size;
+                size = size > ccnxVPN_MaxPayloadSize ? ccnxVPN_MaxPayloadSize : size;
 
-                PARCBuffer *payload = _ccnxPingServer_MakePayload(server, size);
+                PARCBuffer *payload = _ccnxVPNServer_MakePayload(server, size);
 
                 CCNxContentObject *contentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, payload);
                 CCNxMetaMessage *message = ccnxMetaMessage_CreateFromContentObject(contentObject);
@@ -201,25 +201,25 @@ _ccnxPingServer_Run(CCNxPingServer *server)
 static void
 _displayUsage(char *progName)
 {
-    printf("CCNx Simple Ping Performance Test\n");
+    printf("CCNx Simple VPN Performance Test\n");
     printf("\n");
     printf("Usage: %s [-l locator] [-s size] \n", progName);
     printf("       %s -h\n", progName);
     printf("\n");
     printf("Example:\n");
-    printf("    ccnxPing_Server -l ccnx:/some/prefix -s 4096\n");
+    printf("    ccnxVPN_Server -l ccnx:/some/prefix -s 4096\n");
     printf("\n");
     printf("Options:\n");
     printf("     -h (--help) Show this help message\n");
     printf("     -l (--locator) Set the locator for this server. The default is 'ccnx:/locator'. \n");
-    printf("     -s (--size) Set the payload size (less than 64000 - see `ccnxPing_MaxPayloadSize` in ccnxPing_Common.h)\n");
+    printf("     -s (--size) Set the payload size (less than 64000 - see `ccnxVPN_MaxPayloadSize` in ccnxVPN_Common.h)\n");
 }
 
 /**
  * Parse the command lines to initialize the state of the
  */
 static bool
-_ccnxPingServer_ParseCommandline(CCNxPingServer *server, int argc, char *argv[argc])
+_ccnxVPNServer_ParseCommandline(CCNxVPNServer *server, int argc, char *argv[argc])
 {
     static struct option longopts[] = {
         { "locator", required_argument, NULL, 'l' },
@@ -229,7 +229,7 @@ _ccnxPingServer_ParseCommandline(CCNxPingServer *server, int argc, char *argv[ar
     };
 
     // Default value
-    server->payloadSize = ccnxPing_MaxPayloadSize;
+    server->payloadSize = ccnxVPN_MaxPayloadSize;
 
     int c;
     while ((c = getopt_long(argc, argv, "l:s:h", longopts, NULL)) != -1) {
@@ -239,7 +239,7 @@ _ccnxPingServer_ParseCommandline(CCNxPingServer *server, int argc, char *argv[ar
                 break;
             case 's':
                 sscanf(optarg, "%zu", &(server->payloadSize));
-                if (server->payloadSize > ccnxPing_MaxPayloadSize) {
+                if (server->payloadSize > ccnxVPN_MaxPayloadSize) {
                     _displayUsage(argv[0]);
                     return false;
                 }
@@ -260,14 +260,14 @@ main(int argc, char *argv[argc])
 {
     parcSecurity_Init();
 
-    CCNxPingServer *server = ccnxPingServer_Create();
-    bool runServer = _ccnxPingServer_ParseCommandline(server, argc, argv);
+    CCNxVPNServer *server = ccnxVPNServer_Create();
+    bool runServer = _ccnxVPNServer_ParseCommandline(server, argc, argv);
 
     if (runServer) {
-        _ccnxPingServer_Run(server);
+        _ccnxVPNServer_Run(server);
     }
 
-    ccnxPingServer_Release(&server);
+    ccnxVPNServer_Release(&server);
 
     parcSecurity_Fini();
 
