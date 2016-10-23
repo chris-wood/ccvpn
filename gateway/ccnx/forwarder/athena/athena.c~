@@ -130,7 +130,8 @@ Athena *
 athena_Create(size_t contentStoreSizeInMB)
 {
 	if(sodium_init()==-1){
-		return 1;
+		printf("Crypto lib sodium not available");
+		exit(1);
 	}
 		
     Athena *athena = parcObject_CreateAndClearInstance(Athena);
@@ -280,25 +281,33 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
 			//Retrieving the recipient (Gateway 2) public key
 			PARCBuffer *keyBuffer = athenaKeyVector_GetKey(vector);
+			char *recipient_pk;
 			if (keyBuffer!=NULL){
-				char *recipient_pk = parcBuffer_ToString(keyBuffer);
+				recipient_pk = parcBuffer_ToString(keyBuffer);
 			}
 			
-			//TODO: Corvert the interest to a byteStream.
-			char* interestByteStream = ...
+			// TODO: Corvert the interest to a byteStream.
+			const char *name = ccnxName_ToString(ccnxName);
+			// Would that work?
+
+			const char* interestByteStream = name;
 			int interestLen = sizeof(interestByteStream);
-		
+			printf("Interest len: %d\n",interestLen);
 
 			//Generating Random Symmetric Key
+			if (crypto_aead_aes256gcm_is_available() == 0) {
+				printf("aead_aes256gcm not available!");
+				exit(1);
+			}
 			unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
 			int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
-			randombytes_buf(key, sizeof key);
+			randombytes_buf(symmetricKey, sizeof symmetricKey);
 			
 
 			//Creating a plaintext to be encrypted: "interestBytes|SymKeyBytes"
 			int plainTextLen = interestLen+symmetricKeyLen;
 			unsigned char plainText[plainTextLen];
-			plaintext[0] = '\0'
+			plainText[0] = '\0'
 			strcat(plainText,interestByteStream);
 			strcat(plainText,symmetricKey);
 
