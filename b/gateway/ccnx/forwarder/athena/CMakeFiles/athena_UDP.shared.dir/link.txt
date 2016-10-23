@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC  -Wall  -shared -Wl,-soname,libathena_UDP.so.1 -o libathena_UDP.so.1.0 CMakeFiles/athena_UDP.shared.dir/athena_Fragmenter.c.o CMakeFiles/athena_UDP.shared.dir/athena_TransportLinkModuleUDP.c.o  -L/home/ivan/Desktop/projects/CCNx_Distillery/usr/lib -lm -Wl,-rpath,/home/ivan/Desktop/projects/CCNx_Distillery/usr/lib: 

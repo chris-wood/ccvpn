@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC  -Wall  -shared -Wl,-soname,libathena_Fragmenter_BEFS.so.1 -o libathena_Fragmenter_BEFS.so.1.0 CMakeFiles/athena_Fragmenter_BEFS.shared.dir/athena_TransportLinkModuleFragmenter_BEFS.c.o  -L/home/ivan/Desktop/projects/CCNx_Distillery/usr/lib -lm -Wl,-rpath,/home/ivan/Desktop/projects/CCNx_Distillery/usr/lib: 

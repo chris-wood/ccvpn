@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC  -Wall  -shared -Wl,-soname,libathena_TCP.so.1 -o libathena_TCP.so.1.0 CMakeFiles/athena_TCP.shared.dir/athena_TransportLinkModuleTCP.c.o  -L/home/ivan/Desktop/projects/CCNx_Distillery/usr/lib -lm -Wl,-rpath,/home/ivan/Desktop/projects/CCNx_Distillery/usr/lib: 

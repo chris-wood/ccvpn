@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC  -Wall  -shared -Wl,-soname,libathena_TEMPLATE.so.1 -o libathena_TEMPLATE.so.1.0 CMakeFiles/athena_TEMPLATE.shared.dir/athena_TransportLinkModuleTEMPLATE.c.o  -L/home/ivan/Desktop/projects/CCNx_Distillery/usr/lib -lm -Wl,-rpath,/home/ivan/Desktop/projects/CCNx_Distillery/usr/lib: 
