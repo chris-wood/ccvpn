@@ -159,6 +159,7 @@ void athenaPIT_Release(AthenaPIT **athenaPIT);
  * @param [in] athenaPIT
  * @param [in] ccnxInterestMessage
  * @param [in] ingressVector
+ * @param [in] encapKey
  * @param [out] expectedReturnVector
  * @return AthenaPITResolution_Aggregated if aggregated, AthenaPITResolution_Forward if it needs to be forwarded, AthenaPITResolution_Error on error.
  *
@@ -172,6 +173,7 @@ void athenaPIT_Release(AthenaPIT **athenaPIT);
 AthenaPITResolution athenaPIT_AddInterest(AthenaPIT *athenaPIT,
                                           const CCNxInterest *ccnxInterestMessage,
                                           const PARCBitVector *ingressVector,
+                                          PARCBuffer *encapKey,
                                           PARCBitVector **expectedReturnVector);
 
 /**

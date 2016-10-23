@@ -219,7 +219,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     //
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution result;
-    if ((result = athenaPIT_AddInterest(athena->athenaPIT, interest, ingressVector, &expectedReturnVector)) != AthenaPITResolution_Forward) {
+    if ((result = athenaPIT_AddInterest(athena->athenaPIT, interest, ingressVector, NULL, &expectedReturnVector)) != AthenaPITResolution_Forward) {
         if (result == AthenaPITResolution_Error) {
             parcLog_Error(athena->log, "PIT resolution error");
         }
