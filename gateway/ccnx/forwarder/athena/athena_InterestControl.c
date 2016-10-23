@@ -549,7 +549,7 @@ _FIB_Command(Athena *athena, CCNxInterest *interest, PARCBitVector *ingress)
 
             int result = false;
             if (strcasecmp(command, AthenaCommand_Add) == 0) {
-                result = athenaFIB_AddRoute(athena->athenaFIB, prefixName, linkVector);
+                result = athenaFIB_AddRoute(athena->athenaFIB, prefixName, NULL, linkVector);
             } else if (strcasecmp(command, AthenaCommand_Remove) == 0) {
                 result = athenaFIB_DeleteRoute(athena->athenaFIB, prefixName, linkVector);
             }

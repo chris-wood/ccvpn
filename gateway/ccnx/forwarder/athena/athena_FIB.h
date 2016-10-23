@@ -84,12 +84,23 @@ struct athena_FIB;
 typedef struct athena_FIB AthenaFIB;
 
 /**
+ * @typedef AthenaKeyVector
+ * @brief A tuple of a bit vector and (serialized) key
+ */
+struct key_vector;
+typedef struct key_vector AthenaKeyVector;
+
+/**
  * @typedef AthenaFIBEntry
  * @brief FIB table entry, vector of links to forward to
  */
 struct athena_FIB_list_entry;
 typedef struct athena_FIB_list_entry AthenaFIBListEntry;
 
+PARCBitVector *athenaKeyVector_GetVector(AthenaKeyVector *vector);
+PARCBuffer *athenaKeyVector_GetKey(AthenaKeyVector *vector);
+void athenaKeyVector_Release(AthenaKeyVector **vectorP);
+AthenaKeyVector *athenaKeyVector_Acquire(const AthenaKeyVector *vector);
 
 CCNxName *athenaFIBListEntry_GetName(AthenaFIBListEntry *entry);
 
@@ -163,7 +174,7 @@ bool athenaFIB_RemoveLink(AthenaFIB *athenaFIB, const PARCBitVector *ccnxLinkVec
  * @param [in] athenaFIB
  * @param [in] ccnxMessage
  * @param [in] ingressVector origin of message
- * @return vector of links to send message out on
+ * @return a key vector (optional key and vector indicating links to send message on)
  *
  * Example:
  * @code
@@ -174,7 +185,7 @@ bool athenaFIB_RemoveLink(AthenaFIB *athenaFIB, const PARCBitVector *ccnxLinkVec
  * }
  * @endcode
  */
-PARCBitVector *athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBitVector *ingressVector);
+AthenaKeyVector *athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBitVector *ingressVector);
 
 /**
  * @abstract add route to FIB
@@ -182,6 +193,7 @@ PARCBitVector *athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName, 
  *
  * @param [in] athenaFIB
  * @param [in] ccnxName
+ * @param [in] key
  * @param [in] ccnxLinkVector
  * @return true if successful
  *
@@ -199,7 +211,7 @@ PARCBitVector *athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName, 
  * }
  * @endcode
  */
-bool athenaFIB_AddRoute(AthenaFIB *athenaFIB, const CCNxName *ccnxName, const PARCBitVector *ccnxLinkVector);
+bool athenaFIB_AddRoute(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBuffer *key, const PARCBitVector *ccnxLinkVector);
 
 /**
  * @abstract remove route to link from FIB

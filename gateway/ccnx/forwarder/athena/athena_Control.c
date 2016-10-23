@@ -111,7 +111,7 @@ athenaControl(Athena *athena, CCNxControl *control, PARCBitVector *ingressVector
             if (operation == CPI_REGISTER_PREFIX) {
                 parcLog_Debug(athena->log, "Adding %s route to interface %d",
                               prefixString, interface);
-                commandResult = athenaFIB_AddRoute(athena->athenaFIB, prefix, egressVector);
+                commandResult = athenaFIB_AddRoute(athena->athenaFIB, prefix, NULL, egressVector);
                 if (!commandResult) {
                     parcLog_Warning(athena->log, "Unable to add route %s to interface %d",
                                     prefixString, interface);

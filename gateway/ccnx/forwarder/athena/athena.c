@@ -240,7 +240,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     //         non-local interface so we need not check that here.
     //
     ccnxName = ccnxInterest_GetName(interest);
-    PARCBitVector *egressVector = athenaFIB_Lookup(athena->athenaFIB, ccnxName, ingressVector);
+    AthenaKeyVector *vector = athenaFIB_Lookup(athena->athenaFIB, ccnxName, ingressVector);
+    PARCBitVector *egressVector = NULL;
+    if (vector != NULL) {
+        egressVector = athenaKeyVector_GetVector(vector);
+    }
 
     if (egressVector != NULL) {
         // If no links are in the egress vector the FIB returned, return a no route interest message
@@ -265,6 +269,10 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             }
         } else {
             parcBitVector_SetVector(expectedReturnVector, egressVector);
+
+            // XXX caw: if the vector's key is not null, encrypt the interest under that key
+            // XXX caw: we also need to move the PIT insertion to *after* this step. (it's above at line 222 right now.)
+
             PARCBitVector *failedLinks =
                 athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, interest, egressVector);
 
