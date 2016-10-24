@@ -320,6 +320,9 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
 			//TODO: Create the new interest, something like: strcat("/domain/2/",ciphertext);
 
+			/*
+
+			*/
 			printf("Ivan's code ends here\n");
 
 

@@ -307,7 +307,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 			//Creating a plaintext to be encrypted: "interestBytes|SymKeyBytes"
 			int plainTextLen = interestLen+symmetricKeyLen;
 			unsigned char plainText[plainTextLen];
-			plainText[0] = '\0'
+			plainText[0] = '\0';
 			strcat(plainText,interestByteStream);
 			strcat(plainText,symmetricKey);
 
@@ -320,6 +320,12 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
 			//TODO: Create the new interest, something like: strcat("/domain/2/",ciphertext);
 
+			/*
+			char gateway2Name[] = "/domain/2/"
+			char newName[sizeof(gateway2Name)+cyphertextLen];
+			
+			CCNxInterest *newInterest = ccnxInterest_CreateSimple(name);
+			*/
 			printf("Ivan's code ends here\n");
 
 
