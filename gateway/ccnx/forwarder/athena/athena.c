@@ -133,7 +133,7 @@ athena_Create(size_t contentStoreSizeInMB)
 		printf("Crypto lib sodium not available");
 		exit(1);
 	}
-		
+
     Athena *athena = parcObject_CreateAndClearInstance(Athena);
 
     athena->athenaName = ccnxName_CreateFromCString(CCNxNameAthena_Forwarder);
@@ -285,7 +285,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 			if (keyBuffer!=NULL){
 				recipient_pk = parcBuffer_ToString(keyBuffer);
 			}
-			
+
 			// TODO: Corvert the interest to a byteStream.
 			const char *name = ccnxName_ToString(ccnxName);
 			// Would that work?
@@ -302,7 +302,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 			unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
 			int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
 			randombytes_buf(symmetricKey, sizeof symmetricKey);
-			
+
 
 			//Creating a plaintext to be encrypted: "interestBytes|SymKeyBytes"
 			int plainTextLen = interestLen+symmetricKeyLen;
