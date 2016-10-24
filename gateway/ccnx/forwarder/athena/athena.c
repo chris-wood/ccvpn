@@ -321,7 +321,13 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 			//TODO: Create the new interest, something like: strcat("/domain/2/",ciphertext);
 
 			/*
+			char namePrefix[] = "/domain/2/"
+			char newName[cyphertextLen+sizeof(namePrefix)];
+			newName[0]='\0'
+			strcat(newName,namePrefix);
+			strcat(newName,ciphertext);
 
+			CCNxName *ccnx_newName =  ccnxName_CreateFromCString(newName);
 			*/
 			printf("Ivan's code ends here\n");
 
