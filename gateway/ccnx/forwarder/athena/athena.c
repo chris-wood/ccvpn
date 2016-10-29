@@ -282,14 +282,19 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 			//Retrieving the recipient (Gateway 2) public key
 			PARCBuffer *keyBuffer = athenaKeyVector_GetKey(vector);
 			char *recipient_pk;
-			if (keyBuffer!=NULL){
-				recipient_pk = parcBuffer_ToString(keyBuffer);
+//			if (keyBuffer!=NULL){
+			if (1){	//temporary
+				//recipient_pk = parcBuffer_ToString(keyBuffer);
+									
+				unsigned char recipient_pk[crypto_sign_PUBLICKEYBYTES];	//temporary
+				unsigned char recipient_sk[crypto_sign_SECRETKEYBYTES];	//temporary
+				crypto_sign_keypair(recipient_pk, recipient_sk);  //temporary
+
 
 				// TODO: Corvert the interest to a byteStream.
-				const char *name = ccnxName_ToString(ccnxName);
+				char* interestByteStream = ccnxName_ToString(ccnxName);
 				// Would that work?
 
-				const char* interestByteStream = name;
 				int interestLen = sizeof(interestByteStream);
 				printf("Interest len: %d\n",interestLen);
 
