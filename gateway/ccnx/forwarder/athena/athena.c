@@ -277,69 +277,63 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         } else {
             parcBitVector_SetVector(expectedReturnVector, egressVector);
 
-			printf("Ivan's code starts here\n");
-
-			//Retrieving the recipient (Gateway 2) public key
-			PARCBuffer *keyBuffer = athenaKeyVector_GetKey(vector);
-			char *recipient_pk;
-//			if (keyBuffer!=NULL){
-			if (1){	//temporary
-				//recipient_pk = parcBuffer_ToString(keyBuffer);
-									
-				unsigned char recipient_pk[crypto_sign_PUBLICKEYBYTES];	//temporary
-				unsigned char recipient_sk[crypto_sign_SECRETKEYBYTES];	//temporary
-				crypto_sign_keypair(recipient_pk, recipient_sk);  //temporary
-
-
-				// TODO: Corvert the interest to a byteStream.
-				char* interestByteStream = ccnxName_ToString(ccnxName);
-				// Would that work?
-
-				int interestLen = sizeof(interestByteStream);
-				printf("Interest len: %d\n",interestLen);
-
-				//Generating Random Symmetric Key
-				if (crypto_aead_aes256gcm_is_available() == 0) {
-					printf("aead_aes256gcm not available!");
-					exit(1);
-				}
-				unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
-				int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
-				randombytes_buf(symmetricKey, sizeof symmetricKey);
-
-
-				//Creating a plaintext to be encrypted: "interestBytes|SymKeyBytes"
-				int plainTextLen = interestLen+symmetricKeyLen;
-				unsigned char plainText[plainTextLen];
-				plainText[0] = '\0';
-				strcat(plainText,interestByteStream);
-				strcat(plainText,symmetricKey);
-
-				// Cyphertext buffer
-				int cyphertextLen = crypto_box_SEALBYTES + plainTextLen;
-				unsigned char ciphertext[cyphertextLen];
-
-				//Encrypting with gateway 2 public key.
-				crypto_box_seal(ciphertext, plainText, plainTextLen, recipient_pk);
-
-				//Creating the new interest, something like: ("/domain/2/"|ciphertext);
-
-				char namePrefix[] = "/domain/2/";
-				char newName[cyphertextLen+sizeof(namePrefix)];
-				newName[0]='\0';
-				strcat(newName,namePrefix);
-				strcat(newName,ciphertext);
-
-				CCNxName *ccnx_newName =  ccnxName_CreateFromCString(newName);
-				CCNxInterest *newInterest = ccnxInterest_CreateSimple(ccnx_newName);
-
-				//TODO: Add newInterest to PIT
-				//TODO: Forward Interest
-			}else{
-				printf("No key in the buffer!\n");	
-			}
-			printf("Ivan's code ends here\n");
-
+			// printf("Ivan's code starts here\n");
+            //
+			// // Retrieving the recipient (Gateway 2) public key
+			// PARCBuffer *keyBuffer = athenaKeyVector_GetKey(vector);
+			// if (keyBuffer != NULL) {
+			// // if (1){	//temporary
+			// 	//recipient_pk = parcBuffer_ToString(keyBuffer);
+			// 	unsigned char recipient_pk[crypto_sign_PUBLICKEYBYTES];	//temporary
+			// 	unsigned char recipient_sk[crypto_sign_SECRETKEYBYTES];	//temporary
+			// 	crypto_sign_keypair(recipient_pk, recipient_sk);  //temporary
+            //
+            //
+			// 	// TODO: Corvert the interest to a byteStream.
+			// 	char* interestByteStream = ccnxName_ToString(ccnxName);
+			// 	// Would that work?
+            //
+			// 	int interestLen = sizeof(interestByteStream);
+			// 	printf("Interest len: %d\n",interestLen);
+            //
+			// 	//Generating Random Symmetric Key
+			// 	if (crypto_aead_aes256gcm_is_available() == 0) {
+			// 		printf("aead_aes256gcm not available!");
+			// 		exit(1);
+			// 	}
+			// 	unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
+			// 	int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
+			// 	randombytes_buf(symmetricKey, sizeof symmetricKey);
+            //
+            //
+			// 	//Creating a plaintext to be encrypted: "interestBytes|SymKeyBytes"
+			// 	int plainTextLen = interestLen+symmetricKeyLen;
+			// 	unsigned char plainText[plainTextLen];
+			// 	plainText[0] = '\0';
+			// 	strcat(plainText,interestByteStream);
+			// 	strcat(plainText,symmetricKey);
+            //
+			// 	// Cyphertext buffer
+			// 	int cyphertextLen = crypto_box_SEALBYTES + plainTextLen;
+			// 	unsigned char ciphertext[cyphertextLen];
+            //
+			// 	//Encrypting with gateway 2 public key.
+			// 	crypto_box_seal(ciphertext, plainText, plainTextLen, recipient_pk);
+            //
+			// 	//Creating the new interest, something like: ("/domain/2/"|ciphertext);
+            //
+			// 	char namePrefix[] = "/domain/2/";
+			// 	char newName[cyphertextLen+sizeof(namePrefix)];
+			// 	newName[0]='\0';
+			// 	strcat(newName,namePrefix);
+			// 	strcat(newName,ciphertext);
+            //
+			// 	CCNxName *ccnx_newName =  ccnxName_CreateFromCString(newName);
+			// 	CCNxInterest *newInterest = ccnxInterest_CreateSimple(ccnx_newName);
+            //
+			// 	//TODO: Add newInterest to PIT
+			// 	//TODO: Forward Interest
+			// }
 
             // XXX caw: if the vector's key is not null, encrypt the interest under that key
             // XXX caw: we also need to move the PIT insertion to *after* this step. (it's above at line 222 right now.)
@@ -352,7 +346,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 parcBitVector_Release(&failedLinks);
             }
         }
-        parcBitVector_Release(&egressVector);
+        athenaKeyVector_Release(&vector);
     } else {
         // No FIB entry found, return a NoRoute interest return and remove the entry from the PIT.
 

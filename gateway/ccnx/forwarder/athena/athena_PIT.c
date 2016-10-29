@@ -219,7 +219,7 @@ _athenaPITEntry_Create(const PARCBuffer *key,
         entry->ccnxMessage = ccnxMetaMessage_Acquire(message);
         entry->ingress = parcBitVector_Copy(ingress);
         entry->egress = parcBitVector_Acquire(egress);
-        entry->encapKey = parcBuffer_Acquire(encapKey);
+        entry->encapKey = encapKey == NULL ? NULL : parcBuffer_Acquire(encapKey);
         entry->expiration = _time_Create(expiration);
         entry->creationTime = _time_Create(creationTime);
     }

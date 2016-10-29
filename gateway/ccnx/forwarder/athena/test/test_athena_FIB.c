@@ -114,6 +114,7 @@ LONGBOW_TEST_FIXTURE(Global)
     LONGBOW_RUN_TEST_CASE(Global, athenaFIB_RemoveLink);
     LONGBOW_RUN_TEST_CASE(Global, athenaFIB_CreateEntryList);
     LONGBOW_RUN_TEST_CASE(Global, athenaFIB_ProcessMessage);
+
 //    LONGBOW_RUN_TEST_CASE(Global, athenaFIB_Equals);
 //    LONGBOW_RUN_TEST_CASE(Global, athenaFIB_NotEquals);
 //    LONGBOW_RUN_TEST_CASE(Global, athenaFIB_ToString);
@@ -194,8 +195,8 @@ LONGBOW_TEST_CASE(Global, athenaFIB_AddRoute)
 {
     TestData *data = longBowTestCase_GetClipBoardData(testCase);
 
-    athenaFIB_AddRoute(data->testFIB, data->testName1, NULL, data->testVector1);
-    athenaFIB_AddRoute(data->testFIB, data->testName1, NULL, data->testVector1);
+    assertTrue(athenaFIB_AddRoute(data->testFIB, data->testName1, NULL, data->testVector1), "Failed to add a route");
+    assertTrue(athenaFIB_AddRoute(data->testFIB, data->testName1, NULL, data->testVector1), "Failed to add a route");
 }
 
 LONGBOW_TEST_CASE(Global, athenaFIB_Lookup)
@@ -288,7 +289,7 @@ LONGBOW_TEST_CASE(Global, athenaFIB_DeleteRoute)
     assertNotNull(vector, "Lookup result NULL");
     PARCBitVector *result = athenaKeyVector_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector12), "Expected lookup to equal test vector");
-    // athenaKeyVector_Release(&vector);
+    athenaKeyVector_Release(&vector);
 
     res = athenaFIB_DeleteRoute(data->testFIB, data->testName1, data->testVector1);
     assertTrue(res, "Expected delete of route to succeed (res=%d)", res);
@@ -296,7 +297,7 @@ LONGBOW_TEST_CASE(Global, athenaFIB_DeleteRoute)
     assertNotNull(vector, "2nd Lookup result NULL");
     result = athenaKeyVector_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector2), "Expected lookup to equal test vector");
-    // athenaKeyVector_Release(&vector);
+    athenaKeyVector_Release(&vector);
 
     res = athenaFIB_DeleteRoute(data->testFIB, data->testName1, data->testVector1);
     assertFalse(res, "Expected delete of same route to fail");
@@ -304,7 +305,7 @@ LONGBOW_TEST_CASE(Global, athenaFIB_DeleteRoute)
     assertNotNull(vector, "3rd Lookup result NULL");
     result = athenaKeyVector_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector2), "Expected lookup to equal test vector");
-    // athenaKeyVector_Release(&vector);
+    athenaKeyVector_Release(&vector);
 
     res = athenaFIB_DeleteRoute(data->testFIB, data->testName1, data->testVector12);
     assertTrue(res, "Expected delete of route to succeed");
