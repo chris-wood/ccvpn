@@ -21,6 +21,8 @@ int main(){
 	randombytes_buf(key, sizeof key);
 	randombytes_buf(nonce, sizeof nonce);
 
+    printf("Key size: %zu, Nonce size: %zu\n", sizeof(key), sizeof(nonce));
+
 	crypto_aead_aes256gcm_encrypt(ciphertext, &ciphertext_len,
 		                          MESSAGE, MESSAGE_LEN,
 		                          ADDITIONAL_DATA, ADDITIONAL_DATA_LEN,

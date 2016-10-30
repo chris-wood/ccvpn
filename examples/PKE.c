@@ -11,6 +11,8 @@ int main(){
 	unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
 	crypto_box_keypair(recipient_pk, recipient_sk);
 
+    printf("Public key size %zu, private key size %zu\n", sizeof(recipient_pk), sizeof(recipient_sk));
+
 	/* Anonymous sender encrypts a message using an ephemeral key pair
 	 * and the recipient's public key */
 	unsigned char ciphertext[CIPHERTEXT_LEN];
