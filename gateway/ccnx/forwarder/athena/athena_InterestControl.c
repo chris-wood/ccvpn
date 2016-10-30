@@ -83,6 +83,8 @@
 
 #include <ccnx/api/control/controlPlaneInterface.h>
 
+#include <parc/algol/parc_JSON.h>
+
 #include "athena_About.h"
 
 static char *
@@ -515,11 +517,12 @@ _FIB_Command(Athena *athena, CCNxInterest *interest, PARCBitVector *ingress)
 
             char linkName[MAXPATHLEN];
             char prefix[MAXPATHLEN];
+            char jsonCommand[MAXPATHLEN * 1024]; // much bigger than what's probably needed
             PARCBitVector *linkVector;
 
             // {Add,Remove} Route arguments "<prefix> [<linkName>]", if linkName not specified, use the incoming link id ([de-]registration)
-            int numberOfArguments = sscanf(arguments, "%s %s", prefix, linkName);
-            if (numberOfArguments == 2) {
+            int numberOfArguments = sscanf(arguments, "%s %s %s", prefix, linkName, jsonCommand);
+            if (numberOfArguments == 2 || numberOfArguments == 3) {
                 int linkId = athenaTransportLinkAdapter_LinkNameToId(athena->athenaTransportLinkAdapter, linkName);
                 if (linkId == -1) {
                     responseMessage = _create_response(athena, ccnxName, "Unknown linkName %s", linkName);
@@ -548,10 +551,38 @@ _FIB_Command(Athena *athena, CCNxInterest *interest, PARCBitVector *ingress)
             }
 
             int result = false;
-            if (strcasecmp(command, AthenaCommand_Add) == 0) {
-                result = athenaFIB_AddRoute(athena->athenaFIB, prefixName, NULL, linkVector);
-            } else if (strcasecmp(command, AthenaCommand_Remove) == 0) {
+            if (strcasecmp(command, AthenaCommand_Remove) == 0) {
                 result = athenaFIB_DeleteRoute(athena->athenaFIB, prefixName, linkVector);
+            } else if (strcasecmp(command, AthenaCommand_Add) == 0) {
+                PARCBuffer *keyBuffer = NULL;
+
+                // If there was a third argument, pull apart the values and build the key value
+                if (numberOfArguments == 3) {
+                    PARCJSON *jsonPayload = parcJSON_ParseString(jsonCommand);
+                    PARCJSONValue *keyJsonType = parcJSON_GetValueByName(jsonPayload, "key_type");
+                    PARCJSONValue *keyJsonValue = parcJSON_GetValueByName(jsonPayload, "key_value");
+
+                    if (keyJsonType == NULL || keyJsonValue == NULL) {
+                        responseMessage = _create_response(athena, ccnxName, "Please specify the key_type and key_value arguments in the JSON payload %s", prefix);
+                        parcMemory_Deallocate(&command);
+                        parcMemory_Deallocate(&arguments);
+                        parcBitVector_Release(&linkVector);
+                        return responseMessage;
+                    }
+
+                    PARCBuffer *keyValue = parcJSONValue_GetString(keyJsonValue);
+                    uint64_t keyType = (uint64_t) parcJSONValue_GetInteger(keyJsonType);
+
+                    PARCBuffer *keyBuffer = parcBuffer_Allocate(sizeof(keyType) + parcBuffer_Remaining(keyValue));
+                    parcBuffer_PutUint64(keyBuffer, keyType);
+                    parcBuffer_PutBuffer(keyBuffer, keyValue);
+
+                    parcBuffer_Flip(keyBuffer);
+
+                    printf("key buffer: %s\n", parcBuffer_ToHexString(keyBuffer));
+                }
+
+                result = athenaFIB_AddRoute(athena->athenaFIB, prefixName, keyBuffer, linkVector);
             }
 
             if (result == true) {

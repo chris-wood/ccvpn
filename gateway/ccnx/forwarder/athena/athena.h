@@ -123,6 +123,7 @@ typedef struct Athena {
 #define AthenaCommandSegment 3
 #define AthenaCommand_Lookup "lookup"
 #define AthenaCommand_Add    "add"
+#define AthenaCommand_Key    "key"
 #define AthenaCommand_List   "list"
 #define AthenaCommand_Remove "remove"
 #define AthenaCommand_Resize "resize"
@@ -146,6 +147,7 @@ typedef struct Athena {
 #define CCNxNameAthenaCommand_FIBLookup          CCNxNameAthena_FIB "/" AthenaCommand_Lookup                  // return current FIB contents for name in payload
 #define CCNxNameAthenaCommand_FIBList            CCNxNameAthena_FIB "/" AthenaCommand_List                    // list current FIB contents
 #define CCNxNameAthenaCommand_FIBAddRoute        CCNxNameAthena_FIB "/" AthenaCommand_Add                     // add route for arguments in payload
+#define CCNxNameAthenaCommand_FIBAddRouteWithKey CCNxNameAthenaCommand_FIBAddRoute "/" AthenaCommand_Key      // add route with key, arguments in payload
 #define CCNxNameAthenaCommand_FIBRemoveRoute     CCNxNameAthena_FIB "/" AthenaCommand_Remove                  // remove route for arguments in payload
 #define CCNxNameAthenaCommand_PITLookup          CCNxNameAthena_PIT "/" AthenaCommand_Lookup                  // return current PIT contents for name in payload
 #define CCNxNameAthenaCommand_PITList            CCNxNameAthena_PIT "/" AthenaCommand_List                    // list current PIT contents

@@ -253,7 +253,7 @@ static int
 _athenactl_AddRoute(PARCIdentity *identity, int argc, char **argv)
 {
     if (argc < 1) {
-        printf("usage: add route [<linkName>] <prefix>\n");
+        printf("usage: add route [<linkName>] <prefix> <keytype> <key>\n");
         return 1;
     }
 
@@ -263,17 +263,46 @@ _athenactl_AddRoute(PARCIdentity *identity, int argc, char **argv)
 
     char *linkName = NULL;
     char *prefix = NULL;
+    char *keyType = NULL;
+    char *keyValue = NULL;
 
     if (argc == 1) {
         prefix = argv[0];
-    } else {
+    } else if (argc == 2) {
         linkName = argv[0];
         prefix = argv[1];
+    } else if (argc == 4) {
+        linkName = argv[0];
+        prefix = argv[1];
+        keyType = argv[2];
+        keyValue = argv[3];
     }
 
     // passed in as <linkName> <prefix>, passed on as <prefix> <linkname>
     char routeArguments[MAXPATHLEN];
-    if (linkName) {
+    if (keyType && keyValue) {
+        PARCJSON *json = parcJSON_Create();
+
+        // Create the key type JSONPair
+        uint64_t keyNumber = atoi(keyType);
+        PARCJSONValue *value = parcJSONValue_CreateFromInteger(keyNumber);
+        parcJSON_AddValue(json, "key_type", value);
+        parcJSONValue_Release(&value);
+
+        // Create the key value JSONPair
+        PARCBuffer *keyBuffer = parcBuffer_AllocateCString(keyValue);
+        value = parcJSONValue_CreateFromString(keyBuffer);
+        parcJSON_AddValue(json, "key_value", value);
+        parcJSONValue_Release(&value);
+        parcBuffer_Release(&keyBuffer);
+
+        // Create the minimal JSON string
+        char *jsonString = parcJSON_ToCompactString(json);
+
+        sprintf(routeArguments, "%s %s %s", prefix, linkName, jsonString);
+
+        parcMemory_Deallocate(&jsonString);
+    } else if (linkName) {
         sprintf(routeArguments, "%s %s", prefix, linkName);
     } else {
         sprintf(routeArguments, "%s", prefix);
