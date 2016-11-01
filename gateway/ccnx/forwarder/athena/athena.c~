@@ -342,7 +342,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 					memcpy(newName+namePrefixLen,ciphertext, ciphertextLen);
 					//memcpy(newName+namePrefixLen+ciphertextLen,"\0", 1);
 
-					printf("New interest name: %*s\n",newNameLen,newName);
+					printf("New Interest: %*s\n",newNameLen,newName);
 					printf("len: %d\n",newNameLen);
 
 					printf("Creating the new interest by the name...\n");
