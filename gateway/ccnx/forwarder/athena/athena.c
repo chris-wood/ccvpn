@@ -308,18 +308,26 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 					int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
 					randombytes_buf(symmetricKey, sizeof symmetricKey);
 
+					//Converting symmetric key to Hex format
+					int i;
+					char symmHexBuf[symmetricKeyLen*2];
+					for (i=0;i<symmetricKeyLen;i++){
+						sprintf(symmHexBuf+i,"%02X", symmetricKey[i]);
+					}
 					printf("Created symmetric key for AEAD!\n");
+					printf("Symmetric key: 0x%s\n",symmHexBuf);
+						
 
 		        	//Creating a plaintext to be encrypted: "interestBytes|SymKeyBytes"
-					int plainTextLen = interestLen+symmetricKeyLen+1;
+					int plainTextLen = interestLen+symmetricKeyLen*2+1;
 					unsigned char plainText[plainTextLen];
 					memcpy(plainText,interestByteStream,interestLen);
 					memcpy(plainText+interestLen,"/",1);
-					memcpy(plainText+interestLen+1,symmetricKey,symmetricKeyLen);
+					memcpy(plainText+interestLen+1,symmHexBuf,symmetricKeyLen*2);
 		        	// ciphertext buffer
 
 					printf("Generated new plaintext!\n");
-					printf("Plaintext: %*s\n",plainTextLen,plainText);
+					printf("Plaintext: %s\n",plainText);
 
 					int ciphertextLen = crypto_box_SEALBYTES + plainTextLen;
 					unsigned char ciphertext[ciphertextLen];
@@ -327,8 +335,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 					crypto_box_seal(ciphertext, plainText, plainTextLen, recipient_pk);
 		        	//Creating the new interest, something like: ("ccnx:/domain/2/"|ciphertext);
 
-					printf("generated ciphertext: %*s\n",ciphertextLen,ciphertext);
-					printf("len: %d\n",ciphertextLen);
+					char cipherHexBuf[ciphertextLen*2];
+					for (i=0;i<ciphertextLen;i++){
+						sprintf(cipherHexBuf+i,"%02X", ciphertext[i]);
+					}
+					printf("generated ciphertext: %s\n",cipherHexBuf);
 
 		        	char namePrefix[] = "ccnx:/domain/2/";
 					int namePrefixLen = strlen(namePrefix);
@@ -336,17 +347,19 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 					printf("newName prefix: %s\n",namePrefix);
 					printf("len: %d\n",namePrefixLen);
 
-					char newName[ciphertextLen+namePrefixLen];
+					char newName[ciphertextLen*2+namePrefixLen];
 					int newNameLen = ciphertextLen+namePrefixLen;
 				 	memcpy(newName,namePrefix,namePrefixLen);
-					memcpy(newName+namePrefixLen,ciphertext, ciphertextLen);
+					memcpy(newName+namePrefixLen,cipherHexBuf, ciphertextLen*2);
 					//memcpy(newName+namePrefixLen+ciphertextLen,"\0", 1);
 
-					printf("New interest name: %*s\n",newNameLen,newName);
+					printf("New interest name: %s\n",newName);
 					printf("len: %d\n",newNameLen);
 
-					printf("Creating the new interest by the name...\n");
+					printf("Creating the name from CString...\n");
 		        	CCNxName *ccnx_newName =  ccnxName_CreateFromCString(newName);
+					printf("Done!\n");
+					printf("Creating the new interest by the name...\n");
 					CCNxInterest *newInterest = ccnxInterest_CreateSimple(ccnx_newName);
 					printf("Done!\n");
 		        	//TODO: Add newInterest to PIT
