@@ -84,11 +84,11 @@ struct athena_FIB;
 typedef struct athena_FIB AthenaFIB;
 
 /**
- * @typedef AthenaKeyVector
+ * @typedef AthenaFIBValue
  * @brief A tuple of a bit vector and (serialized) key
  */
 struct key_vector;
-typedef struct key_vector AthenaKeyVector;
+typedef struct key_vector AthenaFIBValue;
 
 /**
  * @typedef AthenaFIBEntry
@@ -97,10 +97,10 @@ typedef struct key_vector AthenaKeyVector;
 struct athena_FIB_list_entry;
 typedef struct athena_FIB_list_entry AthenaFIBListEntry;
 
-PARCBitVector *athenaKeyVector_GetVector(AthenaKeyVector *vector);
-PARCBuffer *athenaKeyVector_GetKey(AthenaKeyVector *vector);
-void athenaKeyVector_Release(AthenaKeyVector **vectorP);
-AthenaKeyVector *athenaKeyVector_Acquire(const AthenaKeyVector *vector);
+PARCBitVector *athenaFIBValue_GetVector(AthenaFIBValue *vector);
+PARCBuffer *athenaFIBValue_GetKey(AthenaFIBValue *vector);
+void athenaFIBValue_Release(AthenaFIBValue **vectorP);
+AthenaFIBValue *athenaFIBValue_Acquire(const AthenaFIbValue *vector);
 
 CCNxName *athenaFIBListEntry_GetName(AthenaFIBListEntry *entry);
 
@@ -185,7 +185,7 @@ bool athenaFIB_RemoveLink(AthenaFIB *athenaFIB, const PARCBitVector *ccnxLinkVec
  * }
  * @endcode
  */
-AthenaKeyVector *athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBitVector *ingressVector);
+AthenaFIBValue *athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBitVector *ingressVector);
 
 /**
  * @abstract add route to FIB
