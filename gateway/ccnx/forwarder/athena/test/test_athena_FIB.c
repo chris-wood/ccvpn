@@ -204,10 +204,10 @@ LONGBOW_TEST_CASE(Global, athenaFIB_Lookup)
     TestData *data = longBowTestCase_GetClipBoardData(testCase);
 
     athenaFIB_AddRoute(data->testFIB, data->testName1, NULL, data->testVector1);
-    AthenaKeyVector *vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
-    PARCBitVector *result = athenaKeyVector_GetVector(vector);
+    AthenaFIBValue *vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
+    PARCBitVector *result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector1), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     //
     // Name3 (the default route) contains both vector1 and vector2.
@@ -221,9 +221,9 @@ LONGBOW_TEST_CASE(Global, athenaFIB_Lookup)
     //
     athenaFIB_AddRoute(data->testFIB, data->testName3, NULL, data->testVector12);
     vector = athenaFIB_Lookup(data->testFIB, data->testName4, data->testVector1);
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector2), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 }
 
 LONGBOW_TEST_CASE(Global, athenaFIB_Lookup_EmptyPath)
@@ -231,42 +231,42 @@ LONGBOW_TEST_CASE(Global, athenaFIB_Lookup_EmptyPath)
     TestData *data = longBowTestCase_GetClipBoardData(testCase);
 
     athenaFIB_AddRoute(data->testFIB, data->testName3, NULL, data->testVector1);
-    AthenaKeyVector *vector = athenaFIB_Lookup(data->testFIB, data->testName3, NULL);
-    PARCBitVector *result = athenaKeyVector_GetVector(vector);
+    AthenaFIBValue *vector = athenaFIB_Lookup(data->testFIB, data->testName3, NULL);
+    PARCBitVector *result = athenaFIBValue_GetVector(vector);
     assertNotNull(result, "Expect non-null match to global path (\"/\")");
     assertTrue(parcBitVector_Equals(result, data->testVector1), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertNotNull(result, "Expect non-null match to global path (\"/\")");
     assertTrue(parcBitVector_Equals(result, data->testVector1), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     vector = athenaFIB_Lookup(data->testFIB, data->testName2, NULL);
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertNotNull(result, "Expect non-null match to global path (\"/\")");
     assertTrue(parcBitVector_Equals(result, data->testVector1), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     athenaFIB_AddRoute(data->testFIB, data->testName3, NULL, data->testVector2);
     vector = athenaFIB_Lookup(data->testFIB, data->testName3, NULL);
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertNotNull(result, "Expect non-null match to global path (\"/\")");
     assertTrue(parcBitVector_Equals(result, data->testVector12), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertNotNull(result, "Expect non-null match to global path (\"/\")");
     assertTrue(parcBitVector_Equals(result, data->testVector12), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     vector = athenaFIB_Lookup(data->testFIB, data->testName2, NULL);
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertNotNull(result, "Expect non-null match to global path (\"/\")");
     assertTrue(parcBitVector_Equals(result, data->testVector12), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 }
 
 LONGBOW_TEST_CASE(Global, athenaFIB_DeleteRoute)
@@ -285,27 +285,27 @@ LONGBOW_TEST_CASE(Global, athenaFIB_DeleteRoute)
 
     athenaFIB_AddRoute(data->testFIB, data->testName1, NULL, data->testVector12);
 
-    AthenaKeyVector *vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
+    AthenaFIBValue *vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
     assertNotNull(vector, "Lookup result NULL");
-    PARCBitVector *result = athenaKeyVector_GetVector(vector);
+    PARCBitVector *result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector12), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     res = athenaFIB_DeleteRoute(data->testFIB, data->testName1, data->testVector1);
     assertTrue(res, "Expected delete of route to succeed (res=%d)", res);
     vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
     assertNotNull(vector, "2nd Lookup result NULL");
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector2), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     res = athenaFIB_DeleteRoute(data->testFIB, data->testName1, data->testVector1);
     assertFalse(res, "Expected delete of same route to fail");
     vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
     assertNotNull(vector, "3rd Lookup result NULL");
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector2), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     res = athenaFIB_DeleteRoute(data->testFIB, data->testName1, data->testVector12);
     assertTrue(res, "Expected delete of route to succeed");
@@ -325,25 +325,25 @@ LONGBOW_TEST_CASE(Global, athenaFIB_RemoveLink)
     athenaFIB_AddRoute(data->testFIB, data->testName1, NULL, data->testVector1);
     athenaFIB_AddRoute(data->testFIB, data->testName2, NULL, data->testVector2);
 
-    AthenaKeyVector *vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
-    PARCBitVector *result = athenaKeyVector_GetVector(vector);
+    AthenaFIBValue *vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
+    PARCBitVector *result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector1), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
     vector = athenaFIB_Lookup(data->testFIB, data->testName2, NULL);
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector2), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     athenaFIB_RemoveLink(data->testFIB, data->testVector1);
     vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector3), "Expecting lookup to equal default vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     vector = athenaFIB_Lookup(data->testFIB, data->testName2, NULL);
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector2), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     athenaFIB_AddRoute(data->testFIB, data->testName1, NULL, data->testVector12);
     athenaFIB_RemoveLink(data->testFIB, data->testVector3);
@@ -352,9 +352,9 @@ LONGBOW_TEST_CASE(Global, athenaFIB_RemoveLink)
     vector = athenaFIB_Lookup(data->testFIB, data->testName2, NULL);
     assertNull(vector, "Expecting a NULL result from Lookup after Delete Route");
     vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
-    result = athenaKeyVector_GetVector(vector);
+    result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector1), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 }
 
 LONGBOW_TEST_CASE(Global, athenaFIB_CreateEntryList)
@@ -366,10 +366,10 @@ LONGBOW_TEST_CASE(Global, athenaFIB_CreateEntryList)
 
     athenaFIB_AddRoute(data->testFIB, data->testName1, NULL, data->testVector12);
 
-    AthenaKeyVector *vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
-    PARCBitVector *result = athenaKeyVector_GetVector(vector);
+    AthenaFIBValue *vector = athenaFIB_Lookup(data->testFIB, data->testName1, NULL);
+    PARCBitVector *result = athenaFIBValue_GetVector(vector);
     assertTrue(parcBitVector_Equals(result, data->testVector12), "Expected lookup to equal test vector");
-    athenaKeyVector_Release(&vector);
+    athenaFIBValue_Release(&vector);
 
     PARCList *entryList = athenaFIB_CreateEntryList(data->testFIB);
     assertTrue(parcList_Size(entryList) == 3, "Expected the EntryList to have 3 elements");

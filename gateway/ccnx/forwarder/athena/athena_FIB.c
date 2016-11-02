@@ -73,27 +73,27 @@ struct key_vector {
 };
 
 static void
-_AthenaKeyVector_Destroy(AthenaKeyVector **entryP)
+_AthenaFIBValue_Destroy(AthenaFIBValue **entryP)
 {
-    AthenaKeyVector *entry = *entryP;
+    AthenaFIBValue *entry = *entryP;
     parcBitVector_Release(&entry->linkV);
     if (entry->key != NULL) {
         parcBuffer_Release(&entry->key);
     }
 }
 
-parcObject_ExtendPARCObject(AthenaKeyVector, _AthenaKeyVector_Destroy, NULL, NULL, NULL, NULL, NULL, NULL);
+parcObject_ExtendPARCObject(AthenaFIBValue, _AthenaFIBValue_Destroy, NULL, NULL, NULL, NULL, NULL, NULL);
 
-parcObject_ImplementAcquire(athenaKeyVector, AthenaKeyVector);
+parcObject_ImplementAcquire(athenaFIBValue, AthenaFIBValue);
 
-parcObject_ImplementRelease(athenaKeyVector, AthenaKeyVector);
+parcObject_ImplementRelease(athenaFIBValue, AthenaFIBValue);
 
-AthenaKeyVector *
-AthenaKeyVector_Create(PARCBitVector *linkV, PARCBuffer *key)
+AthenaFIBValue *
+AthenaFIBValue_Create(PARCBitVector *linkV, PARCBuffer *key)
 {
     assertNotNull(linkV, "Cannot create a key vector with a NULL link");
 
-    AthenaKeyVector *entry = parcObject_CreateInstance(AthenaKeyVector);
+    AthenaFIBValue *entry = parcObject_CreateInstance(AthenaFIBValue);
     if (entry != NULL) {
         entry->linkV = parcBitVector_Acquire(linkV);
         entry->key = key == NULL ? NULL : parcBuffer_Acquire(key);
@@ -103,13 +103,13 @@ AthenaKeyVector_Create(PARCBitVector *linkV, PARCBuffer *key)
 }
 
 PARCBitVector *
-athenaKeyVector_GetVector(AthenaKeyVector *vector)
+athenaFIBValue_GetVector(AthenaFIBValue *vector)
 {
     return vector->linkV;
 }
 
 PARCBuffer *
-athenaKeyVector_GetKey(AthenaKeyVector *vector)
+athenaFIBValue_GetKey(AthenaFIBValue *vector)
 {
     return vector->key;
 }
@@ -177,16 +177,16 @@ athenaFIB_Create()
     return newFIB;
 }
 
-AthenaKeyVector *
+AthenaFIBValue *
 athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBitVector *ingressVector)
 {
     CCNxName *name = ccnxName_Copy(ccnxName);
-    AthenaKeyVector *vector = NULL;
+    AthenaFIBValue *vector = NULL;
 
     // Return the longest prefix match which contains at least one link other than the ingress.
     // If the result happens to contain the ingress link, make a copy and remove it before returning.
     while ((ccnxName_GetSegmentCount(name) > 0) && (vector == NULL)) {
-        vector = (AthenaKeyVector *) parcHashMap_Get(athenaFIB->tableByName, (PARCObject *) name);
+        vector = (AthenaFIBValue *) parcHashMap_Get(athenaFIB->tableByName, (PARCObject *) name);
         if (vector != NULL) {
             // If there's an ingressVector provided, return a copy of the result the ingress link cleared.
             // If that would result in an empty vector, continue looking for a substring match.
@@ -196,7 +196,7 @@ athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBitVector *
                     if (parcBitVector_NumberOfBitsSet(vector->linkV) > 1) {
                         PARCBitVector *reducedLinkV = parcBitVector_Copy(vector->linkV);
                         parcBitVector_ClearVector(reducedLinkV, ingressVector);
-                        vector = AthenaKeyVector_Create(reducedLinkV, vector->key);
+                        vector = AthenaFIBValue_Create(reducedLinkV, vector->key);
                         parcBitVector_Release(&reducedLinkV);
                     } else { // ingress was only link, keep looking
                         vector = NULL;
@@ -205,7 +205,7 @@ athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBitVector *
                     continue;
                 }
             }
-            vector = athenaKeyVector_Acquire(vector);
+            vector = athenaFIBValue_Acquire(vector);
         }
         name = ccnxName_Trim(name, 1);
     }
@@ -221,16 +221,16 @@ athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBitVector *
                 if (parcBitVector_NumberOfBitsSet(athenaFIB->defaultRoute) > 1) {
                     PARCBitVector *reducedLinkV = parcBitVector_Copy(athenaFIB->defaultRoute);
                     parcBitVector_ClearVector(reducedLinkV, ingressVector);
-                    vector = AthenaKeyVector_Create(reducedLinkV, NULL); // there is no key for the default route
+                    vector = AthenaFIBValue_Create(reducedLinkV, NULL); // there is no key for the default route
                     parcBitVector_Release(&reducedLinkV);
                 } else { // ingress was the only link
                     vector = NULL;
                 }
             } else { // ingress was not in the default route
-                vector = AthenaKeyVector_Create(athenaFIB->defaultRoute, NULL);
+                vector = AthenaFIBValue_Create(athenaFIB->defaultRoute, NULL);
             }
         } else { // no ingress vector was provided
-            vector = AthenaKeyVector_Create(athenaFIB->defaultRoute, NULL);
+            vector = AthenaFIBValue_Create(athenaFIB->defaultRoute, NULL);
         }
     }
 
@@ -286,7 +286,7 @@ athenaFIB_AddRoute(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBuffer *e
         }
 
         // Now add the actual fib mapping
-        AthenaKeyVector *vector = (AthenaKeyVector *) parcHashMap_Get(athenaFIB->tableByName, (PARCObject *) ccnxName);
+        AthenaFIBValue *vector = (AthenaFIBValue *) parcHashMap_Get(athenaFIB->tableByName, (PARCObject *) ccnxName);
         if (vector != NULL) {
             linkV = vector->linkV;
         }
@@ -294,11 +294,11 @@ athenaFIB_AddRoute(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBuffer *e
             PARCBitVector *newLinkV = parcBitVector_Create();
             linkV = newLinkV;
 
-            AthenaKeyVector *entry = AthenaKeyVector_Create(newLinkV, entryKey);
+            AthenaFIBValue *entry = athenaFIBValue_Create(newLinkV, entryKey);
             parcHashMap_Put(athenaFIB->tableByName, (PARCObject *) ccnxName, (PARCObject *) entry);
 
             parcBitVector_Release(&newLinkV);
-            athenaKeyVector_Release(&entry);
+            athenaFIBValue_Release(&entry);
         }
     }
 
@@ -333,7 +333,7 @@ athenaFIB_DeleteRoute(AthenaFIB *athenaFIB, const CCNxName *ccnxName, const PARC
         }
     }
 
-    AthenaKeyVector *keyVector = athenaFIB_Lookup(athenaFIB, ccnxName, NULL);
+    AthenaFIBValue *keyVector = athenaFIB_Lookup(athenaFIB, ccnxName, NULL);
     if (keyVector != NULL) {
         // Only clear bits if the link sets intersect
         PARCBitVector *linkSet = parcBitVector_And(keyVector->linkV, ccnxLinkVector);
@@ -362,7 +362,7 @@ athenaFIB_DeleteRoute(AthenaFIB *athenaFIB, const CCNxName *ccnxName, const PARC
         }
 
         parcBitVector_Release(&linkSet);
-        athenaKeyVector_Release(&keyVector);
+        athenaFIBValue_Release(&keyVector);
     }
 
     return result;

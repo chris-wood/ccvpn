@@ -247,10 +247,10 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     //         non-local interface so we need not check that here.
     //
     ccnxName = ccnxInterest_GetName(interest);
-    AthenaKeyVector *vector = athenaFIB_Lookup(athena->athenaFIB, ccnxName, ingressVector);
+    AthenaFIBValue *vector = athenaFIB_Lookup(athena->athenaFIB, ccnxName, ingressVector);
     PARCBitVector *egressVector = NULL;
     if (vector != NULL) {
-        egressVector = athenaKeyVector_GetVector(vector);
+        egressVector = athenaFIBValue_GetVector(vector);
     }
 
     if (egressVector != NULL) {
@@ -279,7 +279,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
 			printf("Ivan's code starts here\n");
             // Retrieving the recipient (Gateway 2) public key
-			PARCBuffer *keyBuffer = athenaKeyVector_GetKey(vector);
+			PARCBuffer *keyBuffer = athenaFIBValue_GetKey(vector);
 
 			if (keyBuffer == NULL) {
 				printf("Key buffer is NULL!\n");
@@ -387,7 +387,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 parcBitVector_Release(&failedLinks);
             }
         }
-        athenaKeyVector_Release(&vector);
+        athenaFIBValue_Release(&vector);
     } else {
         // No FIB entry found, return a NoRoute interest return and remove the entry from the PIT.
 
