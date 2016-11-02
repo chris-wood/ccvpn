@@ -280,7 +280,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             printf("Ivan's code starts here\n");
             // Retrieving the recipient (Gateway 2) public key
             PARCBuffer *keyBuffer = athenaKeyVector_GetKey(vector);
-			PARCBuffer *keyBuffer = athenaFIBValue_GetKey(vector);
+            PARCBuffer *keyBuffer = athenaFIBValue_GetKey(vector);
 
 
             if (keyBuffer == NULL) {
