@@ -295,10 +295,10 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             	
 				// TODO: Corvert the interest to a byteStream.
 				char* interestByteStream = ccnxName_ToString(ccnxName);
-				printf("Interest name: %s\n",interestByteStream);
+				printf("Interest name: %s\n", interestByteStream);
              	int interestLen = strlen(interestByteStream);
             
-				if(!strncmp("ccnx:/localhost/6b8b4567/",interestByteStream,strlen("ccnx:/localhost/6b8b4567\0"))){  // Lookup table instead of hardcoded
+				if(!strncmp("ccnx:/localhost/6b8b4567/", interestByteStream, strlen("ccnx:/localhost/6b8b4567\0"))){  // Lookup table instead of hardcoded
 					//Generating Random Symmetric Key
 					if (crypto_aead_aes256gcm_is_available() == 0) {
 						printf("aead_aes256gcm not available!");
@@ -310,60 +310,56 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
 					//Converting symmetric key to Hex format
 					int i;
-					char symmHexBuf[symmetricKeyLen*2];
-					for (i=0;i<symmetricKeyLen;i++){
-						sprintf(symmHexBuf+i,"%02X", symmetricKey[i]);
+					char symmHexBuf[symmetricKeyLen * 2];
+					for (i=0; i < symmetricKeyLen; i++){
+						sprintf(symmHexBuf+i, "%02X", symmetricKey[i]);
 					}
+
 					printf("Created symmetric key for AEAD!\n");
-					printf("Symmetric key: 0x%s\n",symmHexBuf);
-						
+					printf("Symmetric key: 0x%s\n", symmHexBuf);	
 
 		        	//Creating a plaintext to be encrypted: "interestBytes|SymKeyBytes"
-					int plainTextLen = interestLen+symmetricKeyLen*2+1;
+					int plainTextLen = interestLen + symmetricKeyLen * 2 + 1;
 					unsigned char plainText[plainTextLen];
-					memcpy(plainText,interestByteStream,interestLen);
-					memcpy(plainText+interestLen,"/",1);
-					memcpy(plainText+interestLen+1,symmHexBuf,symmetricKeyLen*2);
-		        	// ciphertext buffer
-
+					memcpy(plainText, interestByteStream, interestLen);
+					memcpy(plainText + interestLen, "/", 1);
+					memcpy(plainText+interestLen + 1, symmHexBuf, symmetricKeyLen * 2);
 					printf("Generated new plaintext!\n");
-					printf("Plaintext: %s\n",plainText);
+					printf("Plaintext: %s\n", plainText);
 
+		        	// ciphertext buffer
 					int ciphertextLen = crypto_box_SEALBYTES + plainTextLen;
 					unsigned char ciphertext[ciphertextLen];
 		        	//Encrypting with gateway 2 public key.
 					crypto_box_seal(ciphertext, plainText, plainTextLen, recipient_pk);
-		        	//Creating the new interest, something like: ("ccnx:/domain/2/"|ciphertext);
 
-					char cipherHexBuf[ciphertextLen*2];
-					for (i=0;i<ciphertextLen;i++){
+		        	//Creating the new interest, something like: ("ccnx:/domain/2/"|ciphertext);
+					char cipherHexBuf[ciphertextLen * 2];
+					for (i=0; i < ciphertextLen; i++){
 						sprintf(cipherHexBuf+i,"%02X", ciphertext[i]);
 					}
-					printf("generated ciphertext: %s\n",cipherHexBuf);
+					printf("generated ciphertext: %s\n", cipherHexBuf);
 
 		        	char namePrefix[] = "ccnx:/domain/2/";
 					int namePrefixLen = strlen(namePrefix);
+					printf("newName prefix: %s\n", namePrefix);
+					printf("len: %d\n", namePrefixLen);
 
-					printf("newName prefix: %s\n",namePrefix);
-					printf("len: %d\n",namePrefixLen);
-
-					char newName[ciphertextLen*2+namePrefixLen];
-					int newNameLen = ciphertextLen+namePrefixLen;
-				 	memcpy(newName,namePrefix,namePrefixLen);
-					memcpy(newName+namePrefixLen,cipherHexBuf, ciphertextLen*2);
-					//memcpy(newName+namePrefixLen+ciphertextLen,"\0", 1);
-
+					//Creating new interest name
+					char newName[ciphertextLen * 2 + namePrefixLen];
+					int newNameLen = ciphertextLen + namePrefixLen;
+				 	memcpy(newName, namePrefix, namePrefixLen);
+					memcpy(newName + namePrefixLen, cipherHexBuf, ciphertextLen*2);
 					printf("New interest name: %s\n",newName);
 					printf("len: %d\n",newNameLen);
 
+					//Creating the interest by name and adding it to PIT
 					printf("Creating the name from CString...\n");
 		        	CCNxName *ccnx_newName =  ccnxName_CreateFromCString(newName);
 					printf("Done!\n");
 					printf("Creating the new interest by the name...\n");
 					CCNxInterest *newInterest = ccnxInterest_CreateSimple(ccnx_newName);
 					printf("Done!\n");
-		        	//TODO: Add newInterest to PIT
-					//TODO: Forward Interest
 					printf("Adding interest to PIT...\n");
 				    PARCBitVector *expectedReturnVector;
 					AthenaPITResolution result;
@@ -374,6 +370,8 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 						return;
 					}
 					printf("Done!\n");
+					
+					//TODO: Forward Interest
 
 					printf("Succeful execution\n\n\n");
 				}
