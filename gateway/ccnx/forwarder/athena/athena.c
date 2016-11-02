@@ -288,9 +288,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 				unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
 				unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
 				crypto_box_keypair(recipient_pk, recipient_sk);
-
 				//char* recipient_pk = parcBuffer_ToString(keyBuffer);
-
             	printf("key pair generated\n");
             	
 				// TODO: Corvert the interest to a byteStream.
@@ -314,7 +312,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 					for (i=0; i < symmetricKeyLen; i++){
 						sprintf(symmHexBuf+i, "%02X", symmetricKey[i]);
 					}
-
 					printf("Created symmetric key for AEAD!\n");
 					printf("Symmetric key: 0x%s\n", symmHexBuf);	
 
@@ -357,9 +354,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 					printf("Creating the name from CString...\n");
 		        	CCNxName *ccnx_newName =  ccnxName_CreateFromCString(newName);
 					printf("Done!\n");
+
 					printf("Creating the new interest by the name...\n");
 					CCNxInterest *newInterest = ccnxInterest_CreateSimple(ccnx_newName);
 					printf("Done!\n");
+
 					printf("Adding interest to PIT...\n");
 				    PARCBitVector *expectedReturnVector;
 					AthenaPITResolution result;
