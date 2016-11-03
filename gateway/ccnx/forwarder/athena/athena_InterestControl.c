@@ -582,7 +582,7 @@ _FIB_Command(Athena *athena, CCNxInterest *interest, PARCBitVector *ingress)
                     printf("key buffer: %s\n", parcBuffer_ToHexString(keyBuffer));
                 }
 
-                result = athenaFIB_AddRoute(athena->athenaFIB, prefixName, keyBuffer, linkVector);
+                result = athenaFIB_AddTranslationRoute(athena->athenaFIB, prefixName, NULL, keyBuffer, linkVector);
             }
 
             if (result == true) {

@@ -99,8 +99,9 @@ typedef struct athena_FIB_list_entry AthenaFIBListEntry;
 
 PARCBitVector *athenaFIBValue_GetVector(AthenaFIBValue *vector);
 PARCBuffer *athenaFIBValue_GetKey(AthenaFIBValue *vector);
+CCNxName *athenaFIBValue_GetOutputPrefix(AthenaFIBValue *vector);
 void athenaFIBValue_Release(AthenaFIBValue **vectorP);
-AthenaFIBValue *athenaFIBValue_Acquire(const AthenaFIbValue *vector);
+AthenaFIBValue *athenaFIBValue_Acquire(const AthenaFIBValue *vector);
 
 CCNxName *athenaFIBListEntry_GetName(AthenaFIBListEntry *entry);
 
@@ -211,7 +212,9 @@ AthenaFIBValue *athenaFIB_Lookup(AthenaFIB *athenaFIB, const CCNxName *ccnxName,
  * }
  * @endcode
  */
-bool athenaFIB_AddRoute(AthenaFIB *athenaFIB, const CCNxName *ccnxName, PARCBuffer *key, const PARCBitVector *ccnxLinkVector);
+bool athenaFIB_AddRoute(AthenaFIB *athenaFIB, const CCNxName *ccnxName, const PARCBitVector *ccnxLinkVector);
+
+bool athenaFIB_AddTranslationRoute(AthenaFIB *athenaFIB, const CCNxName *inputName, const CCNxName *outputName, PARCBuffer *key, const PARCBitVector *ccnxLinkVector);
 
 /**
  * @abstract remove route to link from FIB
