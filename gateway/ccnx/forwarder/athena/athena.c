@@ -277,11 +277,8 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         } else {
             parcBitVector_SetVector(expectedReturnVector, egressVector);
 
-            printf("Ivan's code starts here\n");
             // Retrieving the recipient (Gateway 2) public key
-            PARCBuffer *keyBuffer = athenaKeyVector_GetKey(vector);
             PARCBuffer *keyBuffer = athenaFIBValue_GetKey(vector);
-
 
             if (keyBuffer == NULL) {
                 printf("Key buffer is NULL!\n");

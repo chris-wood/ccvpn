@@ -176,9 +176,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
     athena_ProcessMessage(athena, interest, interestIngressVector);
 
     // Add route for interest, it should now be forwarded
-    athenaFIB_AddRoute(athena->athenaFIB, name, NULL, contentObjectIngressVector);
+    athenaFIB_AddRoute(athena->athenaFIB, name, contentObjectIngressVector);
     CCNxName *defaultName = ccnxName_CreateFromCString("lci:/");
-    athenaFIB_AddRoute(athena->athenaFIB, defaultName, NULL, contentObjectIngressVector);
+    athenaFIB_AddRoute(athena->athenaFIB, defaultName, contentObjectIngressVector);
     ccnxName_Release(&defaultName);
 
     // Process exact interest match
