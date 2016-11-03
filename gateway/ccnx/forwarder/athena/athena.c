@@ -293,7 +293,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 //char* recipient_pk = parcBuffer_ToString(keyBuffer);
                 printf("key pair generated\n");
 
-                // TODO: Corvert the interest to a byteStream.
+                // TODO: Corvert the interest to wire format.
                 char* interestByteStream = ccnxName_ToString(ccnxName);
                 printf("Interest name: %s\n", interestByteStream);
                 int interestLen = strlen(interestByteStream);
