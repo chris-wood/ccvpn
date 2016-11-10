@@ -253,6 +253,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         egressVector = athenaFIBValue_GetVector(vector);
     }
 
+    PARCBuffer *keyBuffer;
+    char *interestByteStream;
+    CCNxName *ccnx_newName;
+    CCNxInterest *newInterest;
+
     if (egressVector != NULL) {
         // If no links are in the egress vector the FIB returned, return a no route interest message
         if (parcBitVector_NumberOfBitsSet(egressVector) == 0) {
@@ -278,29 +283,37 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             parcBitVector_SetVector(expectedReturnVector, egressVector);
 
             // Retrieving the recipient (Gateway 2) public key
-            PARCBuffer *keyBuffer = athenaFIBValue_GetKey(vector);
+
+            keyBuffer = athenaFIBValue_GetKey(vector);
 
             if (keyBuffer == NULL) {
                 printf("Key buffer is NULL!\n");
             }
+
             if (1) {//(keyBuffer != NULL) {
+
                 unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
                 unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
+
                 crypto_box_keypair(recipient_pk, recipient_sk);
+
                 //char* recipient_pk = parcBuffer_ToString(keyBuffer);
                 printf("key pair generated\n");
 
                 // TODO: Corvert the interest to wire format.
-                char* interestByteStream = ccnxName_ToString(ccnxName);
+                interestByteStream = ccnxName_ToString(ccnxName);
+
                 printf("Interest name: %s\n", interestByteStream);
                 int interestLen = strlen(interestByteStream);
             
-                if(!strncmp("ccnx:/localhost/6b8b4567/", interestByteStream, strlen("ccnx:/localhost/6b8b4567\0"))) {  // Lookup table instead of hardcoded
+                if(!strncmp("ccnx:/foo/bar/baz", interestByteStream, strlen("ccnx:/foo/bar/baz\0"))) {  // Lookup table instead of hardcoded
+
                     //Generating Random Symmetric Key
                     if (crypto_aead_aes256gcm_is_available() == 0) {
                         printf("aead_aes256gcm not available!");
                         exit(1);
                     }
+
                     unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
                     int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
                     randombytes_buf(symmetricKey, sizeof symmetricKey);
@@ -336,6 +349,8 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                     }
                     printf("Generated ciphertext:\n%s\n\n", cipherHexBuf);
 
+                    //Use athenaFIBValue_GetOutputPrefix(AthenaFIBValue *vector);
+                    //to get the new name prefix
                     char namePrefix[] = "ccnx:/domain/2/";
                     int namePrefixLen = strlen(namePrefix);
                     printf("newName prefix:\n%s\n\n", namePrefix);
@@ -349,11 +364,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
                     //Creating the interest by name and adding it to PIT
                     printf("Creating the name from CString...\n");
-                    CCNxName *ccnx_newName =  ccnxName_CreateFromCString(newName);
+                    ccnx_newName =  ccnxName_CreateFromCString(newName);
                     printf("Done!\n");
 
                     printf("Creating the new interest by the name...\n");
-                    CCNxInterest *newInterest = ccnxInterest_CreateSimple(ccnx_newName);
+                    newInterest = ccnxInterest_CreateSimple(ccnx_newName);
                     printf("Done!\n");
 
                     printf("Adding interest to PIT...\n");
@@ -366,12 +381,21 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                         return;
                     }
                     printf("Done!\n");
-					
+
+                    ccnxInterest_Release(&newInterest);
+                    ccnxName_Release(&ccnx_newName);				
+
                     //TODO: Forward Interest
 
                     printf("Succeful execution\n\n\n");
+
 				}
+                parcMemory_Deallocate(&interestByteStream);
 			}
+
+            
+
+
 
             // XXX caw: if the vector's key is not null, encrypt the interest under that key
             // XXX caw: we also need to move the PIT insertion to *after* this step. (it's above at line 222 right now.)

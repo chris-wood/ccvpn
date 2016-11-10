@@ -66,6 +66,8 @@
 
 #include <stdio.h>
 
+#include <sodium.h>
+
 typedef struct test_data {
     AthenaFIB *testFIB;
     CCNxName *testName1;
@@ -105,6 +107,7 @@ LONGBOW_TEST_RUNNER_TEARDOWN(athena_FIB)
 
 LONGBOW_TEST_FIXTURE(Global)
 {
+
     LONGBOW_RUN_TEST_CASE(Global, athenaFIB_Create);
     LONGBOW_RUN_TEST_CASE(Global, athenaFIB_AcquireRelease);
     LONGBOW_RUN_TEST_CASE(Global, athenaFIB_AddRoute);
@@ -114,6 +117,8 @@ LONGBOW_TEST_FIXTURE(Global)
     LONGBOW_RUN_TEST_CASE(Global, athenaFIB_RemoveLink);
     LONGBOW_RUN_TEST_CASE(Global, athenaFIB_CreateEntryList);
     LONGBOW_RUN_TEST_CASE(Global, athenaFIB_ProcessMessage);
+
+    LONGBOW_RUN_TEST_CASE(Global, athenaFIB_AddTranslationRoute);
 
 //    LONGBOW_RUN_TEST_CASE(Global, athenaFIB_Equals);
 //    LONGBOW_RUN_TEST_CASE(Global, athenaFIB_NotEquals);
@@ -198,6 +203,23 @@ LONGBOW_TEST_CASE(Global, athenaFIB_AddRoute)
     assertTrue(athenaFIB_AddRoute(data->testFIB, data->testName1, data->testVector1), "Failed to add a route");
     assertTrue(athenaFIB_AddRoute(data->testFIB, data->testName1, data->testVector1), "Failed to add a route");
 }
+
+LONGBOW_TEST_CASE(Global, athenaFIB_AddTranslationRoute)
+{
+    TestData *data = longBowTestCase_GetClipBoardData(testCase);
+
+    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
+
+    unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
+    unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
+    crypto_box_keypair(recipient_pk, recipient_sk);
+    PARCBuffer *publicKey = parcBuffer_WrapCString(recipient_pk);
+
+    assertTrue(athenaFIB_AddTranslationRoute(data->testFIB, data->testName1, data->testName2, publicKey, data->testVector1), "Failed to add a route");
+
+    parcBuffer_Release(&publicKey);
+}
+
 
 LONGBOW_TEST_CASE(Global, athenaFIB_Lookup)
 {
