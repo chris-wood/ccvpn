@@ -254,6 +254,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     }
 
     PARCBuffer *keyBuffer;
+    CCNxName *prefixBuffer;
     char *interestByteStream;
     CCNxName *ccnx_newName;
     CCNxInterest *newInterest;
@@ -285,20 +286,20 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             // Retrieving the recipient (Gateway 2) public key
 
             keyBuffer = athenaFIBValue_GetKey(vector);
+            prefixBuffer = athenaFIBValue_GetOutputPrefix(vector);
 
-            if (keyBuffer == NULL) {
-                printf("Key buffer is NULL!\n");
+            if (keyBuffer == NULL || prefixBuffer == NULL) {
+                printf("Key buffer or prefix buffer is NULL!\n");
             }
 
-            if (1) {//(keyBuffer != NULL) {
+            if(keyBuffer != NULL && prefixBuffer != NULL) {
+                printf("aqui\n");
+                char* recipient_pk = parcBuffer_ToString(keyBuffer);
+                char* namePrefix = ccnxName_ToString(prefixBuffer);
+                printf("ok\n");
 
-                unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
-                unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
+                //cleaprintf("%s\n",namePrefix);
 
-                crypto_box_keypair(recipient_pk, recipient_sk);
-
-                //char* recipient_pk = parcBuffer_ToString(keyBuffer);
-                printf("key pair generated\n");
 
                 // TODO: Corvert the interest to wire format.
                 interestByteStream = ccnxName_ToString(ccnxName);
@@ -340,7 +341,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                     int ciphertextLen = crypto_box_SEALBYTES + plainTextLen;
                     unsigned char ciphertext[ciphertextLen];
                     //Encrypting with gateway 2 public key.
-                    crypto_box_seal(ciphertext, plainText, plainTextLen, recipient_pk);
+                    crypto_box_seal(ciphertext, plainText, plainTextLen, (unsigned char*)recipient_pk);
 
                     //Creating the new interest, something like: ("ccnx:/domain/2/"|ciphertext);
                     char cipherHexBuf[ciphertextLen * 2];
@@ -349,9 +350,8 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                     }
                     printf("Generated ciphertext:\n%s\n\n", cipherHexBuf);
 
-                    //Use athenaFIBValue_GetOutputPrefix(AthenaFIBValue *vector);
                     //to get the new name prefix
-                    char namePrefix[] = "ccnx:/domain/2/";
+//                    char namePrefix[] = "ccnx:/domain/2/";
                     int namePrefixLen = strlen(namePrefix);
                     printf("newName prefix:\n%s\n\n", namePrefix);
 
@@ -383,7 +383,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                     printf("Done!\n");
 
                     ccnxInterest_Release(&newInterest);
-                    ccnxName_Release(&ccnx_newName);				
+                    ccnxName_Release(&ccnx_newName);
 
                     //TODO: Forward Interest
 
@@ -391,12 +391,13 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
 				}
                 parcMemory_Deallocate(&interestByteStream);
+                parcMemory_Deallocate(&namePrefix);
 			}
-
-            
-
-
-
+/*
+            if (prefixBuffer != NULL) {
+                ccnxName_Release(&prefixBuffer);
+            }
+*/
             // XXX caw: if the vector's key is not null, encrypt the interest under that key
             // XXX caw: we also need to move the PIT insertion to *after* this step. (it's above at line 222 right now.)
 

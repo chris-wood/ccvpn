@@ -68,7 +68,7 @@
 #include <ccnx/common/internal/ccnx_InterestDefault.h>
 
 #include <stdio.h>
-
+#include <sodium.h>
 
 LONGBOW_TEST_RUNNER(athena)
 {
@@ -94,12 +94,13 @@ LONGBOW_TEST_RUNNER_TEARDOWN(athena)
 
 LONGBOW_TEST_FIXTURE(Global)
 {
-    LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestReturn);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ForwarderEngine);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
+    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestTranslation);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestReturn);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ForwarderEngine);
 
     LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl_CPI_REGISTER_PREFIX);
 }
@@ -211,6 +212,114 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
     ccnxInterest_Release(&interest);
     ccnxInterest_Release(&contentObject);
     athena_Release(&athena);
+}
+
+LONGBOW_TEST_CASE(Global, athena_ProcessInterestTranslation)
+{
+    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
+
+    PARCURI *connectionURI;
+    Athena *athena = athena_Create(100);
+    CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
+    CCNxInterest *interest = ccnxInterest_CreateSimple(name);
+
+    uint64_t chunkNum = 0;
+    CCNxNameSegment *chunkSegment = ccnxNameSegmentNumber_Create(CCNxNameLabelType_CHUNK, chunkNum);
+    ccnxName_Append(name, chunkSegment);
+    ccnxNameSegment_Release(&chunkSegment);
+
+    PARCBuffer *payload = parcBuffer_WrapCString("this is a payload");
+    CCNxContentObject *contentObject = ccnxContentObject_CreateWithNameAndPayload(name, payload);
+    parcBuffer_Release(&payload);
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    uint64_t nowInMillis = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+    ccnxContentObject_SetExpiryTime(contentObject, nowInMillis + 100000); // expire in 100 seconds
+
+    connectionURI = parcURI_Parse("tcp://localhost:50100/listener/name=TCPListener");
+    const char *result = athenaTransportLinkAdapter_Open(athena->athenaTransportLinkAdapter, connectionURI);
+    assertTrue(result != NULL, "athenaTransportLinkAdapter_Open failed(%s)", strerror(errno));
+    parcURI_Release(&connectionURI);
+
+    connectionURI = parcURI_Parse("tcp://localhost:50100/name=TCP_0/local=false");
+    result = athenaTransportLinkAdapter_Open(athena->athenaTransportLinkAdapter, connectionURI);
+    assertTrue(result != NULL, "athenaTransportLinkAdapter_Open failed (%s)", strerror(errno));
+    parcURI_Release(&connectionURI);
+
+    connectionURI = parcURI_Parse("tcp://localhost:50100/name=TCP_1/local=false");
+    result = athenaTransportLinkAdapter_Open(athena->athenaTransportLinkAdapter, connectionURI);
+    assertTrue(result != NULL, "athenaTransportLinkAdapter_Open failed (%s)", strerror(errno));
+    parcURI_Release(&connectionURI);
+
+    int linkId = athenaTransportLinkAdapter_LinkNameToId(athena->athenaTransportLinkAdapter, "TCP_0");
+    PARCBitVector *interestIngressVector = parcBitVector_Create();
+    parcBitVector_Set(interestIngressVector, linkId);
+
+    linkId = athenaTransportLinkAdapter_LinkNameToId(athena->athenaTransportLinkAdapter, "TCP_1");
+    PARCBitVector *contentObjectIngressVector = parcBitVector_Create();
+    parcBitVector_Set(contentObjectIngressVector, linkId);
+
+    athena_EncodeMessage(interest);
+    athena_EncodeMessage(contentObject);
+
+    // Before FIB entry interest should not be forwarded
+    athena_ProcessMessage(athena, interest, interestIngressVector);
+
+    // Creating public/secret keys for gateway2
+    unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
+    unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
+    crypto_box_keypair(recipient_pk, recipient_sk);
+    PARCBuffer *publicKey = parcBuffer_WrapCString((char*)recipient_pk);
+   
+    // Creating the translation prefix
+    CCNxName *gw2Name = ccnxName_CreateFromCString("lci:/domain/2/");
+
+    //Adding translation route
+//    athenaFIB_AddRoute(athena->athenaFIB, name, contentObjectIngressVector);
+    athenaFIB_AddTranslationRoute(athena->athenaFIB, name, gw2Name, publicKey, contentObjectIngressVector);
+    CCNxName *defaultName = ccnxName_CreateFromCString("lci:/");
+    athenaFIB_AddRoute(athena->athenaFIB, defaultName, contentObjectIngressVector);
+
+    //destructors
+    ccnxName_Release(&defaultName);
+    ccnxName_Release(&gw2Name);
+    parcBuffer_Release(&publicKey);
+
+    // Process exact interest match
+    athena_ProcessMessage(athena, interest, interestIngressVector);
+
+    // Process a super-interest match
+    CCNxName *superName = ccnxName_CreateFromCString("lci:/foo/bar/baz/unmatched");
+    CCNxInterest *superInterest = ccnxInterest_CreateSimple(superName);
+    athena_EncodeMessage(superInterest);
+    athena_ProcessMessage(athena, superInterest, interestIngressVector);
+    ccnxName_Release(&superName);
+    ccnxInterest_Release(&superInterest);
+
+    // Process no-match/default route interest
+    CCNxName *noMatchName = ccnxName_CreateFromCString("lci:/buggs/bunny");
+    CCNxInterest *noMatchInterest = ccnxInterest_CreateSimple(noMatchName);
+    athena_EncodeMessage(noMatchInterest);
+    athena_ProcessMessage(athena, noMatchInterest, interestIngressVector);
+    ccnxName_Release(&noMatchName);
+    ccnxInterest_Release(&noMatchInterest);
+
+    // Create a matching content object that the store should retain and reply to the following interest with
+    athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
+    athena_ProcessMessage(athena, interest, interestIngressVector);
+
+    parcBitVector_Release(&interestIngressVector);
+    parcBitVector_Release(&contentObjectIngressVector);
+
+    ccnxName_Release(&name);
+    ccnxInterest_Release(&interest);
+
+    ccnxInterest_Release(&contentObject);
+    printf("print!\n");
+    athena_Release(&athena);
+    printf("never print!\n");
+
 }
 
 LONGBOW_TEST_CASE(Global, athena_ProcessContentObject)
