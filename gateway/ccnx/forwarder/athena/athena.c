@@ -313,6 +313,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 parcBuffer_Release(&encapsulatedInterest);
             }
 
+            // debug
+            char *interestString = ccnxInterest_ToString(newInterest);
+            parcLog_Info(athena->log, "Sent: %s", interestString);
+            parcMemory_Deallocate(&interestString);
+
             PARCBitVector *expectedReturnVector;
             AthenaPITResolution result;
             if ((result = athenaPIT_AddInterest(athena->athenaPIT, newInterest, ingressVector, NULL,
