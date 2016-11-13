@@ -101,8 +101,7 @@ LONGBOW_TEST_FIXTURE(Global)
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestReturn);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ForwarderEngine);
-
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl_CPI_REGISTER_PREFIX);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl_CPI_REGISTER_PREFIX);
 }
 
 LONGBOW_TEST_FIXTURE_SETUP(Global)
