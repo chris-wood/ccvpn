@@ -274,8 +274,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestTranslation)
     // Creating the translation prefix
     CCNxName *gw2Name = ccnxName_CreateFromCString("lci:/domain/2/");
 
-    //Adding translation route
-//    athenaFIB_AddRoute(athena->athenaFIB, name, contentObjectIngressVector);
+    // Adding translation route so that the encryption data path is taken
     athenaFIB_AddTranslationRoute(athena->athenaFIB, name, gw2Name, publicKey, contentObjectIngressVector);
     CCNxName *defaultName = ccnxName_CreateFromCString("lci:/");
     athenaFIB_AddRoute(athena->athenaFIB, defaultName, contentObjectIngressVector);
@@ -315,9 +314,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestTranslation)
     ccnxInterest_Release(&interest);
 
     ccnxInterest_Release(&contentObject);
-    printf("print!\n");
     athena_Release(&athena);
-    printf("never print!\n");
 
 }
 
