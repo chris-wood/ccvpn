@@ -273,7 +273,7 @@ _Control_Command_Spawn(Athena *athena, CCNxName *ccnxName, const char *command, 
     CCNxMetaMessage *responseMessage;
 
     // Create a new athena instance
-    Athena *newAthena = athena_Create(AthenaDefaultContentStoreSize);
+    Athena *newAthena = athena_Create(ccnxName, AthenaDefaultContentStoreSize);
     if (newAthena == NULL) {
         responseMessage = _create_response(athena, ccnxName, "Could not create a new Athena instance");
         return responseMessage;

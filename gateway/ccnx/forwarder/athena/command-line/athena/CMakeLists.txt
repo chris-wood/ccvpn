@@ -6,7 +6,7 @@ set(ATHENA_SOURCE_FILES
     )
 
 add_executable(athenabin ${ATHENA_SOURCE_FILES})
-target_link_libraries(athenabin ${ATHENA_LINK_LIBRARIES})
+target_link_libraries(athenabin ${ATHENA_LINK_LIBRARIES} sodium)
 set_target_properties(athenabin PROPERTIES OUTPUT_NAME athena)
 
 install(TARGETS athenabin RUNTIME DESTINATION bin)

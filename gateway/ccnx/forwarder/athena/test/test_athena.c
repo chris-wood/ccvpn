@@ -121,14 +121,18 @@ LONGBOW_TEST_FIXTURE_TEARDOWN(Global)
 
 LONGBOW_TEST_CASE(Global, athena_CreateRelease)
 {
-    Athena *athena = athena_Create(100);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 100);
+    ccnxName_Release(&testName);
     athena_Release(&athena);
 }
 
 LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
 {
     PARCURI *connectionURI;
-    Athena *athena = athena_Create(100);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 100);
+    ccnxName_Release(&testName);
     CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
 
@@ -218,7 +222,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestTranslation)
     assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
 
     PARCURI *connectionURI;
-    Athena *athena = athena_Create(100);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 100);
+    ccnxName_Release(&testName);
     CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
 
@@ -321,7 +327,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestTranslation)
 LONGBOW_TEST_CASE(Global, athena_ProcessContentObject)
 {
     PARCURI *connectionURI;
-    Athena *athena = athena_Create(100);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 100);
+    ccnxName_Release(&testName);
 
     CCNxName *name = ccnxName_CreateFromCString("lci:/cakes/and/pies");
     uint64_t chunkNum = 0;
@@ -376,7 +384,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessContentObject)
 LONGBOW_TEST_CASE(Global, athena_ProcessControl)
 {
     PARCURI *connectionURI;
-    Athena *athena = athena_Create(100);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 100);
+    ccnxName_Release(&testName);
 
     CCNxControl *control = ccnxControl_CreateFlushRequest();
 
@@ -405,7 +415,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessControl)
 LONGBOW_TEST_CASE(Global, athena_ProcessControl_CPI_REGISTER_PREFIX)
 {
     PARCURI *connectionURI;
-    Athena *athena = athena_Create(100);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 100);
+    ccnxName_Release(&testName);
 
     CCNxName *name = ccnxName_CreateFromCString("ccnx:/foo/bar");
     CCNxControl *control = ccnxControl_CreateAddRouteToSelfRequest(name); // CPI_REGISTER_PREFIX
@@ -466,7 +478,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessControl_CPI_REGISTER_PREFIX)
 LONGBOW_TEST_CASE(Global, athena_ProcessInterestReturn)
 {
     PARCURI *connectionURI;
-    Athena *athena = athena_Create(100);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 100);
+    ccnxName_Release(&testName);
 
     CCNxName *name = ccnxName_CreateFromCString("lci:/boose/roo/pie");
 
@@ -508,7 +522,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestReturn)
 LONGBOW_TEST_CASE(Global, athena_ForwarderEngine)
 {
     // Create a new athena instance
-    Athena *newAthena = athena_Create(AthenaDefaultContentStoreSize);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *newAthena = athena_Create(testName, AthenaDefaultContentStoreSize);
+    ccnxName_Release(&testName);
     assertNotNull(newAthena, "Could not create a new Athena instance");
 
     // Add a link
@@ -525,7 +541,9 @@ LONGBOW_TEST_CASE(Global, athena_ForwarderEngine)
     athena_Release(&newAthena);
 
     // Create a new local instance we can send a quit message from
-    Athena *athena = athena_Create(AthenaDefaultContentStoreSize);
+    testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, AthenaDefaultContentStoreSize);
+    ccnxName_Release(&testName);
     assertNotNull(athena, "Could not create a new Athena instance");
 
     connectionURI = parcURI_Parse("tcp://localhost:50100/name=TCP_1");

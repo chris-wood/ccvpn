@@ -111,6 +111,7 @@ _removeLink(void *context, PARCBitVector *linkVector) {
 static void
 _athenaDestroy(Athena **athena) {
     ccnxName_Release(&((*athena)->athenaName));
+    ccnxName_Release(&((*athena)->publicName));
     athenaTransportLinkAdapter_Destroy(&((*athena)->athenaTransportLinkAdapter));
     athenaContentStore_Release(&((*athena)->athenaContentStore));
     athenaPIT_Release(&((*athena)->athenaPIT));
@@ -124,14 +125,15 @@ _athenaDestroy(Athena **athena) {
 parcObject_ExtendPARCObject(Athena, _athenaDestroy, NULL, NULL, NULL, NULL, NULL, NULL);
 
 Athena *
-athena_Create(size_t contentStoreSizeInMB) {
+athena_Create(CCNxName *name, size_t contentStoreSizeInMB) {
     int init = sodium_init();
-    assertTrue(init == 1, "libsodium is not available");
+    assertTrue(init == 0, "libsodium is not available");
     assertTrue(crypto_aead_aes256gcm_is_available() == 1, "AES-GCM-256 is not available");
 
     Athena *athena = parcObject_CreateAndClearInstance(Athena);
 
     athena->athenaName = ccnxName_CreateFromCString(CCNxNameAthena_Forwarder);
+    athena->publicName = ccnxName_Acquire(name);
     assertNotNull(athena->athenaName, "Failed to create forwarder name (%s)", CCNxNameAthena_Forwarder);
 
     athena->athenaFIB = athenaFIB_Create();

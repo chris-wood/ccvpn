@@ -180,7 +180,9 @@ static struct {
 
 LONGBOW_TEST_CASE(Global, athenactl_Command)
 {
-    Athena *athena = athena_Create(AthenaDefaultContentStoreSize);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo/bar");
+    Athena *athena = athena_Create(testName, AthenaDefaultContentStoreSize);
+    ccnxName_Release(&testName);
     PARCIdentity *identity;
 
     if (athena) {

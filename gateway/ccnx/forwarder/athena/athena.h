@@ -89,6 +89,7 @@ typedef enum {
  */
 typedef struct Athena {
     CCNxName *athenaName;
+    CCNxName *publicName;
     AthenaState athenaState;
     AthenaTransportLinkAdapter *athenaTransportLinkAdapter;
     AthenaPIT *athenaPIT;
@@ -173,7 +174,7 @@ typedef struct Athena {
  * }
  * @endcode
  */
-Athena *athena_Create(size_t contentStoreSizeInMB);
+Athena *athena_Create(CCNxName *name, size_t contentStoreSizeInMB);
 
 /**
  * @abstract acquire a reference to an Athena forwarder instance

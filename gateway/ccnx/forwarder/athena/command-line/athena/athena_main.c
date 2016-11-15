@@ -285,14 +285,18 @@ main(int argc, char *argv[])
     _athenaLogo();
     printf("\n");
 
-    Athena *athena = athena_Create(AthenaDefaultContentStoreSize);
+    printf("Starting with name: %s\n", argv[1]);
+
+    CCNxName *name = ccnxName_CreateFromCString(argv[1]);
+    Athena *athena = athena_Create(name, AthenaDefaultContentStoreSize);
+    ccnxName_Release(&name);
 
     // Passing in a reference that will be released by athena_Process.  athena_Process is used
     // in athena_InterestControl.c:_Control_Command as the entry point for spawned instances.
     // Spawned instances may not have have time to acquire a reference before our reference is
     // released so the reference is acquired for them.
     if (athena) {
-        _parseCommandLine(athena, argc, argv);
+        _parseCommandLine(athena, argc - 1, &argv[1]); // we already ate the first parameter
         (void) athena_ForwarderEngine(athena_Acquire(athena));
     }
     athena_Release(&athena);

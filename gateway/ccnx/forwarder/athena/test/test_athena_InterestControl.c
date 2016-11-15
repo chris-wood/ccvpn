@@ -120,7 +120,9 @@ LONGBOW_TEST_CASE(Global, athenaInterestControl_FIB)
 {
     const char *linkSpecification;
     PARCBuffer *payload;
-    Athena *athena = athena_Create(0);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 0);
+    ccnxName_Release(&testName);
     PARCBitVector *ingressVector = parcBitVector_Create();
 
     CCNxName *name = ccnxName_CreateFromCString(CCNxNameAthenaCommand_LinkConnect);
@@ -256,7 +258,9 @@ LONGBOW_TEST_CASE(Global, athenaInterestControl_TransportLinkAdapter)
 {
     const char *linkSpecification;
     PARCBuffer *payload;
-    Athena *athena = athena_Create(0);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 0);
+    ccnxName_Release(&testName);
     PARCBitVector *ingressVector = parcBitVector_Create();
 
     CCNxName *name = ccnxName_CreateFromCString(CCNxNameAthenaCommand_LinkConnect);
@@ -336,7 +340,9 @@ LONGBOW_TEST_CASE(Global, athenaInterestControl_TransportLinkAdapter)
 
 LONGBOW_TEST_CASE(Global, athenaInterestControl_Control)
 {
-    Athena *athena = athena_Create(0);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 0);
+    ccnxName_Release(&testName);
     PARCBitVector *ingressVector = parcBitVector_Create();
     CCNxName *name = ccnxName_CreateFromCString(CCNxNameAthena_Control);
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
@@ -354,7 +360,9 @@ LONGBOW_TEST_CASE(Global, athenaInterestControl_Control)
 
 LONGBOW_TEST_CASE(Global, athenaInterestControl_ContentStore)
 {
-    Athena *athena = athena_Create(0);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 0);
+    ccnxName_Release(&testName);
     PARCBitVector *ingressVector = parcBitVector_Create();
     CCNxName *name = ccnxName_CreateFromCString(CCNxNameAthena_ContentStore "/unknown");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
@@ -372,7 +380,9 @@ LONGBOW_TEST_CASE(Global, athenaInterestControl_ContentStore)
 
 LONGBOW_TEST_CASE(Global, athenaInterestControl_PIT)
 {
-    Athena *athena = athena_Create(0);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 0);
+    ccnxName_Release(&testName);
     PARCBitVector *ingressVector = parcBitVector_Create();
     CCNxName *name = ccnxName_CreateFromCString(CCNxNameAthena_PIT "/unknown");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
@@ -393,7 +403,9 @@ char *_logLevels[] = { "off", "notice", "info", "debug", "error", "all", "unknow
 LONGBOW_TEST_CASE(Global, athenaInterestControl_Set)
 {
     CCNxMetaMessage *response;
-    Athena *athena = athena_Create(0);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 0);
+    ccnxName_Release(&testName);
     char logLevelURI[MAXPATHLEN];
 
     sprintf(logLevelURI, "%s/invalie", CCNxNameAthenaCommand_Set);
@@ -442,7 +454,9 @@ LONGBOW_TEST_CASE(Global, athenaInterestControl_Set)
 
 LONGBOW_TEST_CASE(Global, athenaInterestControl_Quit)
 {
-    Athena *athena = athena_Create(0);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 0);
+    ccnxName_Release(&testName);
 
     CCNxName *name = ccnxName_CreateFromCString(CCNxNameAthenaCommand_Quit);
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
@@ -460,7 +474,9 @@ LONGBOW_TEST_CASE(Global, athenaInterestControl_Quit)
 
 LONGBOW_TEST_CASE(Global, athenaInterestControl_Stats)
 {
-    Athena *athena = athena_Create(0);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 0);
+    ccnxName_Release(&testName);
 
     CCNxName *name = ccnxName_CreateFromCString(CCNxNameAthenaCommand_Stats);
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
@@ -478,7 +494,9 @@ LONGBOW_TEST_CASE(Global, athenaInterestControl_Stats)
 
 LONGBOW_TEST_CASE(Global, athenaInterestControl_Spawn)
 {
-    Athena *athena = athena_Create(0);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 0);
+    ccnxName_Release(&testName);
 
     CCNxName *name = ccnxName_CreateFromCString(CCNxNameAthenaCommand_Run);
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
@@ -565,7 +583,9 @@ LONGBOW_TEST_FIXTURE_SETUP(Static)
 
 LONGBOW_TEST_CASE(Static, _create_stats_response)
 {
-    Athena *athena = athena_Create(0);
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create(testName, 0);
+    ccnxName_Release(&testName);
 
     CCNxName *name = ccnxName_CreateFromCString(CCNxNameAthena_Control "/stats");
 
