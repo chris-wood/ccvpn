@@ -434,33 +434,33 @@ LONGBOW_TEST_CASE(Global, athenaPIT_AddInterest)
 
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
     assertNotNull(expectedReturnVector, "Expected a return vector to be created");
 
     parcBitVector_Set(expectedReturnVector, 1);
     PARCBitVector *savedReturnVector = expectedReturnVector;
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
     assertFalse(parcBitVector_Equals(expectedReturnVector, savedReturnVector), "Expect a different return vector");
 
     parcBitVector_Set(expectedReturnVector, 3);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
     assertFalse(parcBitVector_Equals(expectedReturnVector, savedReturnVector), "Expect a different return vector");
 
     // Aggregation of testInterest1
     parcBitVector_Set(expectedReturnVector, 5);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Aggregated, "Expect AddInterest() result to be Aggregated");
     assertTrue(parcBitVector_Equals(expectedReturnVector, savedReturnVector), "Expect an existing return vector");
 
     // Duplicate of testInterest1
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
     assertTrue(parcBitVector_Equals(expectedReturnVector, savedReturnVector), "Expect an existing return vectors");
 }
@@ -471,7 +471,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_RemoveInterest)
 
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult != AthenaPITResolution_Error, "athenaPIT_AddInterest failed");
     assertNotNull(expectedReturnVector, "Expected a return vector to be created");
     size_t interestCount = athenaPIT_GetNumberOfPendingInterests(data->testPIT);
@@ -491,10 +491,10 @@ LONGBOW_TEST_CASE(Global, athenaPIT_RemoveInterest)
     // Remove Aggregated interest
     parcBitVector_Set(expectedReturnVector, 5);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
 
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
     interestCount = athenaPIT_GetNumberOfPendingInterests(data->testPIT);
     assertTrue(interestCount == 2, "Expect there to be 2 interest");
 
@@ -504,11 +504,11 @@ LONGBOW_TEST_CASE(Global, athenaPIT_RemoveInterest)
     assertTrue(interestCount == 0, "Expect there to be 0 interest");
 
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult != AthenaPITResolution_Error, "athenaPIT_AddInterest failed");
 
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult != AthenaPITResolution_Error, "athenaPIT_AddInterest failed");
     interestCount = athenaPIT_GetNumberOfPendingInterests(data->testPIT);
     assertTrue(interestCount == 2, "Expect there to be 2 interest");
@@ -535,7 +535,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_NoRestriction)
 
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     parcBitVector_Set(expectedReturnVector, 1);
@@ -545,34 +545,34 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_NoRestriction)
     CCNxName *name2 = ccnxContentObject_GetName(object2);
     PARCBuffer *keyId2 = ccnxContentObject_GetKeyId(object2);
     PARCBuffer *contentId2 = _createMessageHash(object2);
-    PARCBitVector *backLinkVector = athenaPIT_Match(data->testPIT, name2, keyId2, contentId2, savedReturnVector);
+    AthenaPITValue *backLinkVector = athenaPIT_Match(data->testPIT, name2, keyId2, contentId2, savedReturnVector);
     parcBuffer_Release(&contentId2);
-    assertTrue(parcBitVector_NumberOfBitsSet(backLinkVector) == 0, "Did not expect to find match to forward to");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_NumberOfBitsSet(athenaPITValue_GetVector(backLinkVector)) == 0, "Did not expect to find match to forward to");
+    athenaPITValue_Release(&backLinkVector);
 
     CCNxContentObject *object1 = data->testContent1;
     CCNxName *name1 = ccnxContentObject_GetName(object1);
     PARCBuffer *keyId1 = ccnxContentObject_GetKeyId(object1);
     PARCBuffer *contentId1 = _createMessageHash(object1);
     backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
-    assertTrue(parcBitVector_Equals(backLinkVector, data->testVector1), "Expect to find match to forward to");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_Equals(athenaPITValue_GetVector(backLinkVector), data->testVector1), "Expect to find match to forward to");
+    athenaPITValue_Release(&backLinkVector);
 
     //Aggregation of testInterest1
     assertTrue(athenaPIT_GetNumberOfTableEntries(data->testPIT) == 0, "There should be 0 PIT entries at this point");
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
     parcBitVector_Set(expectedReturnVector, 5);
     assertTrue(athenaPIT_GetNumberOfTableEntries(data->testPIT) == 1, "There should be 1 PIT table entries at this point");
     assertTrue(athenaPIT_GetNumberOfPendingInterests(data->testPIT) == 2, "There should be 2 Pending Interests at this point");
 
     backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
-    assertTrue(parcBitVector_Equals(backLinkVector, data->testVector12), "Expect to find match to forward to");
+    assertTrue(parcBitVector_Equals(athenaPITValue_GetVector(backLinkVector), data->testVector12), "Expect to find match to forward to");
 
     parcBuffer_Release(&contentId1);
-    parcBitVector_Release(&backLinkVector);
+    athenaPITValue_Release(&backLinkVector);
 }
 
 LONGBOW_TEST_CASE(Global, athenaPIT_Match_KeyIdRestriction)
@@ -582,7 +582,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_KeyIdRestriction)
     PARCBitVector *expectedReturnVector;
 
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     parcBitVector_Set(expectedReturnVector, 1);
@@ -593,10 +593,10 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_KeyIdRestriction)
     CCNxName *name1 = ccnxContentObject_GetName(object1);
     PARCBuffer *keyId1 = ccnxContentObject_GetKeyId(object1);
     PARCBuffer *contentId1 = _createMessageHash(object1);
-    PARCBitVector *backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
+    AthenaPITValue *backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
     parcBuffer_Release(&contentId1);
-    assertTrue(parcBitVector_NumberOfBitsSet(backLinkVector) == 0, "Expect to find no match in PIT");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_NumberOfBitsSet(athenaPITValue_GetVector(backLinkVector)) == 0, "Expect to find no match in PIT");
+    athenaPITValue_Release(&backLinkVector);
 
     CCNxContentObject *object1Prime = data->testContent1Prime;
     CCNxName *name1Prime = ccnxContentObject_GetName(object1Prime);
@@ -604,8 +604,8 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_KeyIdRestriction)
     PARCBuffer *contentId1Prime = _createMessageHash(object1Prime);
     backLinkVector = athenaPIT_Match(data->testPIT, name1Prime, keyId1Prime, contentId1Prime, savedReturnVector);
     parcBuffer_Release(&contentId1Prime);
-    assertTrue(parcBitVector_NumberOfBitsSet(backLinkVector) == 0, "Expect to find no match in PIT");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_NumberOfBitsSet(athenaPITValue_GetVector(backLinkVector)) == 0, "Expect to find no match in PIT");
+    athenaPITValue_Release(&backLinkVector);
 
     CCNxContentObject *object1WithSig = data->testContent1WithSig;
     CCNxName *name1WithSig = ccnxContentObject_GetName(object1WithSig);
@@ -613,8 +613,8 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_KeyIdRestriction)
     PARCBuffer *contentId1WithSig = _createMessageHash(object1WithSig);
     backLinkVector = athenaPIT_Match(data->testPIT, name1WithSig, keyId1WithSig, contentId1WithSig, savedReturnVector);
     parcBuffer_Release(&contentId1WithSig);
-    assertTrue(parcBitVector_Equals(backLinkVector, data->testVector1), "Expect to find match to forward to");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_Equals(athenaPITValue_GetVector(backLinkVector), data->testVector1), "Expect to find match to forward to");
+    athenaPITValue_Release(&backLinkVector);
 }
 
 LONGBOW_TEST_CASE(Global, athenaPIT_Match_ContentHashRestriction)
@@ -625,7 +625,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_ContentHashRestriction)
 
     // Match with ContentId
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     parcBitVector_Set(expectedReturnVector, 1);
@@ -636,10 +636,10 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_ContentHashRestriction)
     CCNxName *name1Prime = ccnxContentObject_GetName(object1Prime);
     PARCBuffer *keyId1Prime = ccnxContentObject_GetKeyId(object1Prime);
     PARCBuffer *contentId1Prime = _createMessageHash(object1Prime);
-    PARCBitVector *backLinkVector = athenaPIT_Match(data->testPIT, name1Prime, keyId1Prime, contentId1Prime, savedReturnVector);
+    AthenaPITValue *backLinkVector = athenaPIT_Match(data->testPIT, name1Prime, keyId1Prime, contentId1Prime, savedReturnVector);
     parcBuffer_Release(&contentId1Prime);
-    assertTrue(parcBitVector_NumberOfBitsSet(backLinkVector) == 0, "Expect to find no match in PIT");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_NumberOfBitsSet(athenaPITValue_GetVector(backLinkVector)) == 0, "Expect to find no match in PIT");
+    athenaPITValue_Release(&backLinkVector);
 
     CCNxContentObject *object1WithSig = data->testContent1WithSig;
     CCNxName *name1WithSig = ccnxContentObject_GetName(object1WithSig);
@@ -647,8 +647,8 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_ContentHashRestriction)
     PARCBuffer *contentId1WithSig = _createMessageHash(object1WithSig);
     backLinkVector = athenaPIT_Match(data->testPIT, name1WithSig, keyId1WithSig, contentId1WithSig, savedReturnVector);
     parcBuffer_Release(&contentId1WithSig);
-    assertTrue(parcBitVector_Equals(backLinkVector, data->testVector1), "Expect to find match to forward to");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_Equals(athenaPITValue_GetVector(backLinkVector), data->testVector1), "Expect to find match to forward to");
+    athenaPITValue_Release(&backLinkVector);
 }
 
 LONGBOW_TEST_CASE(Global, athenaPIT_Match_Nameless)
@@ -659,7 +659,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_Nameless)
 
     // Match with ContentId
     AthenaPITResolution addResult =
-            athenaPIT_AddInterest(data->testPIT, data->testNamelessInterest, data->testVector1, NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->testNamelessInterest, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     parcBitVector_Set(expectedReturnVector, 1);
@@ -670,9 +670,9 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_Nameless)
     PARCBuffer *keyIdPrime = ccnxContentObject_GetKeyId(data->testContent1Prime);
     PARCBuffer *contentIdPrime = _createMessageHash(data->testContent1Prime);
 
-    PARCBitVector *backLinkVector = athenaPIT_Match(data->testPIT, namePrime, keyIdPrime, contentIdPrime, savedReturnVector);
-    assertTrue(parcBitVector_NumberOfBitsSet(backLinkVector) == 0, "Expect to find no match in PIT");
-    parcBitVector_Release(&backLinkVector);
+    AthenaPITValue *backLinkVector = athenaPIT_Match(data->testPIT, namePrime, keyIdPrime, contentIdPrime, savedReturnVector);
+    assertTrue(parcBitVector_NumberOfBitsSet(athenaPITValue_GetVector(backLinkVector)) == 0, "Expect to find no match in PIT");
+    athenaPITValue_Release(&backLinkVector);
     parcBuffer_Release(&contentIdPrime);
 
     CCNxName *nameNameless = ccnxContentObject_GetName(data->testNamelessContent);
@@ -680,8 +680,8 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_Nameless)
     PARCBuffer *contentIdNameless = _createMessageHash(data->testNamelessContent);
 
     backLinkVector = athenaPIT_Match(data->testPIT, nameNameless, keyIdNameless, contentIdNameless, savedReturnVector);
-    assertTrue(parcBitVector_Equals(backLinkVector, data->testVector1), "Expect to find match to forward to");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_Equals(athenaPITValue_GetVector(backLinkVector), data->testVector1), "Expect to find match to forward to");
+    athenaPITValue_Release(&backLinkVector);
     parcBuffer_Release(&contentIdNameless);
 }
 
@@ -693,17 +693,17 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_MultipleRestrictions)
 
     // Interest for Content w/ KeyId restriction
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     // Interest for Content w/ KeyId restriction
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     // Interest for Content w/ ContentId restriction
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector3, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector3, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     parcBitVector_Set(expectedReturnVector, 1);
@@ -714,11 +714,11 @@ LONGBOW_TEST_CASE(Global, athenaPIT_Match_MultipleRestrictions)
     CCNxName *name1WithSig = ccnxContentObject_GetName(object1WithSig);
     PARCBuffer *keyId1WithSig = ccnxContentObject_GetKeyId(object1WithSig);
     PARCBuffer *contentId1WithSig = _createMessageHash(object1WithSig);
-    PARCBitVector *backLinkVector = athenaPIT_Match(data->testPIT, name1WithSig, keyId1WithSig, contentId1WithSig, savedReturnVector);
+    AthenaPITValue *backLinkVector = athenaPIT_Match(data->testPIT, name1WithSig, keyId1WithSig, contentId1WithSig, savedReturnVector);
     parcBuffer_Release(&contentId1WithSig);
-    assertTrue(parcBitVector_NumberOfBitsSet(backLinkVector) == 3, "Expect to find 3 PIT matches");
-    assertTrue(parcBitVector_Equals(backLinkVector, data->testVector123), "Expect to find match to forward to");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_NumberOfBitsSet(athenaPITValue_GetVector(backLinkVector)) == 3, "Expect to find 3 PIT matches");
+    assertTrue(parcBitVector_Equals(athenaPITValue_GetVector(backLinkVector), data->testVector123), "Expect to find match to forward to");
+    athenaPITValue_Release(&backLinkVector);
 }
 
 LONGBOW_TEST_CASE(Global, athenaPIT_CreateCapacity)
@@ -731,19 +731,19 @@ LONGBOW_TEST_CASE(Global, athenaPIT_CreateCapacity)
 
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expected forward result");
 
     addResult =
-        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expected forward result");
 
     addResult =
-        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Aggregated, "Expected aggregated result");
 
     addResult =
-        athenaPIT_AddInterest(limitedPIT, data->testInterest1WithKeyId, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(limitedPIT, data->testInterest1WithKeyId, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Error, "Expected error result");
 
     athenaPIT_Release(&limitedPIT);
@@ -759,7 +759,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_PurgeExpired)
 
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expected forward result");
     assertTrue(athenaPIT_GetNumberOfTableEntries(limitedPIT) == 1, "Expect a single PIT entry");
     assertTrue(athenaPIT_GetNumberOfPendingInterests(limitedPIT) == 1, "Expect 1 pending interests");
@@ -767,13 +767,13 @@ LONGBOW_TEST_CASE(Global, athenaPIT_PurgeExpired)
     _TestClockTimeval.tv_usec += 50 * 1000;
 
     addResult =
-        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expected forward result");
     assertTrue(athenaPIT_GetNumberOfTableEntries(limitedPIT) == 1, "Expect a single PIT entry");
     assertTrue(athenaPIT_GetNumberOfPendingInterests(limitedPIT) == 1, "Expect 1 pending interests");
 
     addResult =
-        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(limitedPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Aggregated, "Expected aggregate result");
     assertTrue(athenaPIT_GetNumberOfTableEntries(limitedPIT) == 1, "Expect a single PIT entry");
     assertTrue(athenaPIT_GetNumberOfPendingInterests(limitedPIT) == 2, "Expect 2 pending interests");
@@ -782,14 +782,14 @@ LONGBOW_TEST_CASE(Global, athenaPIT_PurgeExpired)
     _TestClockTimeval.tv_usec += 50 * 1000;
 
     addResult =
-        athenaPIT_AddInterest(limitedPIT, data->testInterest2, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(limitedPIT, data->testInterest2, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Error, "Expected error result");
 
     // Expire the pit entry
     _TestClockTimeval.tv_usec += 1000 * 1000;
 
     addResult =
-        athenaPIT_AddInterest(limitedPIT, data->testInterest1WithKeyId, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(limitedPIT, data->testInterest1WithKeyId, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expected forward result");
 
     athenaPIT_Release(&limitedPIT);
@@ -805,21 +805,21 @@ LONGBOW_TEST_CASE(Global, athenaPIT_RemoveLink)
     // Test 1 - remove link with 3 different interest on the removed link
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult != AthenaPITResolution_Error, "athenaPIT_AddInterest failed");
     assertTrue(athenaPIT_RemoveLink(data->testPIT, data->testVector1), "Expected True result from RemoveLink()");
     assertTrue(athenaPIT_RemoveLink(data->testPIT, data->testVector2), "Expected True result from RemoveLink()");
 
     // Test 2 - remove link with 3 different interest on the removed link
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     parcBitVector_Set(expectedReturnVector, 1);
     PARCBitVector *savedReturnVector = expectedReturnVector;
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, NULL, &expectedReturnVector);
     parcBitVector_Set(expectedReturnVector, 3);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, NULL, &expectedReturnVector);
 
     // Should be no pending interests after remove
     assertTrue(athenaPIT_RemoveLink(data->testPIT, data->testVector1), "Expected True result from RemoveLink()");
@@ -828,45 +828,45 @@ LONGBOW_TEST_CASE(Global, athenaPIT_RemoveLink)
     CCNxName *name1 = ccnxContentObject_GetName(object1);
     PARCBuffer *keyId1 = ccnxContentObject_GetKeyId(object1);
     PARCBuffer *contentId1 = _createMessageHash(object1);
-    PARCBitVector *backLinkVector =
+    AthenaPITValue *backLinkVector =
         athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
     parcBuffer_Release(&contentId1);
-    assertTrue((int) parcBitVector_NextBitSet(backLinkVector, 0) == -1, "Expect an empty back link vector");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue((int) parcBitVector_NextBitSet(athenaPITValue_GetVector(backLinkVector), 0) == -1, "Expect an empty back link vector");
+    athenaPITValue_Release(&backLinkVector);
 
     // Test 3 - remove link with two different interest on the removed link and one on a different link
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     parcBitVector_Set(expectedReturnVector, 1);
     savedReturnVector = expectedReturnVector;
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector2, NULL, NULL, &expectedReturnVector);
     parcBitVector_Set(expectedReturnVector, 3);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector2, NULL, NULL, &expectedReturnVector);
 
     // Should be one pending interests after remove
     assertTrue(athenaPIT_RemoveLink(data->testPIT, data->testVector2), "Expected True result from RemoveLink()");
     backLinkVector =
         athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
-    assertTrue(parcBitVector_Equals(backLinkVector, data->testVector1), "Expect back link vector to equal vector2 ");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_Equals(athenaPITValue_GetVector(backLinkVector), data->testVector1), "Expect back link vector to equal vector2 ");
+    athenaPITValue_Release(&backLinkVector);
 
     // Test 4 - remove link with the same interest on two different links
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
 
     parcBitVector_Set(expectedReturnVector, 1);
     savedReturnVector = expectedReturnVector;
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
 
     // Should be one pending interests after remove
     assertTrue(athenaPIT_RemoveLink(data->testPIT, data->testVector1), "Expected True result from RemoveLink()");
     backLinkVector =
         athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
-    assertTrue(parcBitVector_Equals(backLinkVector, data->testVector2), "Expect back link vector to equal vector2 ");
-    parcBitVector_Release(&backLinkVector);
+    assertTrue(parcBitVector_Equals(athenaPITValue_GetVector(backLinkVector), data->testVector2), "Expect back link vector to equal vector2 ");
+    athenaPITValue_Release(&backLinkVector);
 }
 
 LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfTableEntries)
@@ -879,7 +879,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfTableEntries)
 
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     tableEntries = athenaPIT_GetNumberOfTableEntries(data->testPIT);
@@ -887,7 +887,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfTableEntries)
 
     parcBitVector_Set(expectedReturnVector, 1);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     tableEntries = athenaPIT_GetNumberOfTableEntries(data->testPIT);
@@ -895,7 +895,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfTableEntries)
 
     parcBitVector_Set(expectedReturnVector, 3);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     tableEntries = athenaPIT_GetNumberOfTableEntries(data->testPIT);
@@ -904,7 +904,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfTableEntries)
     // Aggregation of testInterest1
     parcBitVector_Set(expectedReturnVector, 5);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Aggregated, "Expect AddInterest() result to be Aggregated");
 
     tableEntries = athenaPIT_GetNumberOfTableEntries(data->testPIT);
@@ -912,7 +912,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfTableEntries)
 
     // Duplicate of testInterest1
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     tableEntries = athenaPIT_GetNumberOfTableEntries(data->testPIT);
@@ -928,7 +928,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfPendingInterests)
 
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     pendingInterests = athenaPIT_GetNumberOfPendingInterests(data->testPIT);
@@ -936,7 +936,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfPendingInterests)
 
     parcBitVector_Set(expectedReturnVector, 1);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     pendingInterests = athenaPIT_GetNumberOfPendingInterests(data->testPIT);
@@ -944,7 +944,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfPendingInterests)
 
     parcBitVector_Set(expectedReturnVector, 3);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     pendingInterests = athenaPIT_GetNumberOfPendingInterests(data->testPIT);
@@ -953,7 +953,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfPendingInterests)
     // Aggregation of testInterest1
     parcBitVector_Set(expectedReturnVector, 5);
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Aggregated, "Expect AddInterest() result to be Aggregated");
 
     pendingInterests = athenaPIT_GetNumberOfPendingInterests(data->testPIT);
@@ -961,7 +961,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetNumberOfPendingInterests)
 
     // Duplicate of testInterest1
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     pendingInterests = athenaPIT_GetNumberOfPendingInterests(data->testPIT);
@@ -981,7 +981,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetMeanEntryLifetime)
 
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult != AthenaPITResolution_Error, "athenaPIT_AddInterest failed");
 
     // Test lifetime
@@ -993,37 +993,37 @@ LONGBOW_TEST_CASE(Global, athenaPIT_GetMeanEntryLifetime)
     CCNxName *name1 = ccnxContentObject_GetName(object1);
     PARCBuffer *keyId1 = ccnxContentObject_GetKeyId(object1);
     PARCBuffer *contentId1 = _createMessageHash(object1);
-    PARCBitVector *backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
-    parcBitVector_Release(&backLinkVector);
+    AthenaPITValue *backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
+    athenaPITValue_Release(&backLinkVector);
 
     meanLifetime = athenaPIT_GetMeanEntryLifetime(data->testPIT);
     assertTrue(meanLifetime == 50, "Expect mean lifetime == 50ms, was %d", (int) meanLifetime);
 
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
 
     // Test interest lifetime
     _TestClockTimeval.tv_usec += 100 * 1000;
 
     parcBitVector_Set(expectedReturnVector, 1);
     backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
-    parcBitVector_Release(&backLinkVector);
+    athenaPITValue_Release(&backLinkVector);
 
     meanLifetime = athenaPIT_GetMeanEntryLifetime(data->testPIT);
     assertTrue(meanLifetime == 75, "Expect mean lifetime == 75ms, was %d", (int) meanLifetime);
 
     for (size_t i = 0; i < 150; ++i) {
         addResult =
-            athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
         _TestClockTimeval.tv_usec += 1000;
         backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, data->testVector1);
-        parcBitVector_Release(&backLinkVector);
+        athenaPITValue_Release(&backLinkVector);
     }
     addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     _TestClockTimeval.tv_usec += 201 * 1000;
     backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, data->testVector1);
-    parcBitVector_Release(&backLinkVector);
+    athenaPITValue_Release(&backLinkVector);
 
     parcBuffer_Release(&contentId1);
 
@@ -1037,7 +1037,7 @@ LONGBOW_TEST_CASE(Global, athenaPIT_LinkCleanupFromMatch)
 
     PARCBitVector *expectedReturnVector;
     AthenaPITResolution addResult =
-        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+        athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     parcBitVector_Set(expectedReturnVector, 1);
@@ -1046,9 +1046,9 @@ LONGBOW_TEST_CASE(Global, athenaPIT_LinkCleanupFromMatch)
     CCNxName *name1 = ccnxContentObject_GetName(object1);
     PARCBuffer *keyId1 = ccnxContentObject_GetKeyId(object1);
     PARCBuffer *contentId1 = _createMessageHash(object1);
-    PARCBitVector *backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
+    AthenaPITValue *backLinkVector = athenaPIT_Match(data->testPIT, name1, keyId1, contentId1, savedReturnVector);
     parcBuffer_Release(&contentId1);
-    parcBitVector_Release(&backLinkVector);
+    athenaPITValue_Release(&backLinkVector);
 
     assertTrue(athenaPIT_RemoveLink(data->testPIT, data->testVector1), "Expected True result from RemoveLink()");
 }
@@ -1110,28 +1110,28 @@ LONGBOW_TEST_CASE(Global, athenaPIT_CreateEntryList)
     PARCBitVector *expectedReturnVector;
 
     AthenaPITResolution addResult =
-            athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     parcBitVector_Set(expectedReturnVector, 1);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     addResult =
-            athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->testInterest1WithKeyId, data->testVector1, NULL, NULL, &expectedReturnVector);
     parcBitVector_Set(expectedReturnVector, 3);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     addResult =
-            athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->testInterest1WithContentId, data->testVector1, NULL, NULL, &expectedReturnVector);
     parcBitVector_Set(expectedReturnVector, 5);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     // Aggregation of testInterest1
     addResult =
-            athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector2, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Aggregated, "Expect AddInterest() result to be Aggregated");
 
     // Duplicate of testInterest1
     addResult =
-            athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->testInterest1, data->testVector1, NULL, NULL, &expectedReturnVector);
     assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
     PARCList *entryList = athenaPIT_CreateEntryList(data->testPIT);
@@ -1221,7 +1221,7 @@ LONGBOW_TEST_CASE(Performance, athenaPIT_AddInterest)
 
     for (size_t i = 0; i < ITERATIONS; ++i) {
         AthenaPITResolution addResult =
-            athenaPIT_AddInterest(data->testPIT, data->interests[i], data->ingressVectors[i], NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->interests[i], data->ingressVectors[i], NULL, NULL, &expectedReturnVector);
         assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
     }
 }
@@ -1234,7 +1234,7 @@ LONGBOW_TEST_CASE(Performance, athenaPIT_Match)
 
     for (size_t i = 0; i < ITERATIONS; ++i) {
         AthenaPITResolution addResult =
-            athenaPIT_AddInterest(data->testPIT, data->interests[i], data->ingressVectors[i], NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->interests[i], data->ingressVectors[i], NULL, NULL, &expectedReturnVector);
         assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
     }
 
@@ -1243,9 +1243,9 @@ LONGBOW_TEST_CASE(Performance, athenaPIT_Match)
         CCNxName *name = ccnxContentObject_GetName(object);
         PARCBuffer *keyId = ccnxContentObject_GetKeyId(object);
         PARCBuffer *contentId = _createMessageHash(object);
-        PARCBitVector *backLinkVector = athenaPIT_Match(data->testPIT, name, keyId, contentId, expectedReturnVector);
+        AthenaPITValue *backLinkVector = athenaPIT_Match(data->testPIT, name, keyId, contentId, expectedReturnVector);
         parcBuffer_Release(&contentId);
-        parcBitVector_Release(&backLinkVector);
+        athenaPITValue_Release(&backLinkVector);
     }
 }
 
@@ -1257,7 +1257,7 @@ LONGBOW_TEST_CASE(Performance, athenaPIT_RemoveLink)
 
     for (size_t i = 0; i < ITERATIONS; ++i) {
         AthenaPITResolution addResult =
-            athenaPIT_AddInterest(data->testPIT, data->interests[i], data->ingressVectors[i], NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->interests[i], data->ingressVectors[i], NULL, NULL, &expectedReturnVector);
         assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
     }
 
@@ -1280,15 +1280,15 @@ LONGBOW_TEST_CASE(Performance, athenaPIT_Add_Remove)
     uint64_t start = parcClock_GetTime(clock);
     for (size_t i = 0; i < ITERATIONS * 2; ++i) {
         AthenaPITResolution addResult =
-            athenaPIT_AddInterest(data->testPIT, data->interests[1], data->ingressVectors[1], NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->interests[1], data->ingressVectors[1], NULL, NULL, &expectedReturnVector);
         assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
         CCNxContentObject *object = data->content[1];
         CCNxName *name = ccnxContentObject_GetName(object);
         PARCBuffer *keyId = ccnxContentObject_GetKeyId(object);
         PARCBuffer *contentId = _createMessageHash(object);
-        PARCBitVector *backLinkVector = athenaPIT_Match(data->testPIT, name, keyId, contentId, expectedReturnVector);
-        parcBitVector_Release(&backLinkVector);
+        AthenaPITValue *backLinkVector = athenaPIT_Match(data->testPIT, name, keyId, contentId, expectedReturnVector);
+        athenaPITValue_Release(&backLinkVector);
         parcBuffer_Release(&contentId);
     }
     int delta1 = (int) (parcClock_GetTime(clock) - start);
@@ -1296,15 +1296,15 @@ LONGBOW_TEST_CASE(Performance, athenaPIT_Add_Remove)
     start = parcClock_GetTime(clock);
     for (size_t i = 0; i < ITERATIONS * 2; ++i) {
         AthenaPITResolution addResult =
-            athenaPIT_AddInterest(data->testPIT, data->interests[1], data->ingressVectors[1], NULL, &expectedReturnVector);
+            athenaPIT_AddInterest(data->testPIT, data->interests[1], data->ingressVectors[1], NULL, NULL, &expectedReturnVector);
         assertTrue(addResult == AthenaPITResolution_Forward, "Expect AddInterest() result to be Forward");
 
         CCNxContentObject *object = data->content[1];
         CCNxName *name = ccnxContentObject_GetName(object);
         PARCBuffer *keyId = ccnxContentObject_GetKeyId(object);
         PARCBuffer *contentId = _createMessageHash(object);
-        PARCBitVector *backLinkVector = athenaPIT_Match(data->testPIT, name, keyId, contentId, expectedReturnVector);
-        parcBitVector_Release(&backLinkVector);
+        AthenaPITValue *backLinkVector = athenaPIT_Match(data->testPIT, name, keyId, contentId, expectedReturnVector);
+        athenaPITValue_Release(&backLinkVector);
         parcBuffer_Release(&contentId);
     }
     int delta2 = (int) (parcClock_GetTime(clock) - start);

@@ -150,6 +150,7 @@ typedef struct athena_pitEntry {
     CCNxInterest *ccnxMessage;
     PARCBitVector *ingress;
     PARCBitVector *egress; // FIB egress at entry, used to validate return of content on expected link
+    CCNxName *originalName; // The original name that was used to route the packet to this node (the encapsulation name)
     PARCBuffer *encapKey; // one-time encryption key used to decapsulate the response
     _Time *expiration; // not predecessor lifetime, but longest for all
     _Time *creationTime; // not predecessor lifetime, but longest for all
@@ -209,6 +210,7 @@ _athenaPITEntry_Create(const PARCBuffer *key,
                        const CCNxInterest *message,
                        const PARCBitVector *ingress,
                        const PARCBitVector *egress,
+                       CCNxName *originalName,
                        PARCBuffer *encapKey,
                        time_t expiration,
                        time_t creationTime)
@@ -219,6 +221,7 @@ _athenaPITEntry_Create(const PARCBuffer *key,
         entry->ccnxMessage = ccnxMetaMessage_Acquire(message);
         entry->ingress = parcBitVector_Copy(ingress);
         entry->egress = parcBitVector_Acquire(egress);
+        entry->originalName = originalName == NULL ? NULL : ccnxName_Acquire(originalName);
         entry->encapKey = encapKey == NULL ? NULL : parcBuffer_Acquire(encapKey);
         entry->expiration = _time_Create(expiration);
         entry->creationTime = _time_Create(creationTime);
@@ -570,6 +573,7 @@ AthenaPITResolution
 athenaPIT_AddInterest(AthenaPIT *athenaPIT,
                       const CCNxInterest *ccnxInterestMessage,
                       const PARCBitVector *ingressVector,
+                      CCNxName *originalName,
                       PARCBuffer *encapKey,
                       PARCBitVector **expectedReturnVector)
 {
@@ -596,7 +600,7 @@ athenaPIT_AddInterest(AthenaPIT *athenaPIT,
 
             // Add the default entry which contains the Interest name
             _AthenaPITEntry *newEntry =
-                _athenaPITEntry_Create(key, ccnxInterestMessage, ingressVector, newEgressVector, encapKey, expiration, now);
+                _athenaPITEntry_Create(key, ccnxInterestMessage, ingressVector, newEgressVector, originalName, encapKey, expiration, now);
 
             parcHashMap_Put(athenaPIT->entryTable, key, newEntry);
             ++athenaPIT->interestCount;
@@ -612,7 +616,7 @@ athenaPIT_AddInterest(AthenaPIT *athenaPIT,
                 PARCBuffer *namelessKey = _athenaPIT_createCompoundKey(NULL, contentId, NULL);
 
                 _AthenaPITEntry *namelessEntry =
-                        _athenaPITEntry_Create(namelessKey, ccnxInterestMessage, ingressVector, newEgressVector, encapKey, expiration, now);
+                        _athenaPITEntry_Create(namelessKey, ccnxInterestMessage, ingressVector, newEgressVector, originalName, encapKey, expiration, now);
                 parcHashMap_Put(athenaPIT->entryTable, namelessKey, namelessEntry);
 
                 _athenaPIT_addInterestToLinkCleanupList(athenaPIT, ingressVector, namelessEntry);

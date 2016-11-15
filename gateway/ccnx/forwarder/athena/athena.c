@@ -320,7 +320,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
             PARCBitVector *expectedReturnVector;
             AthenaPITResolution result;
-            if ((result = athenaPIT_AddInterest(athena->athenaPIT, newInterest, ingressVector, NULL,
+            if ((result = athenaPIT_AddInterest(athena->athenaPIT, newInterest, ingressVector, NULL, NULL,
                                                 &expectedReturnVector)) != AthenaPITResolution_Forward) {
                 if (result == AthenaPITResolution_Error) {
                     parcLog_Error(athena->log, "PIT resolution error");
@@ -418,6 +418,16 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
     PARCBitVector *egressVector = athenaPITValue_GetVector(value);
     if (egressVector) {
         if (parcBitVector_NumberOfBitsSet(egressVector) > 0) {
+
+            PARCBuffer *encryptKey = athenaPITValue_GetKey(value);
+            if (encryptKey != NULL) {
+                PARCBuffer *contentWireFormat = athenaTransportLinkModule_CreateMessageBuffer(contentObject);
+                size_t contentSize = parcBuffer_Remaining(contentWireFormat);
+                printf("content size = %zu\n", contentSize);
+
+                // XXX
+            }
+
             //
             // *   (2) Add to the Content Store
             //

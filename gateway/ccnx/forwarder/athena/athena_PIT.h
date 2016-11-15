@@ -182,6 +182,7 @@ void athenaPIT_Release(AthenaPIT **athenaPIT);
 AthenaPITResolution athenaPIT_AddInterest(AthenaPIT *athenaPIT,
                                           const CCNxInterest *ccnxInterestMessage,
                                           const PARCBitVector *ingressVector,
+                                          CCNxName *originalName,
                                           PARCBuffer *encapKey,
                                           PARCBitVector **expectedReturnVector);
 
