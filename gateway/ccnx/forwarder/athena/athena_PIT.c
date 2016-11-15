@@ -269,9 +269,56 @@ _athenaPIT_Destroy(AthenaPIT **pitHandle)
 parcObject_ExtendPARCObject(AthenaPIT, _athenaPIT_Destroy, NULL, NULL, NULL, NULL, NULL, NULL);
 
 parcObject_ImplementAcquire(athenaPIT, AthenaPIT);
-
 parcObject_ImplementRelease(athenaPIT, AthenaPIT);
 
+
+struct athena_pit_value {
+    PARCBitVector *vector;
+    PARCBuffer *key;
+};
+
+static void
+_athenaPITValue_Destroy(AthenaPITValue **valueHandle)
+{
+    AthenaPITValue *value = *valueHandle;
+    if (value != NULL) {
+        if (value->vector != NULL) {
+            parcBitVector_Release(&value->vector);
+        }
+        if (value->key != NULL) {
+            parcBuffer_Release(&value->key);
+        }
+    }
+}
+
+
+parcObject_ExtendPARCObject(AthenaPITValue, _athenaPITValue_Destroy, NULL, NULL, NULL, NULL, NULL, NULL);
+
+parcObject_ImplementAcquire(athenaPITValue, AthenaPITValue);
+parcObject_ImplementRelease(athenaPITValue, AthenaPITValue);
+
+AthenaPITValue *
+athenaPITValue_Create(void)
+{
+    AthenaPITValue *value = parcObject_CreateInstance(AthenaPITValue);
+    if (value != NULL) {
+        value->vector = parcBitVector_Create();
+        value->key = NULL;
+    }
+    return value;
+}
+
+PARCBuffer *
+athenaPITValue_GetKey(AthenaPITValue *value)
+{
+    return value->key;
+}
+
+PARCBitVector *
+athenaPITValue_GetVector(AthenaPITValue *value)
+{
+    return value->vector;
+}
 
 AthenaPIT *
 athenaPIT_CreateCapacity(size_t capacity)
@@ -654,7 +701,7 @@ athenaPIT_RemoveInterest(AthenaPIT *athenaPIT,
 }
 
 static void
-_athenaPIT_LookupKey(AthenaPIT *athenaPIT, PARCBuffer *key, PARCBitVector *egressVector)
+_athenaPIT_LookupKey(AthenaPIT *athenaPIT, PARCBuffer *key, AthenaPITValue *value)
 {
     _AthenaPITEntry *entry = (_AthenaPITEntry *) parcHashMap_Get(athenaPIT->entryTable, key);
 
@@ -662,17 +709,22 @@ _athenaPIT_LookupKey(AthenaPIT *athenaPIT, PARCBuffer *key, PARCBitVector *egres
     if (entry != NULL) {
         uint64_t now = parcClock_GetTime(athenaPIT->clock);
         _athenaPIT_AddLifetimeStat(athenaPIT, _athenaPITEntry_Age(entry, now));
-        parcBitVector_SetVector(egressVector, entry->ingress);
+
+        // Set the egress vector
+        parcBitVector_SetVector(value->vector, entry->ingress);
+        if (entry->encapKey != NULL) {
+            value->key = parcBuffer_Acquire(entry->encapKey);
+        }
 
         // Remove Match
         _athenaPIT_removeInterestFromCleanupList(athenaPIT, entry->ingress, key);
         parcHashMap_Remove(athenaPIT->entryTable, key);
         _athenaPIT_removeInterestFromTimeoutTable(athenaPIT, entry);
-        athenaPIT->interestCount -= parcBitVector_NumberOfBitsSet(egressVector);
+        athenaPIT->interestCount -= parcBitVector_NumberOfBitsSet(value->vector);
     }
 }
 
-PARCBitVector *
+AthenaPITValue *
 athenaPIT_Match(AthenaPIT *athenaPIT,
                 const CCNxName *name,
                 const PARCBuffer *keyId,
@@ -682,7 +734,7 @@ athenaPIT_Match(AthenaPIT *athenaPIT,
     //TODO: Add egress check.
 
     PARCBuffer *key;
-    PARCBitVector *result = parcBitVector_Create();
+    AthenaPITValue *result = athenaPITValue_Create(); // parcBitVector_Create();
 
     // Match based on Name & Content Id Restriction & Key Id
     if ((contentId != NULL) && (keyId != NULL)) {

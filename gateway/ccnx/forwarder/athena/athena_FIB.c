@@ -93,7 +93,7 @@ parcObject_ImplementAcquire(athenaFIBValue, AthenaFIBValue);
 parcObject_ImplementRelease(athenaFIBValue, AthenaFIBValue);
 
 AthenaFIBValue *
-athenaFIBValue_Create(PARCBitVector *linkV, CCNxName *prefix, PARCBuffer *key)
+athenaFIBValue_Create(PARCBitVector *linkV, const CCNxName *prefix, PARCBuffer *key)
 {
     assertNotNull(linkV, "Cannot create a key vector with a NULL link");
 

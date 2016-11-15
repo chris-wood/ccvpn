@@ -414,7 +414,8 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
     PARCBuffer *keyId = ccnxContentObject_GetKeyId(contentObject);
     PARCBuffer *digest = _createMessageHash(contentObject);
 
-    PARCBitVector *egressVector = athenaPIT_Match(athena->athenaPIT, name, keyId, digest, ingressVector);
+    AthenaPITValue *value = athenaPIT_Match(athena->athenaPIT, name, keyId, digest, ingressVector);
+    PARCBitVector *egressVector = athenaPITValue_GetVector(value);
     if (egressVector) {
         if (parcBitVector_NumberOfBitsSet(egressVector) > 0) {
             //
@@ -435,7 +436,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 parcBitVector_Release(&result);
             }
         }
-        parcBitVector_Release(&egressVector);
+        athenaPITValue_Release(&value);
     }
 }
 
@@ -447,7 +448,8 @@ _processManifest(Athena *athena, CCNxManifest *manifest, PARCBitVector *ingressV
     const CCNxName *name = ccnxManifest_GetName(manifest);
     PARCBuffer *digest = _createMessageHash(manifest);
 
-    PARCBitVector *egressVector = athenaPIT_Match(athena->athenaPIT, name, NULL, digest, ingressVector);
+    AthenaPITValue *value = athenaPIT_Match(athena->athenaPIT, name, NULL, digest, ingressVector);
+    PARCBitVector *egressVector = athenaPITValue_GetVector(value);
     if (egressVector) {
         if (parcBitVector_NumberOfBitsSet(egressVector) > 0) {
             //
@@ -469,7 +471,7 @@ _processManifest(Athena *athena, CCNxManifest *manifest, PARCBitVector *ingressV
                 parcBitVector_Release(&result);
             }
         }
-        parcBitVector_Release(&egressVector);
+        athenaPITValue_Release(&value);
     }
 }
 

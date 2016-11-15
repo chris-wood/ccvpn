@@ -86,6 +86,15 @@
 struct athena_pit;
 typedef struct athena_pit AthenaPIT;
 
+struct athena_pit_value;
+typedef struct athena_pit_value AthenaPITValue;
+
+PARCBuffer *athenaPITValue_GetKey(AthenaPITValue *value);
+PARCBitVector *athenaPITValue_GetVector(AthenaPITValue *value);
+
+void athenaPITValue_Release(AthenaPITValue **valuePtr);
+AthenaPITValue *athenaPITValue(const AthenaPITValue *value);
+
 /**
  * @typedef AthenaPITResolution
  * @brief PIT decision resolved during insertion
@@ -219,7 +228,7 @@ bool athenaPIT_RemoveInterest(AthenaPIT *athenaPIT,
  * }
  * @endcode
  */
-PARCBitVector *athenaPIT_Match(AthenaPIT *athenaPIT,
+AthenaPITValue *athenaPIT_Match(AthenaPIT *athenaPIT,
                                const CCNxName *name,
                                const PARCBuffer *keyId,
                                const PARCBuffer *contentId,
