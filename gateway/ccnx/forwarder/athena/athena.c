@@ -120,15 +120,22 @@ _athenaDestroy(Athena **athena) {
     if ((*athena)->configurationLog) {
         parcOutputStream_Release(&((*athena)->configurationLog));
     }
+    if ((*athena)->secretKey != NULL) {
+        parcBuffer_Release(&((*athena)->secretKey));
+    }
+    if ((*athena)->publicKey != NULL) {
+        parcBuffer_Release(&((*athena)->publicKey));
+    }
+
 }
 
 parcObject_ExtendPARCObject(Athena, _athenaDestroy, NULL, NULL, NULL, NULL, NULL, NULL);
 
 Athena *
 athena_Create_Key(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer* secretKey, PARCBuffer* publicKey) {
-/*    int init = sodium_init();
+    int init = sodium_init();
     assertTrue(init == 0, "libsodium is not available");
-*/
+
     assertTrue(crypto_aead_aes256gcm_is_available() == 1, "AES-GCM-256 is not available");
 
     Athena *athena = parcObject_CreateAndClearInstance(Athena);
@@ -276,22 +283,26 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
     CCNxName *ccnxName = ccnxInterest_GetName(interest);
     if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->athenaName) == true)) {
+        printf("ahoy\n");
         PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);
+        size_t interestPayloadSize = parcBuffer_Remaining(interestPayload);
         PARCBuffer *secretKey = athena->secretKey;
         PARCBuffer *publicKey = athena->publicKey;
-        PARCBuffer *decrypted = parcBuffer_Allocate(200);
+        PARCBuffer *decrypted = parcBuffer_Allocate(interestPayloadSize);
 
         if (0 != crypto_box_seal_open(
                                  parcBuffer_Overlay(decrypted, 0),
                                  parcBuffer_Overlay(interestPayload, 0),
-                                 100 + crypto_box_SEALBYTES,
+                                 interestPayloadSize,
                                  parcBuffer_Overlay(publicKey, 0),
                                  parcBuffer_Overlay(secretKey, 0))
                                  )
         {
 		    /* message corrupted or not intended for this recipient */
 		    printf("Not decyphered\n");
+            return;
         }
+        printf("%s\n",(char*)parcBuffer_Overlay(decrypted, 0));
     }
 
     //TODO: Check how to tell apart control messages from vpn messages
