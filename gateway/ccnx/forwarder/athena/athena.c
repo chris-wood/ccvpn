@@ -290,7 +290,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     parcMemory_Deallocate(&athenaNameString);
 
     //TODO: The next step is to change the unit test athena_ProcessInterestGW2 to
-    //      to create an interest with an encapsulated interest inside
+    //      to create an interest with an encapsulated interest inside.
 
     if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->athenaName) == true)) {
         printf("ahoy\n");
