@@ -94,10 +94,11 @@ LONGBOW_TEST_RUNNER_TEARDOWN(athena)
 
 LONGBOW_TEST_FIXTURE(Global)
 {
-//    LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
+//      LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
+//      LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestTranslation);
-//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestGW2);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestTranslation);
+    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestGW2);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestReturn);
@@ -125,6 +126,27 @@ LONGBOW_TEST_CASE(Global, athena_CreateRelease)
     CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
     Athena *athena = athena_Create(testName, 100);
     ccnxName_Release(&testName);
+    athena_Release(&athena);
+}
+
+LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease)
+{
+    unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
+    unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
+
+    FILE* sk = fopen("/tmp/key.sec","r");
+    fread(recipient_sk,sizeof(char),crypto_box_SECRETKEYBYTES,sk);
+    fclose(sk);
+    FILE* pk = fopen("/tmp/key.pub","r");
+    fread(recipient_pk,sizeof(char),crypto_box_PUBLICKEYBYTES,pk);
+    fclose(pk);
+    PARCBuffer *secretKey = parcBuffer_WrapCString((char*)recipient_sk);
+    PARCBuffer *publicKey = parcBuffer_WrapCString((char*)recipient_pk);
+
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    Athena *athena = athena_Create_Key(testName, 100, secretKey, publicKey);
+    ccnxName_Release(&testName);
+
     athena_Release(&athena);
 }
 
@@ -335,7 +357,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     FILE* sk = fopen("/tmp/key.sec","r");
     fread(recipient_sk,sizeof(char),crypto_box_SECRETKEYBYTES,sk);
     fclose(sk);
-    FILE* pk = fopen("/tmp/key.sec","r");
+    FILE* pk = fopen("/tmp/key.pub","r");
     fread(recipient_pk,sizeof(char),crypto_box_PUBLICKEYBYTES,pk);
     fclose(pk);
     PARCBuffer *secretKey = parcBuffer_WrapCString((char*)recipient_sk);
@@ -343,9 +365,11 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
 
     PARCURI *connectionURI;
     CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+   // Athena *athena = athena_Create(testName, 100);
     Athena *athena = athena_CreateWithKeyPair(testName, 100, secretKey, publicKey);
     ccnxName_Release(&testName);
-    CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
+//    CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
+    CCNxName *name = ccnxName_CreateFromCString("ccnx:/foo");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
 
     uint64_t chunkNum = 0;
@@ -428,8 +452,6 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     ccnxInterest_Release(&contentObject);
     athena_Release(&athena);
 
-    parcBuffer_Release(&secretKey);
-    parcBuffer_Release(&publicKey);
 }
 
 
