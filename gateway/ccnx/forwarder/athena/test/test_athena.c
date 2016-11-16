@@ -144,7 +144,7 @@ LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease)
     PARCBuffer *publicKey = parcBuffer_WrapCString((char*)recipient_pk);
 
     CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
-    Athena *athena = athena_Create_Key(testName, 100, secretKey, publicKey);
+    Athena *athena = athena_CreateWithKeyPair(testName, 100, secretKey, publicKey);
     ccnxName_Release(&testName);
 
     athena_Release(&athena);
