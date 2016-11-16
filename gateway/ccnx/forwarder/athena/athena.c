@@ -125,7 +125,7 @@ _athenaDestroy(Athena **athena) {
 parcObject_ExtendPARCObject(Athena, _athenaDestroy, NULL, NULL, NULL, NULL, NULL, NULL);
 
 Athena *
-athena_Create_Key(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer* secretKey, PARCBuffer* publicKey) {
+athena_CreateWithKeyPair(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer *secretKey, PARCBuffer *publicKey) {
 /*    int init = sodium_init();
     assertTrue(init == 0, "libsodium is not available");
 */
@@ -275,11 +275,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     // Divert interests destined to the forwarder, we assume these are control messages
 
     CCNxName *ccnxName = ccnxInterest_GetName(interest);
-    if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->athenaName) == true)) {
+    if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->publicName) == true)) {
         PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);
         PARCBuffer *secretKey = athena->secretKey;
         PARCBuffer *publicKey = athena->publicKey;
-        PARCBuffer *decrypted = parcBuffer_Allocate(200);
+        PARCBuffer *decrypted = parcBuffer_Allocate(parcBuffer_Remaining(interestPayload));
 
         if (0 != crypto_box_seal_open(
                                  parcBuffer_Overlay(decrypted, 0),

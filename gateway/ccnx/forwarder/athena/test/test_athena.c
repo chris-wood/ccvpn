@@ -343,7 +343,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
 
     PARCURI *connectionURI;
     CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
-    Athena *athena = athena_Create_Key(testName, 100, secretKey, publicKey);
+    Athena *athena = athena_CreateWithKeyPair(testName, 100, secretKey, publicKey);
     ccnxName_Release(&testName);
     CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
