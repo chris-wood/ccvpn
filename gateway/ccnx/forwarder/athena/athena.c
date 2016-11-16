@@ -125,9 +125,10 @@ _athenaDestroy(Athena **athena) {
 parcObject_ExtendPARCObject(Athena, _athenaDestroy, NULL, NULL, NULL, NULL, NULL, NULL);
 
 Athena *
-athena_Create(CCNxName *name, size_t contentStoreSizeInMB) {
-    int init = sodium_init();
+athena_Create_Key(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer* key) {
+/*    int init = sodium_init();
     assertTrue(init == 0, "libsodium is not available");
+*/
     assertTrue(crypto_aead_aes256gcm_is_available() == 1, "AES-GCM-256 is not available");
 
     Athena *athena = parcObject_CreateAndClearInstance(Athena);
@@ -153,6 +154,44 @@ athena_Create(CCNxName *name, size_t contentStoreSizeInMB) {
 
     athena->log = _athena_logger_create();
     athena->athenaState = Athena_Running;
+
+    athena->secretKey = key;
+
+    return athena;
+}
+
+Athena *
+athena_Create(CCNxName *name, size_t contentStoreSizeInMB) {
+/*    int init = sodium_init();
+    assertTrue(init == 0, "libsodium is not available");
+*/
+    assertTrue(crypto_aead_aes256gcm_is_available() == 1, "AES-GCM-256 is not available");
+
+    Athena *athena = parcObject_CreateAndClearInstance(Athena);
+
+    athena->athenaName = ccnxName_CreateFromCString(CCNxNameAthena_Forwarder);
+    athena->publicName = ccnxName_Acquire(name);
+    assertNotNull(athena->athenaName, "Failed to create forwarder name (%s)", CCNxNameAthena_Forwarder);
+
+    athena->athenaFIB = athenaFIB_Create();
+    assertNotNull(athena->athenaFIB, "Failed to create FIB");
+
+    athena->athenaPIT = athenaPIT_Create();
+    assertNotNull(athena->athenaPIT, "Failed to create PIT");
+
+    AthenaLRUContentStoreConfig storeConfig;
+    storeConfig.capacityInMB = contentStoreSizeInMB;
+
+    athena->athenaContentStore = athenaContentStore_Create(&AthenaContentStore_LRUImplementation, &storeConfig);
+    assertNotNull(athena->athenaContentStore, "Failed to create Content Store");
+
+    athena->athenaTransportLinkAdapter = athenaTransportLinkAdapter_Create(_removeLink, athena);
+    assertNotNull(athena->athenaTransportLinkAdapter, "Failed to create Transport Link Adapter");
+
+    athena->log = _athena_logger_create();
+    athena->athenaState = Athena_Running;
+
+    athena->secretKey = NULL;
 
     return athena;
 }
@@ -232,6 +271,8 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     */
 
     // Divert interests destined to the forwarder, we assume these are control messages
+
+    //TODO: 
     CCNxName *ccnxName = ccnxInterest_GetName(interest);
     if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->athenaName) == true)) {
         _processInterestControl(athena, interest, ingressVector);

@@ -97,6 +97,8 @@ typedef struct Athena {
     AthenaContentStore *athenaContentStore;
     PARCLog *log;
     PARCOutputStream *configurationLog;
+    
+    PARCBuffer *secretKey;
 
     struct {
         uint64_t numProcessedInterests;
@@ -175,7 +177,7 @@ typedef struct Athena {
  * @endcode
  */
 Athena *athena_Create(CCNxName *name, size_t contentStoreSizeInMB);
-
+Athena *athena_Create_Key(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer* key);
 /**
  * @abstract acquire a reference to an Athena forwarder instance
  * @discussion
