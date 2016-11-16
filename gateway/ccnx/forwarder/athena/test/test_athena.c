@@ -355,20 +355,19 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
 
     FILE* sk = fopen("/tmp/key.sec","r");
+    assertNotNull(sk, "Could not open secret key file for reading");
     fread(recipient_sk,sizeof(char),crypto_box_SECRETKEYBYTES,sk);
     fclose(sk);
     FILE* pk = fopen("/tmp/key.pub","r");
+    assertNotNull(pk, "Could not open public key file for reading");
     fread(recipient_pk,sizeof(char),crypto_box_PUBLICKEYBYTES,pk);
     fclose(pk);
     PARCBuffer *secretKey = parcBuffer_WrapCString((char*)recipient_sk);
     PARCBuffer *publicKey = parcBuffer_WrapCString((char*)recipient_pk);
 
     PARCURI *connectionURI;
-    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
-   // Athena *athena = athena_Create(testName, 100);
-    Athena *athena = athena_CreateWithKeyPair(testName, 100, secretKey, publicKey);
-    ccnxName_Release(&testName);
-//    CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
+    CCNxName *domainName = ccnxName_CreateFromCString("ccnx:/domain/2");
+    Athena *athena = athena_CreateWithKeyPair(domainName, 100, secretKey, publicKey);
     CCNxName *name = ccnxName_CreateFromCString("ccnx:/foo");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
 
@@ -415,43 +414,37 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     // Before FIB entry interest should not be forwarded
     athena_ProcessMessage(athena, interest, interestIngressVector);
 
-    // Add route for interest, it should now be forwarded
-    athenaFIB_AddRoute(athena->athenaFIB, name, contentObjectIngressVector);
-    CCNxName *defaultName = ccnxName_CreateFromCString("lci:/");
-    athenaFIB_AddRoute(athena->athenaFIB, defaultName, contentObjectIngressVector);
-    ccnxName_Release(&defaultName);
+    // Creating public/secret keys for gateway2
+    crypto_box_keypair(recipient_pk, recipient_sk);
+    PARCBuffer *targetPublicKey = parcBuffer_WrapCString((char*)recipient_pk);
+
+    // Adding translation route so that the encryption data path is taken
+    athenaFIB_AddTranslationRoute(athena->athenaFIB, name, domainName, targetPublicKey, contentObjectIngressVector);
 
     // Process exact interest match
     athena_ProcessMessage(athena, interest, interestIngressVector);
+    CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, targetPublicKey, domainName);
+    assertNotNull(encryptedInterest, "Failed to encapsulate the interest");
 
-    // Process a super-interest match
-    CCNxName *superName = ccnxName_CreateFromCString("lci:/foo/bar/baz/unmatched");
-    CCNxInterest *superInterest = ccnxInterest_CreateSimple(superName);
-    athena_EncodeMessage(superInterest);
-    athena_ProcessMessage(athena, superInterest, interestIngressVector);
-    ccnxName_Release(&superName);
-    ccnxInterest_Release(&superInterest);
+    // Process encapsulated interest
+//    ccnxInterest_Display(encryptedInterest, 0);
+    athena_ProcessMessage(athena, encryptedInterest, interestIngressVector);
 
-    // Process no-match/default route interest
-    CCNxName *noMatchName = ccnxName_CreateFromCString("lci:/buggs/bunny");
-    CCNxInterest *noMatchInterest = ccnxInterest_CreateSimple(noMatchName);
-    athena_EncodeMessage(noMatchInterest);
-    athena_ProcessMessage(athena, noMatchInterest, interestIngressVector);
-    ccnxName_Release(&noMatchName);
-    ccnxInterest_Release(&noMatchInterest);
-
-    // Create a matching content object that the store should retain and reply to the following interest with
-    athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
-    athena_ProcessMessage(athena, interest, interestIngressVector);
+    ccnxInterest_Release(&encryptedInterest);
+    ccnxInterest_Release(&interest);
+    ccnxContentObject_Release(&contentObject);
 
     parcBitVector_Release(&interestIngressVector);
     parcBitVector_Release(&contentObjectIngressVector);
 
+    ccnxName_Release(&domainName);
     ccnxName_Release(&name);
-    ccnxInterest_Release(&interest);
-    ccnxInterest_Release(&contentObject);
-    athena_Release(&athena);
 
+    parcBuffer_Release(&targetPublicKey);
+    parcBuffer_Release(&secretKey);
+    parcBuffer_Release(&publicKey);
+
+    athena_Release(&athena);
 }
 
 

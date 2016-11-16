@@ -117,6 +117,14 @@ _athenaDestroy(Athena **athena) {
     athenaPIT_Release(&((*athena)->athenaPIT));
     athenaFIB_Release(&((*athena)->athenaFIB));
     parcLog_Release(&((*athena)->log));
+
+    if ((*athena)->publicKey) {
+        parcBuffer_Release(&((*athena)->publicKey));
+    }
+    if ((*athena)->secretKey) {
+        parcBuffer_Release(&((*athena)->secretKey));
+    }
+
     if ((*athena)->configurationLog) {
         parcOutputStream_Release(&((*athena)->configurationLog));
     }
@@ -162,8 +170,8 @@ athena_CreateWithKeyPair(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer
     athena->log = _athena_logger_create();
     athena->athenaState = Athena_Running;
 
-    athena->secretKey = secretKey;
-    athena->publicKey = publicKey;
+    athena->secretKey = parcBuffer_Acquire(secretKey);
+    athena->publicKey = parcBuffer_Acquire(publicKey);
 
     return athena;
 }
@@ -225,6 +233,46 @@ _processControl(Athena *athena, CCNxControl *control, PARCBitVector *ingressVect
     athenaControl(athena, control, ingressVector);
 }
 
+static CCNxInterest *
+_encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, CCNxName *prefix)
+{
+    // Get the wire format
+    PARCBuffer *interestWireFormat = athenaTransportLinkModule_CreateMessageBuffer(interest);
+    size_t interestSize = parcBuffer_Remaining(interestWireFormat);
+
+    // Generate a random symmetric that will be used when encrypting the response
+    unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
+    int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
+    randombytes_buf(symmetricKey, sizeof(symmetricKey));
+
+    // Create the interest and key buffer that will be encrypted
+    PARCBuffer *interestKeyBuffer = parcBuffer_Allocate(symmetricKeyLen + interestSize);
+    parcBuffer_PutArray(interestKeyBuffer, symmetricKeyLen, symmetricKey);
+    parcBuffer_PutBuffer(interestKeyBuffer, interestWireFormat);
+    parcBuffer_Flip(interestKeyBuffer);
+    size_t plaintextLength = parcBuffer_Remaining(interestKeyBuffer);
+
+    // Encrypt the encapsulated interest
+    PARCBuffer *encapsulatedInterest = parcBuffer_Allocate(plaintextLength + crypto_box_SEALBYTES);
+    crypto_box_seal(parcBuffer_Overlay(encapsulatedInterest, 0), parcBuffer_Overlay(interestKeyBuffer, 0),
+                    plaintextLength, parcBuffer_Overlay(keyBuffer, 0));
+
+    // Create the new interest and add the ciphertext as the payload
+    CCNxInterest *newInterest = ccnxInterest_CreateSimple(prefix);
+    ccnxInterest_SetPayloadAndId(newInterest, encapsulatedInterest);
+
+    for (size_t i = 0; i < parcBuffer_Remaining(interestWireFormat); i++) {
+        printf("%02x ", ((uint8_t *) parcBuffer_Overlay(interestWireFormat, 0))[i]);
+    }
+    printf("\n");
+
+    parcBuffer_Release(&interestWireFormat);
+    parcBuffer_Release(&interestKeyBuffer);
+    parcBuffer_Release(&encapsulatedInterest);
+
+    return newInterest;
+}
+
 static void
 _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressVector) {
     uint8_t hoplimit;
@@ -282,7 +330,9 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     // Divert interests destined to the forwarder, we assume these are control messages
 
     CCNxName *ccnxName = ccnxInterest_GetName(interest);
-    if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->publicName) == true)) {
+    bool isPrefix = ccnxName_StartsWith(ccnxName, athena->publicName);
+    bool hasPayload = ccnxInterest_GetPayload(interest) != NULL;
+    if (isPrefix && hasPayload) {
         PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);
         size_t interestPayloadSize = parcBuffer_Remaining(interestPayload);
         PARCBuffer *secretKey = athena->secretKey;
@@ -301,16 +351,42 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 		    printf("Not decyphered\n");
             return;
         }
+
         printf("%s\n",(char*)parcBuffer_Overlay(decrypted, 0));
+
+        // Suck in the key and then advance the buffer to point to the encapsulated interest
+        PARCBuffer *keyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
+        for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES; i++) {
+            parcBuffer_PutUint8(keyBuffer, parcBuffer_GetUint8(decrypted));
+        }
+        parcBuffer_Flip(keyBuffer);
+
+        uint8_t msb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [2];
+        uint8_t lsb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [3];
+        uint16_t size = (((uint16_t) msb) << 8) | lsb;
+
+        PARCBuffer *interestBuffer = parcBuffer_Allocate(size);
+        for (size_t i = 0; i < size; i++) {
+            parcBuffer_PutUint8(interestBuffer, parcBuffer_GetUint8(decrypted));
+        }
+        parcBuffer_Flip(interestBuffer);
+
+//        uint8_t msb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [2];
+//        uint8_t lsb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [3];
+//        uint16_t size = (((uint16_t) msb) << 8) | lsb;
+//        parcBuffer_SetPosition(decrypted, crypto_aead_aes256gcm_KEYBYTES);
+//        parcBuffer_SetLimit(decrypted, size);
+
+        for (size_t i = 0; i < parcBuffer_Remaining(interestBuffer); i++) {
+            printf("%02x ", ((uint8_t *) parcBuffer_Overlay(interestBuffer, 0))[i]);
+        }
+        printf("\n");
+
+        CCNxMetaMessage *rawMessage = ccnxMetaMessage_CreateFromWireFormatBuffer(interestBuffer);
+        ccnxInterest_Release(&interest);
+        interest = ccnxMetaMessage_GetInterest(rawMessage);
     }
 
-    //TODO: Check how to tell apart control messages from vpn messages
-/*    CCNxName *ccnxName = ccnxInterest_GetName(interest);
-    if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->athenaName) == true)) {
-        _processInterestControl(athena, interest, ingressVector);
-        return;
-    }
-*/
     //
     // *   (3) if it's in the FIB, forward, then update the PIT expectedReturnVector so we can verify
     //         when the returned object arrives that it came from an interface it was expected from.
@@ -323,7 +399,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     if (vector != NULL) {
         egressVector = athenaFIBValue_GetVector(vector);
     }
-
 
     if (egressVector != NULL) {
         // If no links are in the egress vector the FIB returned, return a no route interest message
@@ -357,35 +432,9 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             if (keyBuffer != NULL && prefixBuffer != NULL) {
                 assertTrue(keyBuffer != NULL && prefixBuffer != NULL, "Either the key or prefix was NULL.");
 
-                // Get the wire format
-                PARCBuffer *interestWireFormat = athenaTransportLinkModule_CreateMessageBuffer(interest);
-                size_t interestSize = parcBuffer_Remaining(interestWireFormat);
-
-                // Generate a random symmetric that will be used when encrypting the response
-                unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
-                int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
-                randombytes_buf(symmetricKey, sizeof(symmetricKey));
-
-                // Create the interest and key buffer that will be encrypted
-                PARCBuffer *interestKeyBuffer = parcBuffer_Allocate(symmetricKeyLen + interestSize);
-                parcBuffer_PutArray(interestKeyBuffer, symmetricKeyLen, symmetricKey);
-                parcBuffer_PutBuffer(interestKeyBuffer, interestWireFormat);
-                parcBuffer_Flip(interestKeyBuffer);
-                size_t plaintextLength = parcBuffer_Remaining(interestKeyBuffer);
-
-                // Encrypt the encapsulated interest
-                PARCBuffer *encapsulatedInterest = parcBuffer_Allocate(plaintextLength + crypto_box_SEALBYTES);
-                crypto_box_seal(parcBuffer_Overlay(encapsulatedInterest, 0), parcBuffer_Overlay(interestKeyBuffer, 0),
-                                plaintextLength, parcBuffer_Overlay(keyBuffer, 0));
-
-                // Create the new interest and add the ciphertext as the payload
+                CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, prefixBuffer);
                 ccnxInterest_Release(&newInterest);
-                newInterest = ccnxInterest_CreateSimple(prefixBuffer);
-                ccnxInterest_SetPayloadAndId(newInterest, encapsulatedInterest);
-
-                parcBuffer_Release(&interestWireFormat);
-                parcBuffer_Release(&interestKeyBuffer);
-                parcBuffer_Release(&encapsulatedInterest);
+                newInterest = encryptedInterest;
             }
 
             // debug
