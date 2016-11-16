@@ -371,17 +371,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         }
         parcBuffer_Flip(interestBuffer);
 
-//        uint8_t msb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [2];
-//        uint8_t lsb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [3];
-//        uint16_t size = (((uint16_t) msb) << 8) | lsb;
-//        parcBuffer_SetPosition(decrypted, crypto_aead_aes256gcm_KEYBYTES);
-//        parcBuffer_SetLimit(decrypted, size);
-
-        for (size_t i = 0; i < parcBuffer_Remaining(interestBuffer); i++) {
-            printf("%02x ", ((uint8_t *) parcBuffer_Overlay(interestBuffer, 0))[i]);
-        }
-        printf("\n");
-
         CCNxMetaMessage *rawMessage = ccnxMetaMessage_CreateFromWireFormatBuffer(interestBuffer);
         ccnxInterest_Release(&interest);
         interest = ccnxMetaMessage_GetInterest(rawMessage);
