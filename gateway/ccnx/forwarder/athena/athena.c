@@ -280,8 +280,18 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     */
 
     // Divert interests destined to the forwarder, we assume these are control messages
-
+    printf("hey\n");
     CCNxName *ccnxName = ccnxInterest_GetName(interest);
+    char* interestByteStream = ccnxName_ToString(ccnxName);
+    char* athenaNameString = ccnxName_ToString(athena->athenaName);
+    printf("%s\n",interestByteStream);
+    printf("%s\n",athenaNameString);
+    parcMemory_Deallocate(&interestByteStream);
+    parcMemory_Deallocate(&athenaNameString);
+
+    //TODO: The next step is to change the unit test athena_ProcessInterestGW2 to
+    //      to create an interest with an encapsulated interest inside
+
     if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->athenaName) == true)) {
         printf("ahoy\n");
         PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);

@@ -369,7 +369,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     Athena *athena = athena_Create_Key(testName, 100, secretKey, publicKey);
     ccnxName_Release(&testName);
 //    CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
-    CCNxName *name = ccnxName_CreateFromCString("ccnx:/foo");
+    CCNxName *name = ccnxName_CreateFromCString("ccnx:/local/forwarder");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
 
     uint64_t chunkNum = 0;
