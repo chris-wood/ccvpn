@@ -70,11 +70,12 @@
 LONGBOW_TEST_RUNNER(athenactl)
 {
     parcMemory_SetInterface(&PARCSafeMemoryAsPARCMemory);
-
+/*
     LONGBOW_RUN_TEST_FIXTURE(Global);
     LONGBOW_RUN_TEST_FIXTURE(Static);
 
     LONGBOW_RUN_TEST_FIXTURE(Misc);
+*/
 }
 
 // The Test Runner calls this function once before any Test Fixtures are run.

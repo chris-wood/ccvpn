@@ -44,6 +44,7 @@
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_FIB.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athenactl_About.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_TransportLinkModuleFragmenter_BEFS.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/platform/linux/athena_Ethernet.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_Control.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_FIB.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/athenactl/athenactl_main.c" isTestSource="false" />
@@ -51,7 +52,6 @@
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_main.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/CMakeLists.txt" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_TransportLinkModule.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_Control.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_TransportLinkModuleTEMPLATE.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_ContentStore.h" isTestSource="false" />
@@ -61,7 +61,7 @@
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_Fragmenter.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_TransportLinkModuleETH.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_About.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/platform/linux/athena_Ethernet.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_TransportLinkModule.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_Fragmenter.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_TransportLink.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_About.c" isTestSource="false" />
@@ -69,6 +69,7 @@
       <sourceFolder url="file://$MODULE_DIR$/gateway/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/ccnxVPN_Stats.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/athena_keygen.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/ccnxVPN_Common.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/producer/ccnxVPN_Producer.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/ccnxVPN_Common.c" isTestSource="false" />

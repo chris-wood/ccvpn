@@ -22,6 +22,9 @@ set(PRODUCER_SOURCES
         producer/ccnxVPN_Producer.c
         ccnxVPN_Common.c)
 
+set(KEYGEN_SOURCES
+    athena_keygen.c)
+
 include_directories(${CCNX_HOME}/include)
 
 link_directories(${CCNX_HOME}/lib)
@@ -33,6 +36,10 @@ install(TARGETS ccnxVPN_Client RUNTIME DESTINATION bin)
 add_executable(ccnxVPN_Server ${PRODUCER_SOURCES})
 target_link_libraries(ccnxVPN_Server ${CCNX_LIBRARIES})
 install(TARGETS ccnxVPN_Server RUNTIME DESTINATION bin)
+
+add_executable(keygen ${KEYGEN_SOURCES})
+target_link_libraries(keygen ${CCNX_LIBRARIES} sodium)
+install(TARGETS keygen RUNTIME DESTINATION bin)
 
 add_subdirectory(gateway)
 
