@@ -220,7 +220,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
 
 LONGBOW_TEST_CASE(Global, athena_ProcessInterestTranslation)
 {
-    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
+//    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
 
     PARCURI *connectionURI;
     CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
@@ -327,7 +327,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestTranslation)
 
 LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
 {
-    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
+//    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
 
     unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
     unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
@@ -343,7 +343,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
 
     PARCURI *connectionURI;
     CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
-    Athena *athena = athena_Create_Key(testName, 100, secretKey);
+    Athena *athena = athena_Create_Key(testName, 100, secretKey, publicKey);
     ccnxName_Release(&testName);
     CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);

@@ -125,7 +125,7 @@ _athenaDestroy(Athena **athena) {
 parcObject_ExtendPARCObject(Athena, _athenaDestroy, NULL, NULL, NULL, NULL, NULL, NULL);
 
 Athena *
-athena_Create_Key(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer* key) {
+athena_Create_Key(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer* secretKey, PARCBuffer* publicKey) {
 /*    int init = sodium_init();
     assertTrue(init == 0, "libsodium is not available");
 */
@@ -155,16 +155,17 @@ athena_Create_Key(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer* key) 
     athena->log = _athena_logger_create();
     athena->athenaState = Athena_Running;
 
-    athena->secretKey = key;
+    athena->secretKey = secretKey;
+    athena->publicKey = publicKey;
 
     return athena;
 }
 
 Athena *
 athena_Create(CCNxName *name, size_t contentStoreSizeInMB) {
-/*    int init = sodium_init();
+    int init = sodium_init();
     assertTrue(init == 0, "libsodium is not available");
-*/
+
     assertTrue(crypto_aead_aes256gcm_is_available() == 1, "AES-GCM-256 is not available");
 
     Athena *athena = parcObject_CreateAndClearInstance(Athena);
@@ -192,6 +193,7 @@ athena_Create(CCNxName *name, size_t contentStoreSizeInMB) {
     athena->athenaState = Athena_Running;
 
     athena->secretKey = NULL;
+    athena->publicKey = NULL;
 
     return athena;
 }
@@ -272,13 +274,33 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
     // Divert interests destined to the forwarder, we assume these are control messages
 
-    //TODO: 
     CCNxName *ccnxName = ccnxInterest_GetName(interest);
+    if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->athenaName) == true)) {
+        PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);
+        PARCBuffer *secretKey = athena->secretKey;
+        PARCBuffer *publicKey = athena->publicKey;
+        PARCBuffer *decrypted = parcBuffer_Allocate(200);
+
+        if (0 != crypto_box_seal_open(
+                                 parcBuffer_Overlay(decrypted, 0),
+                                 parcBuffer_Overlay(interestPayload, 0),
+                                 100 + crypto_box_SEALBYTES,
+                                 parcBuffer_Overlay(publicKey, 0),
+                                 parcBuffer_Overlay(secretKey, 0))
+                                 )
+        {
+		    /* message corrupted or not intended for this recipient */
+		    printf("Not decyphered\n");
+        }
+    }
+
+    //TODO: Check how to tell apart control messages from vpn messages
+/*    CCNxName *ccnxName = ccnxInterest_GetName(interest);
     if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->athenaName) == true)) {
         _processInterestControl(athena, interest, ingressVector);
         return;
     }
-
+*/
     //
     // *   (3) if it's in the FIB, forward, then update the PIT expectedReturnVector so we can verify
     //         when the returned object arrives that it came from an interface it was expected from.
