@@ -61,6 +61,8 @@
 
 #include <LongBow/unit-test.h>
 
+#include <sodium.h>
+
 #include <errno.h>
 #include <pthread.h>
 
@@ -79,6 +81,7 @@ LONGBOW_TEST_RUNNER(athena_InterestControl)
 // The Test Runner calls this function once before any Test Fixtures are run.
 LONGBOW_TEST_RUNNER_SETUP(athena_InterestControl)
 {
+    sodium_init();
     return LONGBOW_STATUS_SUCCEEDED;
 }
 
