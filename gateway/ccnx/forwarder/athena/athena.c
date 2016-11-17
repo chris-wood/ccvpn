@@ -451,6 +451,10 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 }
                 return;
             }
+
+            if (symKeyBuffer!=NULL) {
+                parcBuffer_Release(&symKeyBuffer);
+            }
 /*
             if (symKeyBuffer!=NULL) {
                 char* test = parcBuffer_ToString(symKeyBuffer);
