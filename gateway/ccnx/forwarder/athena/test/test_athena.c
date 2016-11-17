@@ -97,7 +97,7 @@ LONGBOW_TEST_FIXTURE(Global)
 //      LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
 //      LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
-//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestTranslation);
+    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestTranslation);
     LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestGW2);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
@@ -108,6 +108,7 @@ LONGBOW_TEST_FIXTURE(Global)
 
 LONGBOW_TEST_FIXTURE_SETUP(Global)
 {
+    sodium_init();
     return LONGBOW_STATUS_SUCCEEDED;
 }
 
@@ -416,24 +417,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
 
     // Before FIB entry interest should not be forwarded
     athena_ProcessMessage(athena, interest, interestIngressVector);
-/*
-    // Creating public/secret keys for gateway2
-    crypto_box_keypair(recipient_pk, recipient_sk);
-    PARCBuffer *targetPublicKey = parcBuffer_WrapCString((char*)recipient_pk);
 
-    // Adding translation route so that the encryption data path is taken
-    athenaFIB_AddTranslationRoute(athena->athenaFIB, name, domainName, targetPublicKey, contentObjectIngressVector);
-
-    // Process exact interest match
-    athena_ProcessMessage(athena, interest, interestIngressVector);
-
-    unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
-    int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
-    randombytes_buf(symmetricKey, sizeof(symmetricKey));
-
-    CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, targetPublicKey, domainName, symmetricKey);
-    assertNotNull(encryptedInterest, "Failed to encapsulate the interest");
-*/
     unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
     int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
     randombytes_buf(symmetricKey, sizeof(symmetricKey));
@@ -442,12 +426,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     assertNotNull(encryptedInterest, "Failed to encapsulate the interest");
 
     // Process encapsulated interest
-//    ccnxInterest_Display(encryptedInterest, 0);
     athena_ProcessMessage(athena, encryptedInterest, interestIngressVector);
-
-    printf("Original SymmKey: %s\n", symmetricKey);
-
-    printf("\n\nfinished decapsulation of interest. error in the memory realeasing about to happen...\n\n");
 
     ccnxInterest_Release(&encryptedInterest);
     ccnxInterest_Release(&interest);
