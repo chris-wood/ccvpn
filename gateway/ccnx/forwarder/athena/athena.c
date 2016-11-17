@@ -330,6 +330,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     bool isPrefix = ccnxName_StartsWith(ccnxName, athena->publicName);
     bool hasPayload = ccnxInterest_GetPayload(interest) != NULL;
     if (isPrefix && hasPayload) {
+        printf("Decapsulating...\n");
         PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);
         size_t interestPayloadSize = parcBuffer_Remaining(interestPayload);
         PARCBuffer *secretKey = athena->secretKey;
@@ -416,11 +417,19 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             PARCBuffer *keyBuffer = athenaFIBValue_GetKey(vector);
             CCNxName *prefixBuffer = athenaFIBValue_GetOutputPrefix(vector);
             if (keyBuffer != NULL && prefixBuffer != NULL) {
+                printf("Encapsulating...\n");
                 assertTrue(keyBuffer != NULL && prefixBuffer != NULL, "Either the key or prefix was NULL.");
 
                 unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
                 int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
                 randombytes_buf(symmetricKey, sizeof(symmetricKey));
+                
+                printf("Original SymmKey: ");
+                int i;
+                for (i=0;i<symmetricKeyLen;i++){
+                    printf("%c",symmetricKey[i]);
+                }
+                printf("\n");
 
                 CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, prefixBuffer, symmetricKey);
                 ccnxInterest_Release(&newInterest);
@@ -448,6 +457,12 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                     parcLog_Error(athena->log, "PIT resolution error");
                 }
                 return;
+            }
+
+            if (symKeyBuffer!=NULL) {
+                char* test = parcBuffer_ToString(symKeyBuffer);
+                printf("Stored SymmKey: %s\n",test);
+                parcMemory_Deallocate(&test);
             }
 
             PARCBitVector *failedLinks =
