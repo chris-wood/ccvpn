@@ -423,14 +423,14 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
                 int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
                 randombytes_buf(symmetricKey, sizeof(symmetricKey));
-                
+/*                
                 printf("Original SymmKey: ");
                 int i;
                 for (i=0;i<symmetricKeyLen;i++){
                     printf("%c",symmetricKey[i]);
                 }
                 printf("\n");
-
+*/
                 CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, prefixBuffer, symmetricKey);
                 ccnxInterest_Release(&newInterest);
                 newInterest = encryptedInterest;
@@ -458,13 +458,13 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 }
                 return;
             }
-
+/*
             if (symKeyBuffer!=NULL) {
                 char* test = parcBuffer_ToString(symKeyBuffer);
                 printf("Stored SymmKey: %s\n",test);
                 parcMemory_Deallocate(&test);
             }
-
+*/
             PARCBitVector *failedLinks =
                     athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, newInterest, egressVector);
 

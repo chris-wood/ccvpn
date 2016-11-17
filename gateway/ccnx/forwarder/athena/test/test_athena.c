@@ -433,7 +433,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
 
     // Process encapsulated interest. The result is the forwarding of the original decapsulated interest. Symmetric key is stored in the PIT.
     athena_ProcessMessage(athena, encryptedInterest, interestIngressVector);
-
+/*
     printf("Original SymmKey: ");
     int i;
     for (i=0;i<symmetricKeyLen;i++){
@@ -442,7 +442,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
     printf("\n");
 
     printf("\nfinished decapsulation of interest. error in the memory realeasing about to happen...\n\n");
-
+*/
     ccnxInterest_Release(&encryptedInterest);
     ccnxInterest_Release(&interest);
     ccnxContentObject_Release(&contentObject);
