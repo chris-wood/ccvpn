@@ -97,9 +97,10 @@ LONGBOW_TEST_FIXTURE(Global)
 //      LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
 //      LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
     LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObjectEncryption);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestReturn);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ForwarderEngine);
@@ -424,8 +425,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
     athenaFIB_AddRoute(athena->athenaFIB, name, contentObjectIngressVector);
 
     // Creating encapsulated interest
-    unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
-    int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
+    unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES];
     randombytes_buf(symmetricKey, sizeof(symmetricKey));
 
     CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, publicKey, domainName, symmetricKey);
@@ -433,6 +433,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
 
     // Process encapsulated interest. The result is the forwarding of the original decapsulated interest. Symmetric key is stored in the PIT.
     athena_ProcessMessage(athena, encryptedInterest, interestIngressVector);
+
+    athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
+
 /*
     printf("Original SymmKey: ");
     int i;
@@ -440,8 +443,6 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
         printf("%c",symmetricKey[i]);
     }
     printf("\n");
-
-    printf("\nfinished decapsulation of interest. error in the memory realeasing about to happen...\n\n");
 */
     ccnxInterest_Release(&encryptedInterest);
     ccnxInterest_Release(&interest);
@@ -516,6 +517,118 @@ LONGBOW_TEST_CASE(Global, athena_ProcessContentObject)
     ccnxInterest_Release(&response);
     athena_Release(&athena);
 }
+
+LONGBOW_TEST_CASE(Global, athena_ProcessContentObjectEncryption)
+{
+
+//    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
+
+/*
+  INSERTS THE SYMMETRIC KEY INTO PIT AFTER PROCESSING THE INTEREST
+*/
+
+    unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
+    unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
+
+    // Reading the key pair from /tmp
+    // should run keygen before running this code.
+    FILE* sk = fopen("/tmp/key.sec","r");
+    assertNotNull(sk, "Could not open secret key file for reading");
+    fread(recipient_sk,sizeof(char),crypto_box_SECRETKEYBYTES,sk);
+    fclose(sk);
+    FILE* pk = fopen("/tmp/key.pub","r");
+    assertNotNull(pk, "Could not open public key file for reading");
+    fread(recipient_pk,sizeof(char),crypto_box_PUBLICKEYBYTES,pk);
+    fclose(pk);
+    PARCBuffer *secretKey = parcBuffer_WrapCString((char*)recipient_sk);
+    PARCBuffer *publicKey = parcBuffer_WrapCString((char*)recipient_pk);
+
+    PARCURI *connectionURI;
+
+    CCNxName *domainName = ccnxName_CreateFromCString("ccnx:/domain/2");
+    Athena *athena = athena_CreateWithKeyPair(domainName, 100, secretKey, publicKey);
+
+    CCNxName *name = ccnxName_CreateFromCString("ccnx:/foo");
+
+    CCNxInterest *interest = ccnxInterest_CreateSimple(name);
+
+    uint64_t chunkNum = 0;
+    CCNxNameSegment *chunkSegment = ccnxNameSegmentNumber_Create(CCNxNameLabelType_CHUNK, chunkNum);
+    ccnxName_Append(name, chunkSegment);
+    ccnxNameSegment_Release(&chunkSegment);
+
+    PARCBuffer *payload = parcBuffer_WrapCString("this is a payload");
+    CCNxContentObject *contentObject = ccnxContentObject_CreateWithNameAndPayload(name, payload);
+    parcBuffer_Release(&payload);
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    uint64_t nowInMillis = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+    ccnxContentObject_SetExpiryTime(contentObject, nowInMillis + 100000); // expire in 100 seconds
+
+    connectionURI = parcURI_Parse("tcp://localhost:50100/listener/name=TCPListener");
+    const char *result = athenaTransportLinkAdapter_Open(athena->athenaTransportLinkAdapter, connectionURI);
+    assertTrue(result != NULL, "athenaTransportLinkAdapter_Open failed(%s)", strerror(errno));
+    parcURI_Release(&connectionURI);
+
+    connectionURI = parcURI_Parse("tcp://localhost:50100/name=TCP_0/local=false");
+    result = athenaTransportLinkAdapter_Open(athena->athenaTransportLinkAdapter, connectionURI);
+    assertTrue(result != NULL, "athenaTransportLinkAdapter_Open failed (%s)", strerror(errno));
+    parcURI_Release(&connectionURI);
+
+    connectionURI = parcURI_Parse("tcp://localhost:50100/name=TCP_1/local=false");
+    result = athenaTransportLinkAdapter_Open(athena->athenaTransportLinkAdapter, connectionURI);
+    assertTrue(result != NULL, "athenaTransportLinkAdapter_Open failed (%s)", strerror(errno));
+    parcURI_Release(&connectionURI);
+
+    int linkId = athenaTransportLinkAdapter_LinkNameToId(athena->athenaTransportLinkAdapter, "TCP_0");
+    PARCBitVector *interestIngressVector = parcBitVector_Create();
+    parcBitVector_Set(interestIngressVector, linkId);
+
+    linkId = athenaTransportLinkAdapter_LinkNameToId(athena->athenaTransportLinkAdapter, "TCP_1");
+    PARCBitVector *contentObjectIngressVector = parcBitVector_Create();
+    parcBitVector_Set(contentObjectIngressVector, linkId);
+
+    athena_EncodeMessage(interest);
+    athena_EncodeMessage(contentObject);
+
+    // Before FIB entry interest should not be forwarded
+    athena_ProcessMessage(athena, interest, interestIngressVector);
+
+    // Add route for the decapsulated (original) interest
+    athenaFIB_AddRoute(athena->athenaFIB, name, contentObjectIngressVector);
+
+    // Creating encapsulated interest
+    unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES];
+    int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES;
+    randombytes_buf(symmetricKey, sizeof(symmetricKey));
+
+    CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, publicKey, domainName, symmetricKey);
+    assertNotNull(encryptedInterest, "Failed to encapsulate the interest");
+
+    // Process encapsulated interest. The result is the forwarding of the original decapsulated interest. Symmetric key is stored in the PIT.
+    athena_ProcessMessage(athena, encryptedInterest, interestIngressVector);
+
+    athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
+
+    ccnxInterest_Release(&encryptedInterest);
+    ccnxInterest_Release(&interest);
+    ccnxContentObject_Release(&contentObject);
+
+    parcBitVector_Release(&interestIngressVector);
+    parcBitVector_Release(&contentObjectIngressVector);
+
+    ccnxName_Release(&domainName);
+    ccnxName_Release(&name);
+
+//    parcBuffer_Release(&targetPublicKey);
+    parcBuffer_Release(&secretKey);
+    parcBuffer_Release(&publicKey);
+
+    athena_Release(&athena);
+
+}
+
 
 LONGBOW_TEST_CASE(Global, athena_ProcessControl)
 {
