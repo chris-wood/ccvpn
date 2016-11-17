@@ -335,6 +335,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     bool isPrefix = ccnxName_StartsWith(ccnxName, athena->publicName);
     bool hasPayload = ccnxInterest_GetPayload(interest) != NULL;
     if (isPrefix && hasPayload) {
+        printf("Decapsulating...\n");
         PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);
         size_t interestPayloadSize = parcBuffer_Remaining(interestPayload);
         PARCBuffer *secretKey = athena->secretKey;
@@ -353,7 +354,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 		    printf("Not decyphered\n");
             return;
         }
-        printf("decap\n");
         //printf("Decryption: %s\n",(char*)parcBuffer_Overlay(decrypted, 0));
 
         // Suck in the key and then advance the buffer to point to the encapsulated interest
@@ -363,7 +363,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         }
         parcBuffer_Flip(symKeyBuffer);
 
-        printf("SymmKey in decap: %s\n",(char*)parcBuffer_Overlay(symKeyBuffer, 0));
+        //printf("SymmKey in decap: %s\n",(char*)parcBuffer_Overlay(symKeyBuffer, 0));
 
         uint8_t msb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [2];
         uint8_t lsb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [3];
@@ -379,6 +379,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         ccnxInterest_Release(&interest);
         interest = ccnxMetaMessage_GetInterest(rawMessage);
 
+        //adding decapsulated interest to PIT;
         PARCBitVector *expectedReturnVector;
         AthenaPITResolution result;
         if ((result = athenaPIT_AddInterest(athena->athenaPIT, interest, ingressVector, NULL, symKeyBuffer,
@@ -388,20 +389,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             }
             return;
         }
-
-
-        if (symKeyBuffer!=NULL) {
-            char* test = parcBuffer_ToString(symKeyBuffer);
-            printf("SymmKey in decap: %s\n",test);
-            parcMemory_Deallocate(&test);
-        }else{
-            printf("SymmKey buffer NULL\n");
-        }
-
-        if (symKeyBuffer!=NULL) {
-            parcBuffer_Release(&symKeyBuffer);
-        }
-
     }
 
     //
@@ -448,17 +435,17 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             CCNxName *prefixBuffer = athenaFIBValue_GetOutputPrefix(vector);
             if (keyBuffer != NULL && prefixBuffer != NULL) {
                 assertTrue(keyBuffer != NULL && prefixBuffer != NULL, "Either the key or prefix was NULL.");
+                printf("Encapsulating...\n");
+
 
                 unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
                 int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
                 randombytes_buf(symmetricKey, sizeof(symmetricKey));
-                //printf("SymmKey generated: %s\n",symmetricKey);
 
                 CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, prefixBuffer, symmetricKey);
                 ccnxInterest_Release(&newInterest);
                 newInterest = encryptedInterest;
 
-                printf("encap\n");
                 symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
                 parcBuffer_PutArray(symKeyBuffer, symmetricKeyLen, symmetricKey);
                 parcBuffer_Flip(symKeyBuffer);
@@ -479,15 +466,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 return;
             }
 
-
             if (symKeyBuffer!=NULL) {
                 char* test = parcBuffer_ToString(symKeyBuffer);
-                printf("SymmKey in encap: %s\n",test);
+                printf("Stored SymmKey: %s\n",test);
                 parcMemory_Deallocate(&test);
-            }else{
-                printf("SymmKey buffer NULL\n");
             }
-
 
             if (symKeyBuffer!=NULL) {
                 parcBuffer_Release(&symKeyBuffer);

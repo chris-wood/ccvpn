@@ -97,8 +97,8 @@ LONGBOW_TEST_FIXTURE(Global)
 //      LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
 //      LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
-//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestTranslation);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestGW2);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
+    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestReturn);
@@ -240,7 +240,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
     athena_Release(&athena);
 }
 
-LONGBOW_TEST_CASE(Global, athena_ProcessInterestTranslation)
+LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
 {
 //    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
 
@@ -347,13 +347,15 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestTranslation)
 
 }
 
-LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
+LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
 {
 //    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
 
     unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
     unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
 
+    // Reading the key pair from /tmp
+    // should run keygen before running this code.
     FILE* sk = fopen("/tmp/key.sec","r");
     assertNotNull(sk, "Could not open secret key file for reading");
     fread(recipient_sk,sizeof(char),crypto_box_SECRETKEYBYTES,sk);
@@ -417,28 +419,26 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     // Before FIB entry interest should not be forwarded
     athena_ProcessMessage(athena, interest, interestIngressVector);
 
-    // Creating public/secret keys for gateway2
-    crypto_box_keypair(recipient_pk, recipient_sk);
-    PARCBuffer *targetPublicKey = parcBuffer_WrapCString((char*)recipient_pk);
+    // Add route for the decapsulated (original) interest
+    athenaFIB_AddRoute(athena->athenaFIB, name, contentObjectIngressVector);
 
-    // Adding translation route so that the encryption data path is taken
-    athenaFIB_AddTranslationRoute(athena->athenaFIB, name, domainName, targetPublicKey, contentObjectIngressVector);
-
-    // Process exact interest match
-    athena_ProcessMessage(athena, interest, interestIngressVector);
-
+    // Creating encapsulated interest
     unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
     int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
     randombytes_buf(symmetricKey, sizeof(symmetricKey));
 
-    CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, targetPublicKey, domainName, symmetricKey);
+    CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, publicKey, domainName, symmetricKey);
     assertNotNull(encryptedInterest, "Failed to encapsulate the interest");
 
-    // Process encapsulated interest
-//    ccnxInterest_Display(encryptedInterest, 0);
+    // Process encapsulated interest. The result is the forwarding of the original decapsulated interest. Symmetric key is stored in the PIT.
     athena_ProcessMessage(athena, encryptedInterest, interestIngressVector);
 
-//    printf("Original SymmKey: %s\n", symmetricKey);
+    printf("Original SymmKey: ");
+    int i;
+    for (i=0;i<symmetricKeyLen;i++){
+        printf("%c",symmetricKey[i]);
+    }
+    printf("\n");
 
     printf("\nfinished decapsulation of interest. error in the memory realeasing about to happen...\n\n");
 
@@ -452,7 +452,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     ccnxName_Release(&domainName);
     ccnxName_Release(&name);
 
-    parcBuffer_Release(&targetPublicKey);
+//    parcBuffer_Release(&targetPublicKey);
     parcBuffer_Release(&secretKey);
     parcBuffer_Release(&publicKey);
 
