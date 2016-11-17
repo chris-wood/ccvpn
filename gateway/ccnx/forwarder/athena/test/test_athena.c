@@ -438,9 +438,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
 //    ccnxInterest_Display(encryptedInterest, 0);
     athena_ProcessMessage(athena, encryptedInterest, interestIngressVector);
 
-//    printf("symmKey: %s\n", symmetricKey);
+//    printf("Original SymmKey: %s\n", symmetricKey);
 
-    printf("finished decap\n");
+    printf("\n\nfinished decapsulation of interest. error in the memory realeasing about to happen...\n\n");
 
     ccnxInterest_Release(&encryptedInterest);
     ccnxInterest_Release(&interest);

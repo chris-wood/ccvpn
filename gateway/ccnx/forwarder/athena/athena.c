@@ -354,7 +354,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             return;
         }
 
-        printf("%s\n",(char*)parcBuffer_Overlay(decrypted, 0));
+        printf("Decryption: %s\n",(char*)parcBuffer_Overlay(decrypted, 0));
 
         // Suck in the key and then advance the buffer to point to the encapsulated interest
         symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
@@ -433,8 +433,9 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 ccnxInterest_Release(&newInterest);
                 newInterest = encryptedInterest;
 
-                symKeyBuffer = parcBuffer_Allocate(symmetricKeyLen);
+                symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
                 parcBuffer_PutArray(symKeyBuffer, symmetricKeyLen, symmetricKey);
+                parcBuffer_Flip(symKeyBuffer);
             }
 
             // debug
@@ -452,17 +453,17 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 return;
             }
 
-            if (symKeyBuffer!=NULL) {
-                parcBuffer_Release(&symKeyBuffer);
-            }
 /*
             if (symKeyBuffer!=NULL) {
-                char* test = parcBuffer_ToString(symKeyBuffer);
                 printf("oi\n");
-                printf("SymmKey: %s\n",test);
+                printf("SymmKey: %s\n",parcBuffer_ToString(symKeyBuffer));
                 //parcMemory_Deallocate(&test);
             }
 */
+            if (symKeyBuffer!=NULL) {
+                parcBuffer_Release(&symKeyBuffer);
+            }
+
             PARCBitVector *failedLinks =
                     athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, newInterest, egressVector);
 
