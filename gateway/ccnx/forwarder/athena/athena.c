@@ -559,6 +559,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
         if (parcBitVector_NumberOfBitsSet(egressVector) > 0) {
 
             PARCBuffer *encryptKey = athenaPITValue_GetKey(value);
+            CCNxContentObject *newContentObject = NULL;
 
             if (encryptKey != NULL) {
                 PARCBuffer *contentWireFormat = athenaTransportLinkModule_CreateMessageBuffer(contentObject);
@@ -579,42 +580,53 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 parcBuffer_Flip(symKeyBuffer);
                 parcBuffer_Flip(nonceBuffer);
 
-                printf("I am here\n");
+                char* contentBytes = ccnxName_ToString(athena->publicName);
+                printf("Athena name: %s\n", contentBytes);
+                parcMemory_Deallocate(&contentBytes);
+                contentBytes = ccnxName_ToString(name);
+                printf("Content name: %s\n", contentBytes);
+                parcMemory_Deallocate(&contentBytes);
 
-                printf("Key size: %d\n",parcBuffer_Remaining(symKeyBuffer));
-                printf("Nonce size: %d\n",parcBuffer_Remaining(nonceBuffer));
+                bool isPrefix = ccnxName_StartsWith(name, athena->publicName);
+                // ENCRYPTED CONTENT TO GW1
+                if (0){
+                    printf("Message for GW1 decrypt\n");
+/*
+	                unsigned char decrypted[contentSize];
+	                unsigned long long decrypted_len;
+	                if (ciphertext_len < crypto_aead_aes256gcm_ABYTES ||
+		                crypto_aead_aes256gcm_decrypt(decrypted, &decrypted_len,
+		                                              NULL,
+		                                              parcBuffer_Overlay(ciphertext, 0), ciphertext_len,
+		                                              "",0,
+		                                              parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0)) != 0) {
+		                // message forged!
+	                }else{
+		                printf("Message ok!\n");
+		                printf("Content: %s\n",decrypted);
+	                }
+*/
+                // ORIGINAL CONTENT TO GW2
+                }else{
 
-                PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
-                
-                unsigned long long ciphertext_len;
+                    PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
+                    
+                    unsigned long long ciphertext_len;
 
-            	crypto_aead_aes256gcm_encrypt(parcBuffer_Overlay(ciphertext, 0), &ciphertext_len,
-		                                      parcBuffer_Overlay(contentWireFormat, 0), contentSize,
-		                                      "", 0,
-                                              NULL,
-                                              parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0));
+                	crypto_aead_aes256gcm_encrypt(parcBuffer_Overlay(ciphertext, 0), &ciphertext_len,
+		                                          parcBuffer_Overlay(contentWireFormat, 0), contentSize,
+		                                          "", 0,
+                                                  NULL,
+                                                  parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0));
 
 
-	            unsigned char decrypted[contentSize];
-	            unsigned long long decrypted_len;
-	            if (ciphertext_len < crypto_aead_aes256gcm_ABYTES ||
-		            crypto_aead_aes256gcm_decrypt(decrypted, &decrypted_len,
-		                                          NULL,
-		                                          parcBuffer_Overlay(ciphertext, 0), ciphertext_len,
-		                                          "",0,
-		                                          parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0)) != 0) {
-		            // message forged!
-	            }else{
-		            printf("Message ok!\n");
-		            printf("Content: %s\n",decrypted);
-	            }
-
+                    newContentObject = ccnxContentObject_CreateWithNameAndPayload(athena->publicName, ciphertext);
+                    parcBuffer_Release(&ciphertext);
+                }
 
                 parcBuffer_Release(&symKeyBuffer);
                 parcBuffer_Release(&nonceBuffer);
                 parcBuffer_Release(&contentWireFormat);
-
-                parcBuffer_Release(&ciphertext);
 
                 // XXX
             }
@@ -622,22 +634,37 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             //
             // *   (2) Add to the Content Store
             //
-            athenaContentStore_PutContentObject(athena->athenaContentStore, contentObject);
-
+            if (newContentObject != NULL){
+                athenaContentStore_PutContentObject(athena->athenaContentStore, newContentObject);
+            }else{
+                athenaContentStore_PutContentObject(athena->athenaContentStore, contentObject);
+            }
             //
             // *   (3) Reverse path forward it via PIT entries
             //
             const char *egressVectorString = parcBitVector_ToString(egressVector);
             parcLog_Debug(athena->log, "Content Object forwarded to %s.", egressVectorString);
             parcMemory_Deallocate(&egressVectorString);
-            PARCBitVector *result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, contentObject,
-                                                                    egressVector);
+
+            PARCBitVector *result;
+            if (newContentObject != NULL){
+                result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, newContentObject,
+                                                                        egressVector);
+            }else{
+                result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, contentObject,
+                                                                        egressVector);
+            }
+
             if (result) {
                 // if there are failed channels, client will resend interest unless we wish to retry here
                 parcBitVector_Release(&result);
             }
+            if (newContentObject != NULL){
+                ccnxContentObject_Release(&newContentObject);
+            }
         }
         athenaPITValue_Release(&value);
+        printf("finish\n");
     }
 }
 
