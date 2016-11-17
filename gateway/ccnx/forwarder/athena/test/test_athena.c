@@ -418,11 +418,21 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     // Before FIB entry interest should not be forwarded
     athena_ProcessMessage(athena, interest, interestIngressVector);
 
+    // Creating public/secret keys for gateway2
+    crypto_box_keypair(recipient_pk, recipient_sk);
+    PARCBuffer *targetPublicKey = parcBuffer_WrapCString((char*)recipient_pk);
+
+    // Adding translation route so that the encryption data path is taken
+    athenaFIB_AddTranslationRoute(athena->athenaFIB, name, domainName, targetPublicKey, contentObjectIngressVector);
+
+    // Process exact interest match
+    athena_ProcessMessage(athena, interest, interestIngressVector);
+
     unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
     int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
     randombytes_buf(symmetricKey, sizeof(symmetricKey));
 
-    CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, publicKey, domainName, symmetricKey);
+    CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, targetPublicKey, domainName, symmetricKey);
     assertNotNull(encryptedInterest, "Failed to encapsulate the interest");
 
     // Process encapsulated interest
@@ -438,7 +448,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     ccnxName_Release(&domainName);
     ccnxName_Release(&name);
 
-//    parcBuffer_Release(&targetPublicKey);
+    parcBuffer_Release(&targetPublicKey);
     parcBuffer_Release(&secretKey);
     parcBuffer_Release(&publicKey);
 
