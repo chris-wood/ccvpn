@@ -366,20 +366,12 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
     PARCBuffer *publicKey = parcBuffer_WrapCString((char*)recipient_pk);
 
     PARCURI *connectionURI;
-/*<<<<<<< HEAD
-    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
-   // Athena *athena = athena_Create(testName, 100);
-    Athena *athena = athena_Create_Key(testName, 100, secretKey, publicKey);
-    ccnxName_Release(&testName);
-//    CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
-    CCNxName *name = ccnxName_CreateFromCString("ccnx:/local/forwarder");
-=======
-*/
+
     CCNxName *domainName = ccnxName_CreateFromCString("ccnx:/domain/2");
     Athena *athena = athena_CreateWithKeyPair(domainName, 100, secretKey, publicKey);
-//    ccnxName_Release(&domainName);
+
     CCNxName *name = ccnxName_CreateFromCString("ccnx:/foo");
-//>>>>>>> eb3dd3a05da46d3bb8980275c10106ffe64bd54d
+
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
 
     uint64_t chunkNum = 0;
@@ -434,12 +426,21 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestGW2)
 
     // Process exact interest match
     athena_ProcessMessage(athena, interest, interestIngressVector);
-    CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, targetPublicKey, domainName);
+
+    unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
+    int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
+    randombytes_buf(symmetricKey, sizeof(symmetricKey));
+
+    CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, targetPublicKey, domainName, symmetricKey);
     assertNotNull(encryptedInterest, "Failed to encapsulate the interest");
 
     // Process encapsulated interest
 //    ccnxInterest_Display(encryptedInterest, 0);
     athena_ProcessMessage(athena, encryptedInterest, interestIngressVector);
+
+//    printf("symmKey: %s\n", symmetricKey);
+
+    printf("finished decap\n");
 
     ccnxInterest_Release(&encryptedInterest);
     ccnxInterest_Release(&interest);

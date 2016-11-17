@@ -234,16 +234,16 @@ _processControl(Athena *athena, CCNxControl *control, PARCBitVector *ingressVect
 }
 
 static CCNxInterest *
-_encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, CCNxName *prefix)
+_encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, CCNxName *prefix, unsigned char* symmetricKey)
 {
     // Get the wire format
     PARCBuffer *interestWireFormat = athenaTransportLinkModule_CreateMessageBuffer(interest);
     size_t interestSize = parcBuffer_Remaining(interestWireFormat);
 
     // Generate a random symmetric that will be used when encrypting the response
-    unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
+//    unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
     int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
-    randombytes_buf(symmetricKey, sizeof(symmetricKey));
+//    randombytes_buf(symmetricKey, sizeof(symmetricKey));
 
     // Create the interest and key buffer that will be encrypted
     PARCBuffer *interestKeyBuffer = parcBuffer_Allocate(symmetricKeyLen + interestSize);
@@ -272,6 +272,8 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
 
     return newInterest;
 }
+
+
 
 static void
 _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressVector) {
@@ -328,36 +330,16 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     */
 
     // Divert interests destined to the forwarder, we assume these are control messages
-    printf("hey\n");
+    PARCBuffer *symKeyBuffer = NULL;
     CCNxName *ccnxName = ccnxInterest_GetName(interest);
-/*
-<<<<<<< HEAD
-    char* interestByteStream = ccnxName_ToString(ccnxName);
-    char* athenaNameString = ccnxName_ToString(athena->athenaName);
-    printf("%s\n",interestByteStream);
-    printf("%s\n",athenaNameString);
-    parcMemory_Deallocate(&interestByteStream);
-    parcMemory_Deallocate(&athenaNameString);
-
-    //TODO: The next step is to change the unit test athena_ProcessInterestGW2 to
-    //      to create an interest with an encapsulated interest inside.
-
-    if (ccnxName && (ccnxName_StartsWith(ccnxName, athena->athenaName) == true)) {
-        printf("ahoy\n");
-=======
-*/
     bool isPrefix = ccnxName_StartsWith(ccnxName, athena->publicName);
     bool hasPayload = ccnxInterest_GetPayload(interest) != NULL;
     if (isPrefix && hasPayload) {
-//>>>>>>> eb3dd3a05da46d3bb8980275c10106ffe64bd54d
-        printf("ahoy\n");
         PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);
         size_t interestPayloadSize = parcBuffer_Remaining(interestPayload);
         PARCBuffer *secretKey = athena->secretKey;
         PARCBuffer *publicKey = athena->publicKey;
         PARCBuffer *decrypted = parcBuffer_Allocate(interestPayloadSize);
-        printf("got everything\n");
-//        printf("%s\n",(char*)parcBuffer_Overlay(interestPayload, 0));
 
         if (0 != crypto_box_seal_open(
                                  parcBuffer_Overlay(decrypted, 0),
@@ -369,17 +351,19 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         {
 		    /* message corrupted or not intended for this recipient */
 		    printf("Not decyphered\n");
+            return;
         }
-        
-//        printf("%s\n",(char*)parcBuffer_Overlay(decrypted, 0));
-        printf("Ivan\n");
+
+        printf("%s\n",(char*)parcBuffer_Overlay(decrypted, 0));
 
         // Suck in the key and then advance the buffer to point to the encapsulated interest
-        PARCBuffer *keyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
+        symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
         for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES; i++) {
-            parcBuffer_PutUint8(keyBuffer, parcBuffer_GetUint8(decrypted));
+            parcBuffer_PutUint8(symKeyBuffer, parcBuffer_GetUint8(decrypted));
         }
-        parcBuffer_Flip(keyBuffer);
+        parcBuffer_Flip(symKeyBuffer);
+
+//        printf("SymmKey: %s\n",(char*)parcBuffer_Overlay(symKeyBuffer, 0));
 
         uint8_t msb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [2];
         uint8_t lsb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [3];
@@ -441,9 +425,16 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             if (keyBuffer != NULL && prefixBuffer != NULL) {
                 assertTrue(keyBuffer != NULL && prefixBuffer != NULL, "Either the key or prefix was NULL.");
 
-                CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, prefixBuffer);
+                unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
+                int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
+                randombytes_buf(symmetricKey, sizeof(symmetricKey));
+
+                CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, prefixBuffer, symmetricKey);
                 ccnxInterest_Release(&newInterest);
                 newInterest = encryptedInterest;
+
+                symKeyBuffer = parcBuffer_Allocate(symmetricKeyLen);
+                parcBuffer_PutArray(symKeyBuffer, symmetricKeyLen, symmetricKey);
             }
 
             // debug
@@ -453,14 +444,21 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
             PARCBitVector *expectedReturnVector;
             AthenaPITResolution result;
-            if ((result = athenaPIT_AddInterest(athena->athenaPIT, newInterest, ingressVector, NULL, NULL,
+            if ((result = athenaPIT_AddInterest(athena->athenaPIT, newInterest, ingressVector, NULL, symKeyBuffer,
                                                 &expectedReturnVector)) != AthenaPITResolution_Forward) {
                 if (result == AthenaPITResolution_Error) {
                     parcLog_Error(athena->log, "PIT resolution error");
                 }
                 return;
             }
-
+/*
+            if (symKeyBuffer!=NULL) {
+                char* test = parcBuffer_ToString(symKeyBuffer);
+                printf("oi\n");
+                printf("SymmKey: %s\n",test);
+                //parcMemory_Deallocate(&test);
+            }
+*/
             PARCBitVector *failedLinks =
                     athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, newInterest, egressVector);
 
@@ -512,7 +510,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         }
     }
 }
-
 static void
 _processInterestReturn(Athena *athena, CCNxInterestReturn *interestReturn, PARCBitVector *ingressVector) {
     // We can ignore interest return messages and allow the PIT entry to timeout, or
