@@ -260,12 +260,12 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
     // Create the new interest and add the ciphertext as the payload
     CCNxInterest *newInterest = ccnxInterest_CreateSimple(prefix);
     ccnxInterest_SetPayloadAndId(newInterest, encapsulatedInterest);
-
+/*
     for (size_t i = 0; i < parcBuffer_Remaining(interestWireFormat); i++) {
         printf("%02x ", ((uint8_t *) parcBuffer_Overlay(interestWireFormat, 0))[i]);
     }
     printf("\n");
-
+*/
     parcBuffer_Release(&interestWireFormat);
     parcBuffer_Release(&interestKeyBuffer);
     parcBuffer_Release(&encapsulatedInterest);
@@ -353,8 +353,8 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 		    printf("Not decyphered\n");
             return;
         }
-
-        printf("Decryption: %s\n",(char*)parcBuffer_Overlay(decrypted, 0));
+        printf("decap\n");
+        //printf("Decryption: %s\n",(char*)parcBuffer_Overlay(decrypted, 0));
 
         // Suck in the key and then advance the buffer to point to the encapsulated interest
         symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
@@ -363,7 +363,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         }
         parcBuffer_Flip(symKeyBuffer);
 
-//        printf("SymmKey: %s\n",(char*)parcBuffer_Overlay(symKeyBuffer, 0));
+        printf("SymmKey in decap: %s\n",(char*)parcBuffer_Overlay(symKeyBuffer, 0));
 
         uint8_t msb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [2];
         uint8_t lsb = ((uint8_t *) parcBuffer_Overlay(decrypted, 0)) [3];
@@ -378,6 +378,30 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         CCNxMetaMessage *rawMessage = ccnxMetaMessage_CreateFromWireFormatBuffer(interestBuffer);
         ccnxInterest_Release(&interest);
         interest = ccnxMetaMessage_GetInterest(rawMessage);
+
+        PARCBitVector *expectedReturnVector;
+        AthenaPITResolution result;
+        if ((result = athenaPIT_AddInterest(athena->athenaPIT, interest, ingressVector, NULL, symKeyBuffer,
+                                            &expectedReturnVector)) != AthenaPITResolution_Forward) {
+            if (result == AthenaPITResolution_Error) {
+                parcLog_Error(athena->log, "PIT resolution error");
+            }
+            return;
+        }
+
+
+        if (symKeyBuffer!=NULL) {
+            char* test = parcBuffer_ToString(symKeyBuffer);
+            printf("SymmKey in decap: %s\n",test);
+            parcMemory_Deallocate(&test);
+        }else{
+            printf("SymmKey buffer NULL\n");
+        }
+
+        if (symKeyBuffer!=NULL) {
+            parcBuffer_Release(&symKeyBuffer);
+        }
+
     }
 
     //
@@ -428,12 +452,13 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES];
                 int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES;
                 randombytes_buf(symmetricKey, sizeof(symmetricKey));
-                printf("SymmKey generated: %s\n",symmetricKey);
+                //printf("SymmKey generated: %s\n",symmetricKey);
 
                 CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, prefixBuffer, symmetricKey);
                 ccnxInterest_Release(&newInterest);
                 newInterest = encryptedInterest;
 
+                printf("encap\n");
                 symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
                 parcBuffer_PutArray(symKeyBuffer, symmetricKeyLen, symmetricKey);
                 parcBuffer_Flip(symKeyBuffer);
@@ -457,9 +482,10 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
             if (symKeyBuffer!=NULL) {
                 char* test = parcBuffer_ToString(symKeyBuffer);
-                printf("oi\n");
-                printf("SymmKey from parcbuffer: %s\n",test);
+                printf("SymmKey in encap: %s\n",test);
                 parcMemory_Deallocate(&test);
+            }else{
+                printf("SymmKey buffer NULL\n");
             }
 
 
