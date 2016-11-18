@@ -326,6 +326,9 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     CCNxInterest *newInterest = ccnxInterest_Acquire(interest);
 
     PARCBuffer *symKeyBuffer = NULL;
+    
+    CCNxInterest *originalInterest = ccnxInterest_Acquire(interest);
+
     CCNxName *ccnxName = ccnxInterest_GetName(interest);
     bool isPrefix = ccnxName_StartsWith(ccnxName, athena->publicName);
     bool hasPayload = ccnxInterest_GetPayload(interest) != NULL;
@@ -350,7 +353,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             return;
         }
 
-
         // Suck in the key and then advance the buffer to point to the encapsulated interest
         symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES);
         for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES; i++) {
@@ -368,8 +370,10 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         }
         parcBuffer_Flip(interestBuffer);
 
+
         CCNxMetaMessage *rawMessage = ccnxMetaMessage_CreateFromWireFormatBuffer(interestBuffer);
         ccnxInterest_Release(&newInterest);
+
         newInterest = ccnxInterest_Acquire(ccnxMetaMessage_GetInterest(rawMessage));
         ccnxMetaMessage_Release(&rawMessage);
 
@@ -449,11 +453,14 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             parcLog_Info(athena->log, "Sent: %s", interestString);
             parcMemory_Deallocate(&interestString);
 
-            CCNxName *newInterestName = ccnxInterest_GetName(newInterest);
+            CCNxName *originalInterestName = NULL;
+            if (symKeyBuffer != NULL){
+                originalInterestName = ccnxInterest_GetName(originalInterest);
+            }
 
             PARCBitVector *expectedReturnVector;
             AthenaPITResolution result;
-            if ((result = athenaPIT_AddInterest(athena->athenaPIT, newInterest, ingressVector, newInterestName, symKeyBuffer,
+            if ((result = athenaPIT_AddInterest(athena->athenaPIT, newInterest, ingressVector, originalInterestName, symKeyBuffer,
                                                 &expectedReturnVector)) != AthenaPITResolution_Forward) {
                 if (result == AthenaPITResolution_Error) {
                     parcLog_Error(athena->log, "PIT resolution error");
@@ -461,7 +468,10 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 return;
             }
 
-            ccnxName_Release(&newInterestName);
+            if (originalInterestName!=NULL){
+                ccnxName_Release(&originalInterestName);
+            }
+            
 /*
             if (symKeyBuffer!=NULL) {
                 char* test = parcBuffer_ToString(symKeyBuffer);
@@ -521,6 +531,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     if (symKeyBuffer != NULL) {
         parcBuffer_Release(&symKeyBuffer);
     }
+    ccnxInterest_Release(&originalInterest);
     ccnxInterest_Release(&newInterest);
 }
 static void
