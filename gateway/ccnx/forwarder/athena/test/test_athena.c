@@ -338,6 +338,19 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
     athena_ProcessMessage(athena, interest, interestIngressVector);
 
+    ccnxContentObject_Release(&contentObject);
+
+    // Should decrypt and forward the content using the symmetric key
+
+    payload = parcBuffer_WrapCString("this is a payload");
+    contentObject = ccnxContentObject_CreateWithNameAndPayload(gw2Name, payload);
+    parcBuffer_Release(&payload);
+    athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
+
+
+
+
+
     parcBitVector_Release(&interestIngressVector);
     parcBitVector_Release(&contentObjectIngressVector);
 

@@ -91,6 +91,7 @@ typedef struct athena_pit_value AthenaPITValue;
 
 PARCBuffer *athenaPITValue_GetKey(AthenaPITValue *value);
 PARCBitVector *athenaPITValue_GetVector(AthenaPITValue *value);
+CCNxName *athenaPITValue_GetName(AthenaPITValue *value);
 
 void athenaPITValue_Release(AthenaPITValue **valuePtr);
 AthenaPITValue *athenaPITValue(const AthenaPITValue *value);

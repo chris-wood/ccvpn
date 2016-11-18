@@ -278,6 +278,7 @@ parcObject_ImplementRelease(athenaPIT, AthenaPIT);
 struct athena_pit_value {
     PARCBitVector *vector;
     PARCBuffer *key;
+    CCNxName *name;
 };
 
 static void
@@ -290,6 +291,9 @@ _athenaPITValue_Destroy(AthenaPITValue **valueHandle)
         }
         if (value->key != NULL) {
             parcBuffer_Release(&value->key);
+        }
+        if (value->name != NULL) {
+            ccnxName_Release(&value->name);
         }
     }
 }
@@ -307,6 +311,7 @@ athenaPITValue_Create(void)
     if (value != NULL) {
         value->vector = parcBitVector_Create();
         value->key = NULL;
+        value->name = NULL;
     }
     return value;
 }
@@ -321,6 +326,12 @@ PARCBitVector *
 athenaPITValue_GetVector(AthenaPITValue *value)
 {
     return value->vector;
+}
+
+CCNxName *
+athenaPITValue_GetName(AthenaPITValue *value)
+{
+    return value->name;
 }
 
 AthenaPIT *
@@ -718,6 +729,9 @@ _athenaPIT_LookupKey(AthenaPIT *athenaPIT, PARCBuffer *key, AthenaPITValue *valu
         parcBitVector_SetVector(value->vector, entry->ingress);
         if (entry->encapKey != NULL) {
             value->key = parcBuffer_Acquire(entry->encapKey);
+        }
+        if (entry->originalName != NULL) {
+            value->name = ccnxName_Acquire(entry->originalName);
         }
 
         // Remove Match

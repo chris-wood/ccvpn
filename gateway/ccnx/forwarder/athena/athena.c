@@ -449,15 +449,19 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             parcLog_Info(athena->log, "Sent: %s", interestString);
             parcMemory_Deallocate(&interestString);
 
+            CCNxName *newInterestName = ccnxInterest_GetName(newInterest);
+
             PARCBitVector *expectedReturnVector;
             AthenaPITResolution result;
-            if ((result = athenaPIT_AddInterest(athena->athenaPIT, newInterest, ingressVector, NULL, symKeyBuffer,
+            if ((result = athenaPIT_AddInterest(athena->athenaPIT, newInterest, ingressVector, newInterestName, symKeyBuffer,
                                                 &expectedReturnVector)) != AthenaPITResolution_Forward) {
                 if (result == AthenaPITResolution_Error) {
                     parcLog_Error(athena->log, "PIT resolution error");
                 }
                 return;
             }
+
+            ccnxName_Release(&newInterestName);
 /*
             if (symKeyBuffer!=NULL) {
                 char* test = parcBuffer_ToString(symKeyBuffer);
@@ -580,20 +584,13 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 parcBuffer_Flip(symKeyBuffer);
                 parcBuffer_Flip(nonceBuffer);
 
-                char* contentBytes = ccnxName_ToString(athena->publicName);
-                printf("Athena name: %s\n", contentBytes);
-                parcMemory_Deallocate(&contentBytes);
-                contentBytes = ccnxName_ToString(name);
-                printf("Content name: %s\n", contentBytes);
-                parcMemory_Deallocate(&contentBytes);
-
-                bool isPrefix = ccnxName_StartsWith(name, athena->publicName);
-                // ENCRYPTED CONTENT TO GW1
+                // THIS IF SHOULD SOMEHOW TELL IF THIS IS THE ENCRYPTING (GW2) OR DECRYPTING (GW1) gateway.
                 if (0){
                     printf("Message for GW1 decrypt\n");
+
+//                    PARCBuffer* plaintext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
+//	                unsigned long long plaintext_len;
 /*
-	                unsigned char decrypted[contentSize];
-	                unsigned long long decrypted_len;
 	                if (ciphertext_len < crypto_aead_aes256gcm_ABYTES ||
 		                crypto_aead_aes256gcm_decrypt(decrypted, &decrypted_len,
 		                                              NULL,
@@ -608,7 +605,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 */
                 // ORIGINAL CONTENT TO GW2
                 }else{
-
+                    printf("Symmetric Encryption of content...\n");
                     PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
                     
                     unsigned long long ciphertext_len;
@@ -619,8 +616,8 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                                                   NULL,
                                                   parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0));
 
-
-                    newContentObject = ccnxContentObject_CreateWithNameAndPayload(athena->publicName, ciphertext);
+                    CCNxName *interestName = athenaPITValue_GetName(value);
+                    newContentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, ciphertext);
                     parcBuffer_Release(&ciphertext);
                 }
 
