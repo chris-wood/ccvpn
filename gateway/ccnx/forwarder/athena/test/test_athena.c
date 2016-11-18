@@ -97,7 +97,7 @@ LONGBOW_TEST_FIXTURE(Global)
 //      LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
 //      LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
-//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
+    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
     LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObjectEncryption);
@@ -340,15 +340,17 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
 
     ccnxContentObject_Release(&contentObject);
 
+
+    // ADD THE TEST FOR SYMMETRIC DECRYPTION HERE!!!
     // Should decrypt and forward the content using the symmetric key
 
     payload = parcBuffer_WrapCString("this is a payload");
-    contentObject = ccnxContentObject_CreateWithNameAndPayload(gw2Name, payload);
+    
+    //encrypt payload and use encapsulated interest name as name for content
+    //contentObject = ccnxContentObject_CreateWithNameAndPayload(encapsulatedInterest, symmetricEncryptedPayload);
+    contentObject = ccnxContentObject_CreateWithNameAndPayload(gw2Name, payload);   // change this line for the commented above
     parcBuffer_Release(&payload);
     athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
-
-
-
 
 
     parcBitVector_Release(&interestIngressVector);

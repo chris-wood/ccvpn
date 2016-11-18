@@ -563,6 +563,8 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
         if (parcBitVector_NumberOfBitsSet(egressVector) > 0) {
 
             PARCBuffer *encryptKey = athenaPITValue_GetKey(value);
+            CCNxName *interestName = athenaPITValue_GetName(value);
+
             CCNxContentObject *newContentObject = NULL;
 
             if (encryptKey != NULL) {
@@ -585,7 +587,8 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 parcBuffer_Flip(nonceBuffer);
 
                 // THIS IF SHOULD SOMEHOW TELL IF THIS IS THE ENCRYPTING (GW2) OR DECRYPTING (GW1) gateway.
-                if (1){
+                bool isPrefix = ccnxName_StartsWith(interestName, athena->publicName);
+                if (!isPrefix){
                     // ENCRYPTED CONTENT FOR GW1 TO DECRYPT
                     printf("Symmetric Decryption of content...\n");
 
@@ -611,8 +614,6 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 		                printf("Message ok!\n");
 		                printf("Content: %s\n",parcBuffer_Overlay(plaintext, 0));
 	                }
-
-                    CCNxName *interestName = athenaPITValue_GetName(value);
                     newContentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, plaintext);
                     parcBuffer_Release(&plaintext);
                 
@@ -629,7 +630,6 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                                                   NULL,
                                                   parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0));
 
-                    CCNxName *interestName = athenaPITValue_GetName(value);
                     newContentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, ciphertext);
                     parcBuffer_Release(&ciphertext);
                 }
