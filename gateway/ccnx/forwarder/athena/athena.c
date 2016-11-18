@@ -585,26 +585,36 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 parcBuffer_Flip(nonceBuffer);
 
                 // THIS IF SHOULD SOMEHOW TELL IF THIS IS THE ENCRYPTING (GW2) OR DECRYPTING (GW1) gateway.
-                if (0){
+                if (1){
                     // ENCRYPTED CONTENT FOR GW1 TO DECRYPT
+                    printf("Symmetric Decryption of content...\n");
 
-                    printf("Message for GW1 decrypt\n");
+                    PARCBuffer* plaintext = parcBuffer_Allocate(contentSize);
+	                unsigned long long plaintext_len;
 
-//                    PARCBuffer* plaintext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
-//	                unsigned long long plaintext_len;
-/*
-	                if (ciphertext_len < crypto_aead_aes256gcm_ABYTES ||
-		                crypto_aead_aes256gcm_decrypt(decrypted, &decrypted_len,
+	                if (contentSize < crypto_aead_aes256gcm_ABYTES ||
+		                crypto_aead_aes256gcm_decrypt(parcBuffer_Overlay(plaintext, 0), &plaintext_len,
 		                                              NULL,
-		                                              parcBuffer_Overlay(ciphertext, 0), ciphertext_len,
+		                                              parcBuffer_Overlay(contentWireFormat, 0), contentSize,
 		                                              "",0,
 		                                              parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0)) != 0) {
 		                // message forged!
+		                printf("Message forged!\n");
+                        parcBuffer_Release(&symKeyBuffer);
+                        parcBuffer_Release(&nonceBuffer);
+                        parcBuffer_Release(&contentWireFormat);
+                        parcBuffer_Release(&plaintext);
+                        athenaPITValue_Release(&value);
+                        return;
+    
 	                }else{
 		                printf("Message ok!\n");
-		                printf("Content: %s\n",decrypted);
+		                printf("Content: %s\n",parcBuffer_Overlay(plaintext, 0));
 	                }
-*/
+
+                    CCNxName *interestName = athenaPITValue_GetName(value);
+                    newContentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, plaintext);
+                    parcBuffer_Release(&plaintext);
                 
                 }else{
                     // ORIGINAL CONTENT FOR GW2 TO ENCRYPT
