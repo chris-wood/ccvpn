@@ -586,6 +586,8 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 
                 // THIS IF SHOULD SOMEHOW TELL IF THIS IS THE ENCRYPTING (GW2) OR DECRYPTING (GW1) gateway.
                 if (0){
+                    // ENCRYPTED CONTENT FOR GW1 TO DECRYPT
+
                     printf("Message for GW1 decrypt\n");
 
 //                    PARCBuffer* plaintext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
@@ -603,8 +605,9 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 		                printf("Content: %s\n",decrypted);
 	                }
 */
-                // ORIGINAL CONTENT TO GW2
+                
                 }else{
+                    // ORIGINAL CONTENT FOR GW2 TO ENCRYPT
                     printf("Symmetric Encryption of content...\n");
                     PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
                     
