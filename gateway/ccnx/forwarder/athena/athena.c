@@ -280,7 +280,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             parcLog_Error(athena->log,
                           "Received a message with a hoplimit of zero from a non-local source (%s).",
                           athenaTransportLinkAdapter_LinkIdToName(athena->athenaTransportLinkAdapter, linkId));
-            return;
+            return NULL;
         }
         ccnxInterest_SetHopLimit(interest, hoplimit - 1);
     }
@@ -299,7 +299,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         if (result) { // failed channels - client will resend interest unless we wish to optimize things here
             parcBitVector_Release(&result);
         }
-        return;
+        return NULL;
     }
 
     //
@@ -315,7 +315,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         if (result == AthenaPITResolution_Error) {
             parcLog_Error(athena->log, "PIT resolution error");
         }
-        return;
+        return NULL;
     }
     */
 
@@ -346,7 +346,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         {
 		    /* message corrupted or not intended for this recipient */
 		    printf("Not decyphered\n");
-            return;
+            return NULL;
         }
 
         // Suck in the key and then advance the buffer to point to the encapsulated interest
@@ -462,7 +462,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 if (result == AthenaPITResolution_Error) {
                     parcLog_Error(athena->log, "PIT resolution error");
                 }
-                return;
+                return NULL;
             }
 
 

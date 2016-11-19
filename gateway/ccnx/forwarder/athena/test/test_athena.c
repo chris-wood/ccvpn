@@ -96,9 +96,9 @@ LONGBOW_TEST_FIXTURE(Global)
 {
 //      LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
 //      LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease);
-//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
+    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
     LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
-//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
+    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObjectEncryption);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
@@ -201,8 +201,13 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
     athena_EncodeMessage(interest);
     athena_EncodeMessage(contentObject);
 
+    CCNxInterest* returnInterest = NULL;
+
     // Before FIB entry interest should not be forwarded
-    athena_ProcessMessage(athena, interest, interestIngressVector);
+    returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
 
     // Add route for interest, it should now be forwarded
     athenaFIB_AddRoute(athena->athenaFIB, name, contentObjectIngressVector);
@@ -211,13 +216,19 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
     ccnxName_Release(&defaultName);
 
     // Process exact interest match
-    athena_ProcessMessage(athena, interest, interestIngressVector);
+    returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
 
     // Process a super-interest match
     CCNxName *superName = ccnxName_CreateFromCString("lci:/foo/bar/baz/unmatched");
     CCNxInterest *superInterest = ccnxInterest_CreateSimple(superName);
     athena_EncodeMessage(superInterest);
-    athena_ProcessMessage(athena, superInterest, interestIngressVector);
+    returnInterest = athena_ProcessMessage(athena, superInterest, interestIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
     ccnxName_Release(&superName);
     ccnxInterest_Release(&superInterest);
 
@@ -225,13 +236,23 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
     CCNxName *noMatchName = ccnxName_CreateFromCString("lci:/buggs/bunny");
     CCNxInterest *noMatchInterest = ccnxInterest_CreateSimple(noMatchName);
     athena_EncodeMessage(noMatchInterest);
-    athena_ProcessMessage(athena, noMatchInterest, interestIngressVector);
+    returnInterest = athena_ProcessMessage(athena, noMatchInterest, interestIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
     ccnxName_Release(&noMatchName);
     ccnxInterest_Release(&noMatchInterest);
 
     // Create a matching content object that the store should retain and reply to the following interest with
-    athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
-    athena_ProcessMessage(athena, interest, interestIngressVector);
+    returnInterest = athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
+
+    returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
 
     parcBitVector_Release(&interestIngressVector);
     parcBitVector_Release(&contentObjectIngressVector);
@@ -319,7 +340,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
 
 
-    //SYMMETRIC DECRYPTION TEST STARTS HERE
+////////SYMMETRIC DECRYPTION TEST STARTS HERE ///////////////////////////////////////////
 
     CCNxName *encapName = ccnxInterest_GetName(returnInterest);
     
@@ -348,16 +369,6 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
 
     parcBuffer_Flip(symBuffer);
     parcBuffer_Release(&decrypted);
-
-
-        printf("key!\n");
-        printf("\n\n");
-        for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES; i++) {
-            printf("%02X",((char*)parcBuffer_Overlay(symBuffer, 0))[i]);
-        }
-        printf("end");
-        printf("\n\n");
-
 
     if (returnInterest!=NULL){
         ccnxInterest_Release(&returnInterest);
@@ -405,7 +416,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
         ccnxInterest_Release(&returnInterest);
     }
 
-    //SYMMETRIC DECRYPTION TEST ENDS HERE
+/////////////SYMMETRIC DECRYPTION TEST ENDS HERE/////////////////////////////////////////////////////////////////
 
     ccnxName_Release(&defaultName);
     ccnxName_Release(&gw2Name);
@@ -491,11 +502,20 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
     athena_EncodeMessage(interest);
     athena_EncodeMessage(contentObject);
 
+    CCNxInterest* returnInterest = NULL;
+
     // Before FIB entry interest should not be forwarded
-    athena_ProcessMessage(athena, interest, interestIngressVector);
+    returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
+
 
     // Add route for the decapsulated (original) interest
     athenaFIB_AddRoute(athena->athenaFIB, name, contentObjectIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
 
     // Creating encapsulated interest
     unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES];
@@ -505,29 +525,18 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
     assertNotNull(encryptedInterest, "Failed to encapsulate the interest");
 
     // Process encapsulated interest. The result is the forwarding of the original decapsulated interest. Symmetric key is stored in the PIT.
-    athena_ProcessMessage(athena, encryptedInterest, interestIngressVector);
+    returnInterest = athena_ProcessMessage(athena, encryptedInterest, interestIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
+
 
     // Should encrypt and forward the content using the symmetric key
-    athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
-
-/*
-    ccnxContentObject_Release(&contentObject);
-
-    // Should decrypt and forward the content using the symmetric key
-
-    payload = parcBuffer_WrapCString("this is a payload");
-    contentObject = ccnxContentObject_CreateWithNameAndPayload(domainName, payload);
-    parcBuffer_Release(&payload);
-    athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
-*/
-/*
-    printf("Original SymmKey: ");
-    int i;
-    for (i=0;i<symmetricKeyLen;i++){
-        printf("%c",symmetricKey[i]);
+    returnInterest = athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
     }
-    printf("\n");
-*/
+
     ccnxInterest_Release(&encryptedInterest);
     ccnxInterest_Release(&interest);
     ccnxContentObject_Release(&contentObject);
