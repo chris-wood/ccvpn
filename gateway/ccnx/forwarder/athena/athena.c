@@ -254,12 +254,7 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
     // Create the new interest and add the ciphertext as the payload
     CCNxInterest *newInterest = ccnxInterest_CreateSimple(prefix);
     ccnxInterest_SetPayloadAndId(newInterest, encapsulatedInterest);
-/*
-    for (size_t i = 0; i < parcBuffer_Remaining(interestWireFormat); i++) {
-        printf("%02x ", ((uint8_t *) parcBuffer_Overlay(interestWireFormat, 0))[i]);
-    }
-    printf("\n");
-*/
+
     parcBuffer_Release(&interestWireFormat);
     parcBuffer_Release(&interestKeyBuffer);
     parcBuffer_Release(&encapsulatedInterest);
@@ -428,14 +423,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES];
                 int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES;
                 randombytes_buf(symmetricKey, sizeof(symmetricKey));
-/*                
-                printf("Original SymmKey: ");
-                int i;
-                for (i=0;i<symmetricKeyLen;i++){
-                    printf("%c",symmetricKey[i]);
-                }
-                printf("\n");
-*/
+
                 CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, prefixBuffer, symmetricKey);
                 ccnxInterest_Release(&newInterest);
                 newInterest = encryptedInterest;
@@ -447,15 +435,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES);
                 parcBuffer_PutArray(symKeyBuffer, symmetricKeyLen, symmetricKey);
                 parcBuffer_Flip(symKeyBuffer);
-/*
-                printf("key!\n");
-                printf("\n\n");
-                for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES; i++) {
-                    printf("%02X",((char*)parcBuffer_Overlay(symKeyBuffer, 0))[i]);
-                }
-                printf("end");
-                printf("\n\n");
-*/
+
             }
 
             // debug
@@ -490,13 +470,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 ccnxName_Release(&originalInterestName);
             }
             
-/*
-            if (symKeyBuffer!=NULL) {
-                char* test = parcBuffer_ToString(symKeyBuffer);
-                printf("Stored SymmKey: %s\n",test);
-                parcMemory_Deallocate(&test);
-            }
-*/
             PARCBitVector *failedLinks =
                     athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, newInterest, egressVector);
 
@@ -671,7 +644,6 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 parcBuffer_Release(&symKeyBuffer);
                 parcBuffer_Release(&nonceBuffer);
                 parcBuffer_Release(&contentWireFormat);
-                // XXX
             }
 
             //
@@ -707,7 +679,6 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             }
         }
         athenaPITValue_Release(&value);
-        printf("finish\n");
     }
 }
 
