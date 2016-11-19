@@ -583,7 +583,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 if (!isPrefix) {
                     PARCBuffer *payload = ccnxContentObject_GetPayload(contentObject);
                     contentSize = parcBuffer_Remaining(payload);
-                    
+
                     PARCBuffer* plaintext = parcBuffer_Allocate(contentSize - crypto_aead_aes256gcm_ABYTES);
 	                unsigned long long plaintext_len;
 
@@ -606,7 +606,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 
                     // Recover the serialized message
                     CCNxMetaMessage *rawMessage = ccnxMetaMessage_CreateFromWireFormatBuffer(plaintext);
-                    newContentObject = ccnxContentObject_Acquire(ccnxMetaMessage_GetContentObject(rawMessage));
+                    contentObject = ccnxContentObject_Acquire(ccnxMetaMessage_GetContentObject(rawMessage));
                     ccnxMetaMessage_Release(&rawMessage);
                     parcBuffer_Release(&plaintext);
                 } else {
@@ -619,7 +619,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                                                   NULL,
                                                   (unsigned char *) parcBuffer_Overlay(nonceBuffer, 0), (unsigned char *) parcBuffer_Overlay(symKeyBuffer, 0));
 
-                    newContentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, ciphertext);
+                    contentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, ciphertext);
                     parcBuffer_Release(&ciphertext);
                 }
 
@@ -631,39 +631,25 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             //
             // *   (2) Add to the Content Store
             //
-            if (newContentObject != NULL) {
-                athenaContentStore_PutContentObject(athena->athenaContentStore, newContentObject);
-            } else {
-                athenaContentStore_PutContentObject(athena->athenaContentStore, contentObject);
-            }
+            athenaContentStore_PutContentObject(athena->athenaContentStore, contentObject);
+
             //
             // *   (3) Reverse path forward it via PIT entries
             //
             const char *egressVectorString = parcBitVector_ToString(egressVector);
             parcLog_Debug(athena->log, "Content Object forwarded to %s.", egressVectorString);
             parcMemory_Deallocate(&egressVectorString);
-
-            PARCBitVector *result;
-            if (newContentObject != NULL){
-                result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, newContentObject,
-                                                                        egressVector);
-            } else {
-                result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, contentObject,
-                                                                        egressVector);
-            }
+            PARCBitVector *result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, contentObject, egressVector);
 
             if (result) {
                 // if there are failed channels, client will resend interest unless we wish to retry here
                 parcBitVector_Release(&result);
             }
-            if (newContentObject != NULL){
-                ccnxContentObject_Release(&newContentObject);
-            }
         }
         athenaPITValue_Release(&value);
     }
 
-    return NULL;
+    return contentObject;
 }
 
 static CCNxMetaMessage *

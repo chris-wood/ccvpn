@@ -211,6 +211,16 @@ LONGBOW_TEST_CASE(Global, athena_pair_ForwardContent)
     CCNxContentObject *originalContent = athena_ProcessMessage(gatewayA, encapsulatedContent, bitVector);
 
     // Check that the decapsulated content matches that which was originally sent
+    CCNxName *expectedContentName = ccnxContentObject_GetName(content);
+    CCNxName *actualContentName = ccnxContentObject_GetName(originalContent);
+
+    printf("%s\n", ccnxName_ToString(expectedContentName));
+    printf("%s\n", ccnxName_ToString(actualContentName));
+    PARCBuffer *expectedPayload = ccnxContentObject_GetPayload(content);
+    PARCBuffer *actualPayload = ccnxContentObject_GetPayload(originalContent);
+    printf("%s\n", parcBuffer_ToString(expectedPayload));
+    printf("%s\n", parcBuffer_ToString(actualPayload));
+
     assertTrue(ccnxContentObject_Equals(content, originalContent), "The decapsulated content does not match the original content");
 
     ccnxName_Release(&producerName);
