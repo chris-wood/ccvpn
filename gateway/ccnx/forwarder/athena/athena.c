@@ -447,6 +447,15 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES);
                 parcBuffer_PutArray(symKeyBuffer, symmetricKeyLen, symmetricKey);
                 parcBuffer_Flip(symKeyBuffer);
+/*
+                printf("key!\n");
+                printf("\n\n");
+                for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES; i++) {
+                    printf("%02X",((char*)parcBuffer_Overlay(symKeyBuffer, 0))[i]);
+                }
+                printf("end");
+                printf("\n\n");
+*/
             }
 
             // debug
@@ -587,17 +596,9 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             CCNxName *interestName = athenaPITValue_GetName(value);
             CCNxContentObject *newContentObject = NULL;
 
-            printf("\n\nI am here\n\n");
-
-            char *interestString = ccnxName_ToString(interestName);
-            printf("returnInterest:\n\n%s\n\n",interestString);
-            parcMemory_Deallocate(&interestString);
-
             if (encryptKey != NULL) {
+
                 PARCBuffer *contentWireFormat = athenaTransportLinkModule_CreateMessageBuffer(contentObject);
-	            printf("Content: %s\n",parcBuffer_Overlay(contentWireFormat, 0));
-                size_t contentSize = parcBuffer_Remaining(contentWireFormat);
-                printf("content size = %zu\n", contentSize);
 
                 PARCBuffer* symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
                 PARCBuffer* nonceBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_NPUBBYTES);
@@ -612,9 +613,13 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 parcBuffer_Flip(symKeyBuffer);
                 parcBuffer_Flip(nonceBuffer);
 
-                // THIS IF SHOULD SOMEHOW TELL IF THIS IS THE ENCRYPTING (GW2) OR DECRYPTING (GW1) gateway.
+                // THIS IF SHOULD TELL IF THIS IS THE ENCRYPTING (GW2) OR DECRYPTING (GW1) gateway.
                 bool isPrefix = ccnxName_StartsWith(interestName, athena->publicName);
                 if (!isPrefix){
+
+                    PARCBuffer *payload = ccnxContentObject_GetPayload(contentObject);
+
+                    size_t contentSize = parcBuffer_Remaining(payload);
                     // ENCRYPTED CONTENT FOR GW1 TO DECRYPT
                     printf("Symmetric Decryption of content...\n");
 
@@ -624,7 +629,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 	                if (contentSize < crypto_aead_aes256gcm_ABYTES ||
 		                crypto_aead_aes256gcm_decrypt(parcBuffer_Overlay(plaintext, 0), &plaintext_len,
 		                                              NULL,
-		                                              parcBuffer_Overlay(contentWireFormat, 0), contentSize,
+		                                              parcBuffer_Overlay(payload, 0), contentSize,
 		                                              "",0,
 		                                              parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0)) != 0)
                     {
@@ -635,6 +640,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                         parcBuffer_Release(&contentWireFormat);
                         parcBuffer_Release(&plaintext);
                         athenaPITValue_Release(&value);
+                        parcBuffer_Release(&payload);
                         return;
     
 	                }else{
@@ -645,6 +651,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                     parcBuffer_Release(&plaintext);
                 
                 }else{
+                    size_t contentSize = parcBuffer_Remaining(contentWireFormat);
                     // ORIGINAL CONTENT FOR GW2 TO ENCRYPT
                     printf("Symmetric Encryption of content...\n");
                     PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
@@ -664,7 +671,6 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 parcBuffer_Release(&symKeyBuffer);
                 parcBuffer_Release(&nonceBuffer);
                 parcBuffer_Release(&contentWireFormat);
-
                 // XXX
             }
 

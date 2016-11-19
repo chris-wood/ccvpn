@@ -2,9 +2,13 @@
 
 #define MESSAGE (const unsigned char *) "Ivan de Oliveira Nunes"
 #define MESSAGE_LEN sizeof("Ivan de Oliveira Nunes")
+#define ADDITIONAL_DATA (const unsigned char *) ""
+#define ADDITIONAL_DATA_LEN 0
+
+/*
 #define ADDITIONAL_DATA (const unsigned char *) "123456"
 #define ADDITIONAL_DATA_LEN 6
-
+*/
 unsigned char nonce[crypto_aead_aes256gcm_NPUBBYTES];
 unsigned char key[crypto_aead_aes256gcm_KEYBYTES];
 unsigned char ciphertext[MESSAGE_LEN + crypto_aead_aes256gcm_ABYTES];

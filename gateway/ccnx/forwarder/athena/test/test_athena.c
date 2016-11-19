@@ -345,8 +345,19 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES; i++) {
         parcBuffer_PutUint8(symBuffer, parcBuffer_GetUint8(decrypted));
     }
+
     parcBuffer_Flip(symBuffer);
     parcBuffer_Release(&decrypted);
+
+
+        printf("key!\n");
+        printf("\n\n");
+        for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES; i++) {
+            printf("%02X",((char*)parcBuffer_Overlay(symBuffer, 0))[i]);
+        }
+        printf("end");
+        printf("\n\n");
+
 
     if (returnInterest!=NULL){
         ccnxInterest_Release(&returnInterest);
