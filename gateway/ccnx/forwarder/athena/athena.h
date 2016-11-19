@@ -241,8 +241,7 @@ void athena_Release(Athena **athena);
  * }
  * @endcode
  */
-//void
-CCNxInterest*
+CCNxMetaMessage *
 athena_ProcessMessage(Athena *athena, CCNxMetaMessage *ccnxMessage, PARCBitVector *ingressVector);
 
 /**
@@ -260,7 +259,7 @@ athena_ProcessMessage(Athena *athena, CCNxMetaMessage *ccnxMessage, PARCBitVecto
  */
 void athena_EncodeMessage(CCNxMetaMessage *message);
 
-/**
+/**C
  * @abstract start an athena forwarder loop
  * @discussion
  *

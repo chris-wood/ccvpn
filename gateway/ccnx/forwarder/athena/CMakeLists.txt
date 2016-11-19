@@ -48,8 +48,7 @@ set(ATHENA_HEADER_FILES
     athena_TransportLinkAdapter.h
     athena_TransportLinkModule.h
     athenactl.h
-    athenactl_About.h
-    )
+    athenactl_About.h)
 
 set(LIBATHENA_TCP_SOURCE_FILES
     athena_TransportLinkModuleTCP.c

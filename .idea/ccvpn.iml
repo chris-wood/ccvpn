@@ -15,7 +15,7 @@
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_LRUContentStore.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_InterestControl.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_PIT.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_FIB.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athenactl.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_TransportLinkModuleETH.c" isTestSource="false" />
@@ -23,9 +23,10 @@
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_TransportLinkModule.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_LRUContentStore.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_TransportLinkModuleTEMPLATE.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_FIB.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_TransportLinkModuleUDP.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_PIT.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_ContentStore.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_pair.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_TransportLink.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_InterestControl.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_TransportLinkAdapter.c" isTestSource="false" />

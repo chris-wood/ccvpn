@@ -213,7 +213,7 @@ LONGBOW_TEST_CASE(Global, athenaFIB_AddTranslationRoute)
     unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
     unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
     crypto_box_keypair(recipient_pk, recipient_sk);
-    PARCBuffer *publicKey = parcBuffer_WrapCString(recipient_pk);
+    PARCBuffer *publicKey = parcBuffer_CreateFromArray(recipient_pk, crypto_box_PUBLICKEYBYTES);
 
     assertTrue(athenaFIB_AddTranslationRoute(data->testFIB, data->testName1, data->testName2, publicKey, data->testVector1), "Failed to add a route");
 

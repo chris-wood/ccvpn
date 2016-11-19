@@ -211,20 +211,21 @@ parcObject_ImplementAcquire(athena, Athena);
 
 parcObject_ImplementRelease(athena, Athena);
 
-static void
-_processInterestControl(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressVector) {
-    //
-    // Management messages
-    //
-    athenaInterestControl(athena, interest, ingressVector);
-}
+//static void
+//_processInterestControl(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressVector) {
+//    //
+//    // Management messages
+//    //
+//    athenaInterestControl(athena, interest, ingressVector);
+//}
 
-static void
+static CCNxMetaMessage *
 _processControl(Athena *athena, CCNxControl *control, PARCBitVector *ingressVector) {
     //
     // Management messages
     //
     athenaControl(athena, control, ingressVector);
+    return NULL;
 }
 
 static CCNxInterest *
@@ -235,9 +236,7 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
     size_t interestSize = parcBuffer_Remaining(interestWireFormat);
 
     // Generate a random symmetric that will be used when encrypting the response
-//    unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES];
     int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES;
-//    randombytes_buf(symmetricKey, sizeof(symmetricKey));
 
     // Create the interest and key buffer that will be encrypted
     PARCBuffer *interestKeyBuffer = parcBuffer_Allocate(symmetricKeyLen + interestSize);
@@ -263,9 +262,7 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
 }
 
 
-
-//static void
-CCNxInterest *
+static CCNxMetaMessage *
 _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressVector) {
     uint8_t hoplimit;
 
@@ -384,6 +381,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     //         non-local interface so we need not check that here.
     //
     ccnxName = ccnxInterest_GetName(newInterest);
+//    ccnxName_Display(ccnxName, 0);
     AthenaFIBValue *vector = athenaFIB_Lookup(athena->athenaFIB, ccnxName, ingressVector);
     PARCBitVector *egressVector = NULL;
     if (vector != NULL) {
@@ -524,15 +522,18 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     }
     ccnxInterest_Release(&originalInterest);
     //    ccnxInterest_Release(&newInterest);
+
     return newInterest;
 }
-static void
+static CCNxMetaMessage *
 _processInterestReturn(Athena *athena, CCNxInterestReturn *interestReturn, PARCBitVector *ingressVector) {
     // We can ignore interest return messages and allow the PIT entry to timeout, or
     //
     // Verify the return came from the next-hop where the interest was originally sent to
     // if not, ignore
     // otherwise, may try another forwarding path or clear the PIT state and forward the interest return on the reverse path
+
+    return NULL;
 }
 
 static PARCBuffer *
@@ -542,6 +543,7 @@ _createMessageHash(const CCNxMetaMessage *metaMessage) {
     CCNxWireFormatMessage *wireFormatMessage = (CCNxWireFormatMessage *) metaMessage;
 
     PARCCryptoHash *hash = ccnxWireFormatMessage_CreateContentObjectHash(wireFormatMessage);
+
     if (hash != NULL) {
         PARCBuffer *buffer = parcBuffer_Acquire(parcCryptoHash_GetDigest(hash));
         parcCryptoHash_Release(&hash);
@@ -551,7 +553,7 @@ _createMessageHash(const CCNxMetaMessage *metaMessage) {
     }
 }
 
-static void
+static CCNxMetaMessage *
 _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitVector *ingressVector) {
     //
     // *   (1) If it does not match anything in the PIT, drop it
@@ -603,39 +605,33 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 		                crypto_aead_aes256gcm_decrypt(parcBuffer_Overlay(plaintext, 0), &plaintext_len,
 		                                              NULL,
 		                                              parcBuffer_Overlay(payload, 0), contentSize,
-		                                              "",0,
+		                                              NULL, 0,
 		                                              parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0)) != 0)
                     {
 		                // message forged!
-		                printf("Message forged!\n");
                         parcBuffer_Release(&symKeyBuffer);
                         parcBuffer_Release(&nonceBuffer);
                         parcBuffer_Release(&contentWireFormat);
                         parcBuffer_Release(&plaintext);
                         athenaPITValue_Release(&value);
                         parcBuffer_Release(&payload);
-                        return;
+                        return NULL;
     
-	                }else{
-		                printf("Message ok!\n");
-		                printf("Content: %s\n",parcBuffer_Overlay(plaintext, 0));
 	                }
+
                     newContentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, plaintext);
                     parcBuffer_Release(&plaintext);
-                
-                }else{
+                } else {
                     size_t contentSize = parcBuffer_Remaining(contentWireFormat);
-                    // ORIGINAL CONTENT FOR GW2 TO ENCRYPT
-                    printf("Symmetric Encryption of content...\n");
+
                     PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
-                    
                     unsigned long long ciphertext_len;
 
                 	crypto_aead_aes256gcm_encrypt(parcBuffer_Overlay(ciphertext, 0), &ciphertext_len,
 		                                          parcBuffer_Overlay(contentWireFormat, 0), contentSize,
-		                                          "", 0,
+		                                          NULL, 0,
                                                   NULL,
-                                                  parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0));
+                                                  (unsigned char *) parcBuffer_Overlay(nonceBuffer, 0), (unsigned char *) parcBuffer_Overlay(symKeyBuffer, 0));
 
                     newContentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, ciphertext);
                     parcBuffer_Release(&ciphertext);
@@ -665,7 +661,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             if (newContentObject != NULL){
                 result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, newContentObject,
                                                                         egressVector);
-            }else{
+            } else {
                 result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, contentObject,
                                                                         egressVector);
             }
@@ -680,9 +676,11 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
         }
         athenaPITValue_Release(&value);
     }
+
+    return NULL;
 }
 
-static void
+static CCNxMetaMessage *
 _processManifest(Athena *athena, CCNxManifest *manifest, PARCBitVector *ingressVector) {
     //
     // *   (1) If it does not match anything in the PIT, drop it
@@ -715,12 +713,13 @@ _processManifest(Athena *athena, CCNxManifest *manifest, PARCBitVector *ingressV
         }
         athenaPITValue_Release(&value);
     }
+
+    return NULL;
 }
 
-//void
-CCNxInterest*
+CCNxMetaMessage *
 athena_ProcessMessage(Athena *athena, CCNxMetaMessage *ccnxMessage, PARCBitVector *ingressVector) {
-    CCNxInterest* ret = NULL ;
+    CCNxMetaMessage *outputMessage = NULL;
     if (ccnxMetaMessage_IsInterest(ccnxMessage)) {
         const CCNxName *ccnxName = ccnxInterest_GetName(ccnxMessage);
         if (ccnxName) {
@@ -731,7 +730,7 @@ athena_ProcessMessage(Athena *athena, CCNxMetaMessage *ccnxMessage, PARCBitVecto
             parcLog_Debug(athena->log, "Received Interest Message without a name.");
         }
         CCNxInterest *interest = ccnxMetaMessage_GetInterest(ccnxMessage);
-        ret = _processInterest(athena, interest, ingressVector);
+        outputMessage = _processInterest(athena, interest, ingressVector);
         athena->stats.numProcessedInterests++;
     } else if (ccnxMetaMessage_IsContentObject(ccnxMessage)) {
         const CCNxName *ccnxName = ccnxContentObject_GetName(ccnxMessage);
@@ -743,30 +742,31 @@ athena_ProcessMessage(Athena *athena, CCNxMetaMessage *ccnxMessage, PARCBitVecto
             parcLog_Debug(athena->log, "Received Content Object Message without a name.");
         }
         CCNxContentObject *contentObject = ccnxMetaMessage_GetContentObject(ccnxMessage);
-        _processContentObject(athena, contentObject, ingressVector);
+        outputMessage = _processContentObject(athena, contentObject, ingressVector);
         athena->stats.numProcessedContentObjects++;
     } else if (ccnxMetaMessage_IsControl(ccnxMessage)) {
         parcLog_Debug(athena->log, "Processing Control Message");
 
         CCNxControl *control = ccnxMetaMessage_GetControl(ccnxMessage);
-        _processControl(athena, control, ingressVector);
+        outputMessage = _processControl(athena, control, ingressVector);
         athena->stats.numProcessedControlMessages++;
     } else if (ccnxMetaMessage_IsInterestReturn(ccnxMessage)) {
         parcLog_Debug(athena->log, "Processing Interest Return Message");
 
         CCNxInterestReturn *interestReturn = ccnxMetaMessage_GetInterestReturn(ccnxMessage);
-        _processInterestReturn(athena, interestReturn, ingressVector);
+        outputMessage = _processInterestReturn(athena, interestReturn, ingressVector);
         athena->stats.numProcessedInterestReturns++;
     } else if (ccnxMetaMessage_IsManifest(ccnxMessage)) {
         parcLog_Debug(athena->log, "Processing Interest Return Message");
 
         CCNxManifest *manifest = ccnxMetaMessage_GetManifest(ccnxMessage);
-        _processManifest(athena, manifest, ingressVector);
+        outputMessage =  _processManifest(athena, manifest, ingressVector);
         athena->stats.numProcessedManifests++;
     } else {
         trapUnexpectedState("Invalid CCNxMetaMessage type");
     }
-    return ret;
+
+    return outputMessage;
 }
 
 void

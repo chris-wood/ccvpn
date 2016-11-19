@@ -109,7 +109,7 @@ LONGBOW_TEST_FIXTURE(Global)
 
 LONGBOW_TEST_FIXTURE_SETUP(Global)
 {
-    sodium_init();
+    __attribute__((unused)) int result = sodium_init();
     return LONGBOW_STATUS_SUCCEEDED;
 }
 
@@ -397,7 +397,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     unsigned long long ciphertext_len;
     crypto_aead_aes256gcm_encrypt(parcBuffer_Overlay(ciphertext, 0), &ciphertext_len,
 		                          parcBuffer_Overlay(payload, 0), contentSize,
-		                          "", 0,
+		                          NULL, 0,
                                   NULL,
                                   parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0));
 

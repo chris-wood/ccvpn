@@ -4,6 +4,7 @@ set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} " --coverage")
 
 set(TestsExpectedToPass
     test_athena
+    test_athena_pair
     test_athena_FIB
     test_athena_PIT
     test_athena_TransportLinkAdapter
