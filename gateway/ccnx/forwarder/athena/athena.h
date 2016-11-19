@@ -241,7 +241,9 @@ void athena_Release(Athena **athena);
  * }
  * @endcode
  */
-void athena_ProcessMessage(Athena *athena, CCNxMetaMessage *ccnxMessage, PARCBitVector *ingressVector);
+//void
+CCNxInterest*
+athena_ProcessMessage(Athena *athena, CCNxMetaMessage *ccnxMessage, PARCBitVector *ingressVector);
 
 /**
  * @abstract encode message into wire format

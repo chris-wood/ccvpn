@@ -98,7 +98,7 @@ LONGBOW_TEST_FIXTURE(Global)
 //      LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
     LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObjectEncryption);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
@@ -247,7 +247,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
 //    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
 
     PARCURI *connectionURI;
-    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
+    CCNxName *testName = ccnxName_CreateFromCString("ccnx:/athena");
     Athena *athena = athena_Create(testName, 100);
     ccnxName_Release(&testName);
     CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
@@ -293,8 +293,13 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     athena_EncodeMessage(interest);
     athena_EncodeMessage(contentObject);
 
+    CCNxInterest* returnInterest = NULL;
+
     // Before FIB entry interest should not be forwarded
-    athena_ProcessMessage(athena, interest, interestIngressVector);
+    returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
 
     // Creating public/secret keys for gateway2
     unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
@@ -303,55 +308,97 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     PARCBuffer *publicKey = parcBuffer_WrapCString((char*)recipient_pk);
    
     // Creating the translation prefix
-    CCNxName *gw2Name = ccnxName_CreateFromCString("lci:/domain/2/");
+    CCNxName *gw2Name = ccnxName_CreateFromCString("lci:/domain/2");
 
     // Adding translation route so that the encryption data path is taken
     athenaFIB_AddTranslationRoute(athena->athenaFIB, name, gw2Name, publicKey, contentObjectIngressVector);
     CCNxName *defaultName = ccnxName_CreateFromCString("lci:/");
     athenaFIB_AddRoute(athena->athenaFIB, defaultName, contentObjectIngressVector);
 
-    //destructors
+    // Process exact interest match/ Generates encapsulated interest
+    returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
+
+
+    //SYMMETRIC DECRYPTION TEST STARTS HERE
+
+    CCNxName *encapName = ccnxInterest_GetName(returnInterest);
+    
+    PARCBuffer *symBuffer = NULL;
+    PARCBuffer *interestPayload = ccnxInterest_GetPayload(returnInterest);
+    size_t interestPayloadSize = parcBuffer_Remaining(interestPayload);
+    PARCBuffer *decrypted = parcBuffer_Allocate(interestPayloadSize);
+
+    if (0 != crypto_box_seal_open(
+                             parcBuffer_Overlay(decrypted, 0),
+                             parcBuffer_Overlay(interestPayload, 0),
+                             interestPayloadSize,
+                             recipient_pk,
+                             recipient_sk)
+                             )
+    {
+	    // message corrupted or not intended for this recipient
+	    printf("Not decyphered\n");
+        return;
+    }
+    // Suck in the key and then advance the buffer to point to the encapsulated interest
+    symBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES);
+    for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES; i++) {
+        parcBuffer_PutUint8(symBuffer, parcBuffer_GetUint8(decrypted));
+    }
+    parcBuffer_Flip(symBuffer);
+    parcBuffer_Release(&decrypted);
+
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
+
+    // This should trigger the symmetric decryption
+    ccnxInterest_Release(&contentObject);
+    payload = parcBuffer_WrapCString("this is a payload");
+
+    size_t contentSize = parcBuffer_Remaining(payload);
+
+    PARCBuffer* symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
+    PARCBuffer* nonceBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_NPUBBYTES);
+
+    for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES; i++) {
+        if (i<crypto_aead_aes256gcm_KEYBYTES){
+            parcBuffer_PutUint8(symKeyBuffer, parcBuffer_GetUint8(symBuffer));
+        }else{
+            parcBuffer_PutUint8(nonceBuffer, parcBuffer_GetUint8(symBuffer));
+        }
+    }
+    parcBuffer_Flip(symKeyBuffer);
+    parcBuffer_Flip(nonceBuffer);
+
+    PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
+    unsigned long long ciphertext_len;
+    crypto_aead_aes256gcm_encrypt(parcBuffer_Overlay(ciphertext, 0), &ciphertext_len,
+		                          parcBuffer_Overlay(payload, 0), contentSize,
+		                          "", 0,
+                                  NULL,
+                                  parcBuffer_Overlay(nonceBuffer, 0), parcBuffer_Overlay(symKeyBuffer, 0));
+
+    parcBuffer_Release(&symKeyBuffer);
+    parcBuffer_Release(&nonceBuffer);
+
+    parcBuffer_Release(&symBuffer);
+
+    contentObject = ccnxContentObject_CreateWithNameAndPayload(encapName, ciphertext);
+    parcBuffer_Release(&payload);
+    parcBuffer_Release(&ciphertext);
+
+    returnInterest = athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
+
+    if (returnInterest!=NULL){
+        ccnxInterest_Release(&returnInterest);
+    }
+
+    //SYMMETRIC DECRYPTION TEST ENDS HERE
+
     ccnxName_Release(&defaultName);
     ccnxName_Release(&gw2Name);
     parcBuffer_Release(&publicKey);
-
-    // Process exact interest match
-    athena_ProcessMessage(athena, interest, interestIngressVector);
-
-    // Process a super-interest match
-    CCNxName *superName = ccnxName_CreateFromCString("lci:/foo/bar/baz/unmatched");
-    CCNxInterest *superInterest = ccnxInterest_CreateSimple(superName);
-    athena_EncodeMessage(superInterest);
-    athena_ProcessMessage(athena, superInterest, interestIngressVector);
-    ccnxName_Release(&superName);
-    ccnxInterest_Release(&superInterest);
-
-    // Process no-match/default route interest
-    CCNxName *noMatchName = ccnxName_CreateFromCString("lci:/buggs/bunny");
-    CCNxInterest *noMatchInterest = ccnxInterest_CreateSimple(noMatchName);
-    athena_EncodeMessage(noMatchInterest);
-    athena_ProcessMessage(athena, noMatchInterest, interestIngressVector);
-    ccnxName_Release(&noMatchName);
-    ccnxInterest_Release(&noMatchInterest);
-
-    // Create a matching content object that the store should retain and reply to the following interest with
-    athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
-    athena_ProcessMessage(athena, interest, interestIngressVector);
-
-    ccnxContentObject_Release(&contentObject);
-
-
-    // ADD THE TEST FOR SYMMETRIC DECRYPTION HERE!!!
-    // Should decrypt and forward the content using the symmetric key
-
-    payload = parcBuffer_WrapCString("this is a payload");
-    
-    //encrypt payload and use encapsulated interest name as name for content
-    //contentObject = ccnxContentObject_CreateWithNameAndPayload(encapsulatedInterest, symmetricEncryptedPayload);
-    contentObject = ccnxContentObject_CreateWithNameAndPayload(gw2Name, payload);   // change this line for the commented above
-    parcBuffer_Release(&payload);
-    athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
-
 
     parcBitVector_Release(&interestIngressVector);
     parcBitVector_Release(&contentObjectIngressVector);
@@ -462,8 +509,6 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
     parcBuffer_Release(&payload);
     athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
 */
-
-
 /*
     printf("Original SymmKey: ");
     int i;
