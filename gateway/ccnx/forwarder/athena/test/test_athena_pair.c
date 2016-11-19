@@ -88,11 +88,12 @@ LONGBOW_TEST_RUNNER_TEARDOWN(athena_pair)
 LONGBOW_TEST_FIXTURE(Global)
 {
     LONGBOW_RUN_TEST_CASE(Global, athena_pair_ForwardInterest);
+    LONGBOW_RUN_TEST_CASE(Global, athena_pair_ForwardContent);
 }
 
 LONGBOW_TEST_FIXTURE_SETUP(Global)
 {
-    sodium_init();
+    __attribute__((unused)) int result = sodium_init();
     return LONGBOW_STATUS_SUCCEEDED;
 }
 
@@ -106,7 +107,8 @@ LONGBOW_TEST_FIXTURE_TEARDOWN(Global)
     return LONGBOW_STATUS_SUCCEEDED;
 }
 
-LONGBOW_TEST_CASE(Global, athena_pair_ForwardInterest)
+static Athena *
+_setupForwarder(char *forwarderName)
 {
     unsigned char publicKeyABuffer[crypto_box_PUBLICKEYBYTES];
     unsigned char secretKeyABuffer[crypto_box_SECRETKEYBYTES];
@@ -116,26 +118,27 @@ LONGBOW_TEST_CASE(Global, athena_pair_ForwardInterest)
     PARCBuffer *secretKeyA = parcBuffer_CreateFromArray(secretKeyABuffer, crypto_box_SECRETKEYBYTES);
     parcBuffer_Flip(secretKeyA);
 
-    unsigned char publicKeyBBuffer[crypto_box_PUBLICKEYBYTES];
-    unsigned char secretKeyBBuffer[crypto_box_SECRETKEYBYTES];
-    crypto_box_keypair(publicKeyBBuffer, secretKeyBBuffer);
-    PARCBuffer *publicKeyB = parcBuffer_CreateFromArray(publicKeyBBuffer, crypto_box_PUBLICKEYBYTES);
-    parcBuffer_Flip(publicKeyB);
-    PARCBuffer *secretKeyB = parcBuffer_CreateFromArray(secretKeyBBuffer, crypto_box_SECRETKEYBYTES);
-    parcBuffer_Flip(secretKeyB);
-
-    CCNxName *gatewayAName = ccnxName_CreateFromCString("ccnx:/gateway/A");
-    CCNxName *gatewayBName = ccnxName_CreateFromCString("ccnx:/gateway/B");
+    CCNxName *gatewayAName = ccnxName_CreateFromCString(forwarderName);
 
     Athena *gatewayA = athena_CreateWithKeyPair(gatewayAName, 100, secretKeyA, publicKeyA);
-    Athena *gatewayB = athena_CreateWithKeyPair(gatewayBName, 100, secretKeyB, publicKeyB);
+
+    parcBuffer_Release(&publicKeyA);
+    parcBuffer_Release(&secretKeyA);
+    ccnxName_Release(&gatewayAName);
+
+    return gatewayA;
+}
+
+LONGBOW_TEST_CASE(Global, athena_pair_ForwardInterest)
+{
+    Athena *gatewayA = _setupForwarder("ccnx:/gateway/A");
+    Athena *gatewayB = _setupForwarder("ccnx:/gateway/B");
 
     CCNxName *producerName = ccnxName_CreateFromCString("ccnx:/producer");
 
     PARCBitVector *bitVector = parcBitVector_Create();
     parcBitVector_Set(bitVector, 1);
-    athenaFIB_AddTranslationRoute(gatewayA->athenaFIB, producerName, gatewayBName, publicKeyB, bitVector);
-
+    athenaFIB_AddTranslationRoute(gatewayA->athenaFIB, producerName, gatewayB->publicName, gatewayB->publicKey, bitVector);
 
     CCNxName *interestName = ccnxName_ComposeNAME(producerName, "foo");
     CCNxInterest *interest = ccnxInterest_CreateSimple(interestName);
@@ -151,25 +154,76 @@ LONGBOW_TEST_CASE(Global, athena_pair_ForwardInterest)
     // Ensure that the original interest matches the unwrapped interest
     assertTrue(ccnxInterest_Equals(interest, originalInterest), "The original input interest did not match the output decapsulated interest");
 
-
     ccnxName_Release(&interestName);
     ccnxName_Release(&producerName);
-    ccnxName_Release(&gatewayAName);
-    ccnxName_Release(&gatewayBName);
 
     ccnxInterest_Release(&interest);
     ccnxInterest_Release(&encapsulatedInterest);
     ccnxInterest_Release(&originalInterest);
 
     parcBitVector_Release(&bitVector);
+    parcBitVector_Release(&ingressVector);
 
     athena_Release(&gatewayA);
     athena_Release(&gatewayB);
+}
 
-    parcBuffer_Release(&publicKeyA);
-    parcBuffer_Release(&publicKeyB);
-    parcBuffer_Release(&secretKeyA);
-    parcBuffer_Release(&secretKeyB);
+static CCNxContentObject *
+_createMatchingContentObject(CCNxInterest *interest)
+{
+    CCNxName *name = ccnxInterest_GetName(interest);
+    PARCBuffer *payload = parcBuffer_AllocateCString("hello world. dogs rule. cats are lame.");
+    CCNxContentObject *content = ccnxContentObject_CreateWithNameAndPayload(name, payload);
+    parcBuffer_Release(&payload);
+    return content;
+}
+
+LONGBOW_TEST_CASE(Global, athena_pair_ForwardContent)
+{
+    Athena *gatewayA = _setupForwarder("ccnx:/gateway/A");
+    Athena *gatewayB = _setupForwarder("ccnx:/gateway/B");
+
+    CCNxName *producerName = ccnxName_CreateFromCString("ccnx:/producer");
+
+    PARCBitVector *bitVector = parcBitVector_Create();
+    parcBitVector_Set(bitVector, 1);
+    athenaFIB_AddTranslationRoute(gatewayA->athenaFIB, producerName, gatewayB->publicName, gatewayB->publicKey, bitVector);
+    athenaFIB_AddRoute(gatewayB->athenaFIB, producerName, bitVector);
+
+    CCNxName *interestName = ccnxName_ComposeNAME(producerName, "foo");
+    CCNxInterest *interest = ccnxInterest_CreateSimple(interestName);
+
+    // Send the interest to gatewayA
+    PARCBitVector *ingressVector = parcBitVector_Create();
+    parcBitVector_Set(ingressVector, 7);
+    CCNxInterest *encapsulatedInterest = athena_ProcessMessage(gatewayA, interest, ingressVector);
+
+    // Send the encrypted interest to gatewayB
+    CCNxInterest *originalInterest = athena_ProcessMessage(gatewayB, encapsulatedInterest, ingressVector);
+
+    // From the interest, create a matching content object
+    CCNxContentObject *content = _createMatchingContentObject(originalInterest);
+
+    // Send the content through gatewayB and get the encrypted/encapsulated content
+    CCNxContentObject *encapsulatedContent = athena_ProcessMessage(gatewayB, content, bitVector);
+
+    // Forward the encapsulated content object to gatewayA
+    CCNxContentObject *originalContent = athena_ProcessMessage(gatewayA, encapsulatedContent, bitVector);
+
+    // Check that the decapsulated content matches that which was originally sent
+    assertTrue(ccnxContentObject_Equals(content, originalContent), "The decapsulated content does not match the original content");
+
+    ccnxName_Release(&producerName);
+
+    ccnxInterest_Release(&interest);
+    ccnxInterest_Release(&encapsulatedInterest);
+    ccnxInterest_Release(&originalInterest);
+
+    parcBitVector_Release(&bitVector);
+    parcBitVector_Release(&ingressVector);
+
+    athena_Release(&gatewayA);
+    athena_Release(&gatewayB);
 }
 
 int

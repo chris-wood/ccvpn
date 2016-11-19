@@ -317,16 +317,15 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     */
 
     CCNxInterest *newInterest = ccnxInterest_Acquire(interest);
-
     PARCBuffer *symKeyBuffer = NULL;
-    
     CCNxInterest *originalInterest = ccnxInterest_Acquire(interest);
 
+    // Check to see if this interest has a prefix that is meant for us (our public prefix)
+    // If so, then it contains an encapsulated interest. So we must decrypt the interest.
     CCNxName *ccnxName = ccnxInterest_GetName(interest);
     bool isPrefix = ccnxName_StartsWith(ccnxName, athena->publicName);
     bool hasPayload = ccnxInterest_GetPayload(interest) != NULL;
     if (isPrefix && hasPayload) {
-        printf("Decapsulating...\n");
         PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);
         size_t interestPayloadSize = parcBuffer_Remaining(interestPayload);
         PARCBuffer *secretKey = athena->secretKey;
@@ -363,7 +362,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         }
         parcBuffer_Flip(interestBuffer);
 
-
+        // From the wire format, re-create the encapsulated interest
         CCNxMetaMessage *rawMessage = ccnxMetaMessage_CreateFromWireFormatBuffer(interestBuffer);
         ccnxInterest_Release(&newInterest);
 
@@ -381,7 +380,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     //         non-local interface so we need not check that here.
     //
     ccnxName = ccnxInterest_GetName(newInterest);
-//    ccnxName_Display(ccnxName, 0);
     AthenaFIBValue *vector = athenaFIB_Lookup(athena->athenaFIB, ccnxName, ingressVector);
     PARCBitVector *egressVector = NULL;
     if (vector != NULL) {
@@ -411,18 +409,18 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 }
             }
         } else {
-            // Retrieving the recipient public key
+            // If there is a a public key and target prefix associated with the matching FIB entry,
+            // then we must encapsulate the interest
             PARCBuffer *keyBuffer = athenaFIBValue_GetKey(vector);
-            CCNxName *prefixBuffer = athenaFIBValue_GetOutputPrefix(vector);
-            if (keyBuffer != NULL && prefixBuffer != NULL) {
-                printf("Encapsulating...\n");
-                assertTrue(keyBuffer != NULL && prefixBuffer != NULL, "Either the key or prefix was NULL.");
+            CCNxName *targetPrefix = athenaFIBValue_GetOutputPrefix(vector);
+            if (keyBuffer != NULL && targetPrefix != NULL) {
+                assertTrue(keyBuffer != NULL && targetPrefix != NULL, "Either the key or prefix was NULL.");
 
                 unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES];
                 int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES;
                 randombytes_buf(symmetricKey, sizeof(symmetricKey));
 
-                CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, prefixBuffer, symmetricKey);
+                CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, targetPrefix, symmetricKey);
                 ccnxInterest_Release(&newInterest);
                 newInterest = encryptedInterest;
 
@@ -433,23 +431,15 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES);
                 parcBuffer_PutArray(symKeyBuffer, symmetricKeyLen, symmetricKey);
                 parcBuffer_Flip(symKeyBuffer);
-
             }
 
             // debug
             char *interestString = ccnxInterest_ToString(newInterest);
             parcLog_Info(athena->log, "Sent: %s", interestString);
-/*
-            FILE* in = fopen("/tmp/interest.name","w");
-            assertNotNull(in, "Could not open interestName file for writting");
-            fwrite(interestString,sizeof(char),strlen(interestString),in);
-            fclose(in);
-*/
             parcMemory_Deallocate(&interestString);
 
-
             CCNxName *originalInterestName = NULL;
-            if (symKeyBuffer != NULL){
+            if (symKeyBuffer != NULL) {
                 originalInterestName = ccnxInterest_GetName(originalInterest);
             }
 
@@ -464,7 +454,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             }
 
 
-            if (originalInterestName!=NULL){
+            if (originalInterestName != NULL) {
                 ccnxName_Release(&originalInterestName);
             }
             
@@ -572,16 +562,16 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             CCNxContentObject *newContentObject = NULL;
 
             if (encryptKey != NULL) {
-
                 PARCBuffer *contentWireFormat = athenaTransportLinkModule_CreateMessageBuffer(contentObject);
+                size_t contentSize = parcBuffer_Remaining(contentWireFormat);
 
                 PARCBuffer* symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
                 PARCBuffer* nonceBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_NPUBBYTES);
 
                 for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES; i++) {
-                    if (i<crypto_aead_aes256gcm_KEYBYTES){
+                    if (i < crypto_aead_aes256gcm_KEYBYTES) {
                         parcBuffer_PutUint8(symKeyBuffer, parcBuffer_GetUint8(encryptKey));
-                    }else{
+                    } else {
                         parcBuffer_PutUint8(nonceBuffer, parcBuffer_GetUint8(encryptKey));
                     }
                 }
@@ -590,14 +580,10 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 
                 // THIS IF SHOULD TELL IF THIS IS THE ENCRYPTING (GW2) OR DECRYPTING (GW1) gateway.
                 bool isPrefix = ccnxName_StartsWith(interestName, athena->publicName);
-                if (!isPrefix){
-
+                if (!isPrefix) {
                     PARCBuffer *payload = ccnxContentObject_GetPayload(contentObject);
-
-                    size_t contentSize = parcBuffer_Remaining(payload);
-                    // ENCRYPTED CONTENT FOR GW1 TO DECRYPT
-                    printf("Symmetric Decryption of content...\n");
-
+                    contentSize = parcBuffer_Remaining(payload);
+                    
                     PARCBuffer* plaintext = parcBuffer_Allocate(contentSize - crypto_aead_aes256gcm_ABYTES);
 	                unsigned long long plaintext_len;
 
@@ -614,16 +600,16 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                         parcBuffer_Release(&contentWireFormat);
                         parcBuffer_Release(&plaintext);
                         athenaPITValue_Release(&value);
-                        parcBuffer_Release(&payload);
                         return NULL;
     
 	                }
 
-                    newContentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, plaintext);
+                    // Recover the serialized message
+                    CCNxMetaMessage *rawMessage = ccnxMetaMessage_CreateFromWireFormatBuffer(plaintext);
+                    newContentObject = ccnxContentObject_Acquire(ccnxMetaMessage_GetContentObject(rawMessage));
+                    ccnxMetaMessage_Release(&rawMessage);
                     parcBuffer_Release(&plaintext);
                 } else {
-                    size_t contentSize = parcBuffer_Remaining(contentWireFormat);
-
                     PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
                     unsigned long long ciphertext_len;
 
@@ -645,9 +631,9 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             //
             // *   (2) Add to the Content Store
             //
-            if (newContentObject != NULL){
+            if (newContentObject != NULL) {
                 athenaContentStore_PutContentObject(athena->athenaContentStore, newContentObject);
-            }else{
+            } else {
                 athenaContentStore_PutContentObject(athena->athenaContentStore, contentObject);
             }
             //
