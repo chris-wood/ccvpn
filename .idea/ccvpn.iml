@@ -51,6 +51,8 @@
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/athenactl/athenactl_main.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/athenactl/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_private.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_gateway.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_main.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/command-line/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gateway/ccnx/forwarder/athena/athena_Control.c" isTestSource="false" />
