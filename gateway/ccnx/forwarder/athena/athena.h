@@ -165,6 +165,7 @@ typedef struct Athena {
  * @abstract create an Athena forwarder instance
  * @discussion
  *
+ * @param [in] name the Athena instance's public (routable) name
  * @param [in] contentStoreSizeInMB size of content store in MB
  * @return athena instance
  *
@@ -178,8 +179,28 @@ typedef struct Athena {
  * @endcode
  */
 Athena *athena_Create(CCNxName *name, size_t contentStoreSizeInMB);
-Athena *athena_CreateWithKeyPair(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer *secretKey,
-                                 PARCBuffer *publicKey);
+
+/**
+ * @abstract create an Athena forwarder instance with a specific public and private key pair
+ * @discussion
+ *
+ * @param [in] name the Athena instance's public (routable) name
+ * @param [in] contentStoreSizeInMB size of content store in MB
+ * @param [in] secretKey the private key
+ * @param [in] publicKey the public key
+ * @return athena instance
+ *
+ * Example:
+ * @code
+ * {
+ *     Athena *athena = athena_Create(10);
+ *     ...
+ *     athena_Release(&athena);
+ * }
+ * @endcode
+ */
+Athena *athena_CreateWithKeyPair(CCNxName *name, size_t contentStoreSizeInMB, PARCBuffer *secretKey, PARCBuffer *publicKey);
+
 /**
  * @abstract acquire a reference to an Athena forwarder instance
  * @discussion
