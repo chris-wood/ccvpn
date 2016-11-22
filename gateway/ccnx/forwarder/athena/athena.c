@@ -246,7 +246,6 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
     size_t plaintextLength = parcBuffer_Remaining(interestKeyBuffer);
 
     // Encrypt the encapsulated interest
-    printf("encrypting the interest...\n");
     PARCBuffer *encapsulatedInterest = parcBuffer_Allocate(plaintextLength + crypto_box_SEALBYTES);
     crypto_box_seal(parcBuffer_Overlay(encapsulatedInterest, 0), parcBuffer_Overlay(interestKeyBuffer, 0),
                     plaintextLength, parcBuffer_Overlay(keyBuffer, 0));
@@ -266,9 +265,6 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
 static CCNxMetaMessage *
 _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressVector) {
     uint8_t hoplimit;
-
-    CCNxInterest *originalInterest = ccnxInterest_Acquire(interest);
-
     //
     // *   (0) Hoplimit check, exclusively on interest messages
     //
@@ -299,34 +295,17 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         if (result) { // failed channels - client will resend interest unless we wish to optimize things here
             parcBitVector_Release(&result);
         }
-        ccnxInterest_Release(&originalInterest);
         return NULL;
     }
-
-    //
-    // *   (2) add it to the PIT, if it was aggregated or there was an error we're done, otherwise we
-    //         forward the interest.  The expectedReturnVector is populated with information we get from
-    //         the FIB and used to verify content objects ingress ports when they arrive.
-    //
-    /*
-    PARCBitVector *expectedReturnVector
-    AthenaPITResolution result;
-    if ((result = athenaPIT_AddInterest(athena->athenaPIT, interest, ingressVector, NULL, &expectedReturnVector)) !=
-        AthenaPITResolution_Forward) {
-        if (result == AthenaPITResolution_Error) {
-            parcLog_Error(athena->log, "PIT resolution error");
-        }
-        return NULL;
-    }
-    */
 
     CCNxInterest *newInterest = ccnxInterest_Acquire(interest);
+    CCNxName *originalInterestName = ccnxInterest_GetName(newInterest);
+
     PARCBuffer *symKeyBuffer = NULL;
 
     // Check to see if this interest has a prefix that is meant for us (our public prefix)
     // If so, then it contains an encapsulated interest. So we must decrypt the interest.
-    CCNxName *ccnxName = ccnxInterest_GetName(interest);
-    bool isPrefix = ccnxName_StartsWith(ccnxName, athena->publicName);
+    bool isPrefix = ccnxName_StartsWith(originalInterestName, athena->publicName);
     bool hasPayload = ccnxInterest_GetPayload(interest) != NULL;
     if (isPrefix && hasPayload) {
         PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);
@@ -335,7 +314,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         PARCBuffer *publicKey = athena->publicKey;
         PARCBuffer *decrypted = parcBuffer_Allocate(interestPayloadSize);
 
-        printf("decrypting the interest...\n");
         if (0 != crypto_box_seal_open(
                                  parcBuffer_Overlay(decrypted, 0),
                                  parcBuffer_Overlay(interestPayload, 0),
@@ -345,8 +323,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                                  )
         {
 		    /* message corrupted or not intended for this recipient */
-		    printf("Not decyphered\n");
-            ccnxInterest_Release(&originalInterest);
+            ccnxInterest_Release(&newInterest);
             return NULL;
         }
 
@@ -369,8 +346,8 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
         // From the wire format, re-create the encapsulated interest
         CCNxMetaMessage *rawMessage = ccnxMetaMessage_CreateFromWireFormatBuffer(interestBuffer);
-        ccnxInterest_Release(&newInterest);
 
+        ccnxInterest_Release(&newInterest);
         newInterest = ccnxInterest_Acquire(ccnxMetaMessage_GetInterest(rawMessage));
         ccnxMetaMessage_Release(&rawMessage);
 
@@ -384,7 +361,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     //         Interest messages with a hoplimit of 0 will never be sent out by the link adapter to a
     //         non-local interface so we need not check that here.
     //
-    ccnxName = ccnxInterest_GetName(newInterest);
+    CCNxName *ccnxName = ccnxInterest_GetName(newInterest);
     AthenaFIBValue *vector = athenaFIB_Lookup(athena->athenaFIB, ccnxName, ingressVector);
     PARCBitVector *egressVector = NULL;
     if (vector != NULL) {
@@ -419,13 +396,14 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             PARCBuffer *keyBuffer = athenaFIBValue_GetKey(vector);
             CCNxName *targetPrefix = athenaFIBValue_GetOutputPrefix(vector);
             if (keyBuffer != NULL && targetPrefix != NULL) {
-                assertTrue(keyBuffer != NULL && targetPrefix != NULL, "Either the key or prefix was NULL.");
 
-                unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES];
-                int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES;
-                randombytes_buf(symmetricKey, sizeof(symmetricKey));
+                // XXX: figure out how this is being modified in place
+                CCNxName *copyPrefix = ccnxName_Copy(targetPrefix);
+                int symmetricKeyLen = crypto_aead_aes256gcm_KEYBYTES + crypto_aead_aes256gcm_NPUBBYTES;
+                unsigned char symmetricKey[symmetricKeyLen];
+                randombytes_buf(symmetricKey, symmetricKeyLen);
 
-                CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, targetPrefix, symmetricKey);
+                CCNxInterest *encryptedInterest = _encryptInterest(athena, newInterest, keyBuffer, copyPrefix, symmetricKey);
                 ccnxInterest_Release(&newInterest);
                 newInterest = encryptedInterest;
 
@@ -436,6 +414,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES);
                 parcBuffer_PutArray(symKeyBuffer, symmetricKeyLen, symmetricKey);
                 parcBuffer_Flip(symKeyBuffer);
+                ccnxName_Release(&copyPrefix);
             }
 
             // debug
@@ -443,10 +422,9 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             parcLog_Info(athena->log, "Sent: %s", interestString);
             parcMemory_Deallocate(&interestString);
 
-            CCNxName *originalInterestName = NULL;
-            if (symKeyBuffer != NULL) {
-                originalInterestName = ccnxInterest_GetName(originalInterest);
-            }
+            char *nameString = ccnxName_ToString(originalInterestName);
+            parcLog_Info(athena->log, "Adding the interest name: %s", nameString);
+            parcMemory_Deallocate(&nameString);
 
             PARCBitVector *expectedReturnVector;
             AthenaPITResolution result;
@@ -455,12 +433,8 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 if (result == AthenaPITResolution_Error) {
                     parcLog_Error(athena->log, "PIT resolution error");
                 }
+                ccnxInterest_Release(&newInterest);
                 return NULL;
-            }
-
-
-            if (originalInterestName != NULL) {
-                ccnxName_Release(&originalInterestName);
             }
             
             PARCBitVector *failedLinks =
@@ -475,11 +449,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     } else {
         // No FIB entry found, return a NoRoute interest return and remove the entry from the PIT.
 
-        if (ccnxWireFormatMessage_ConvertInterestToInterestReturn(interest,
+        if (ccnxWireFormatMessage_ConvertInterestToInterestReturn(newInterest,
                                                                   CCNxInterestReturn_ReturnCode_NoRoute)) {
             // NOTE: The Interest has been modified in-place. It is now an InterestReturn.
             parcLog_Debug(athena->log, "Returning Interest as InterestReturn (code: NoRoute)");
-            PARCBitVector *failedLinks = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, interest,
+            PARCBitVector *failedLinks = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, newInterest,
                                                                          ingressVector);
             if (failedLinks != NULL) {
                 parcBitVector_Release(&failedLinks);
@@ -494,17 +468,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             }
         }
 
-        // We shouldn't try to remove something from the PIT here because we didn't yet add it (that's the last step)
-//        if (athenaPIT_RemoveInterest(athena->athenaPIT, interest, ingressVector) != true) {
-//            if (ccnxName) {
-//                const char *name = ccnxName_ToString(ccnxName);
-//                parcLog_Error(athena->log, "Unable to remove interest (%s) from the PIT.", name);
-//                parcMemory_Deallocate(&name);
-//            } else {
-//                parcLog_Error(athena->log, "Unable to remove interest () from the PIT.");
-//            }
-//        }
-
         if (ccnxName) {
             const char *name = ccnxName_ToString(ccnxName);
             parcLog_Debug(athena->log, "Name (%s) not found in FIB and no default route. Message dropped.", name);
@@ -517,8 +480,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     if (symKeyBuffer != NULL) {
         parcBuffer_Release(&symKeyBuffer);
     }
-    ccnxInterest_Release(&originalInterest);
-    //    ccnxInterest_Release(&newInterest);
 
     return newInterest;
 }
@@ -563,30 +524,36 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 
     AthenaPITValue *value = athenaPIT_Match(athena->athenaPIT, name, keyId, digest, ingressVector);
     PARCBitVector *egressVector = athenaPITValue_GetVector(value);
+    PARCBuffer *encryptKey = athenaPITValue_GetKey(value);
+    CCNxName *interestName = athenaPITValue_GetName(value);
 
     if (egressVector) {
+        egressVector = parcBitVector_Acquire(egressVector);
         if (parcBitVector_NumberOfBitsSet(egressVector) > 0) {
-            PARCBuffer *encryptKey = athenaPITValue_GetKey(value);
-            CCNxName *interestName = athenaPITValue_GetName(value);
+            if (encryptKey != NULL && interestName != NULL) {
+                encryptKey = parcBuffer_Acquire(encryptKey);
+                interestName = ccnxName_Acquire(interestName);
 
-            if (encryptKey != NULL) {
+//                ccnxName_Display(interestName, 0);
+
                 PARCBuffer *contentWireFormat = athenaTransportLinkModule_CreateMessageBuffer(contentObject);
                 size_t contentSize = parcBuffer_Remaining(contentWireFormat);
 
                 PARCBuffer* symKeyBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_KEYBYTES);
                 PARCBuffer* nonceBuffer = parcBuffer_Allocate(crypto_aead_aes256gcm_NPUBBYTES);
 
-                for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES; i++) {
-                    if (i < crypto_aead_aes256gcm_KEYBYTES) {
-                        parcBuffer_PutUint8(symKeyBuffer, parcBuffer_GetUint8(encryptKey));
-                    } else {
-                        parcBuffer_PutUint8(nonceBuffer, parcBuffer_GetUint8(encryptKey));
-                    }
+                for (size_t i = 0; i < crypto_aead_aes256gcm_KEYBYTES; i++) {
+                    parcBuffer_PutUint8(symKeyBuffer, parcBuffer_GetUint8(encryptKey));
                 }
                 parcBuffer_Flip(symKeyBuffer);
+                for (size_t i = 0; i < crypto_aead_aes256gcm_NPUBBYTES; i++) {
+                    parcBuffer_PutUint8(nonceBuffer, parcBuffer_GetUint8(encryptKey));
+                }
                 parcBuffer_Flip(nonceBuffer);
 
-                // THIS IF SHOULD TELL IF THIS IS THE ENCRYPTING (GW2) OR DECRYPTING (GW1) gateway.
+                // Determine if we need to encrypt or decrypt the content by checking if the original interest
+                // name matches our prefix. If so, then we decrypted the corresponding interest, which means here
+                // we must encrypt the content.
                 bool isPrefix = ccnxName_StartsWith(interestName, athena->publicName);
                 if (!isPrefix) { // this content object's payload carries the encapsulated content object
                     PARCBuffer *payload = ccnxContentObject_GetPayload(contentObject);
@@ -595,7 +562,6 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                     PARCBuffer* plaintext = parcBuffer_Allocate(contentSize - crypto_aead_aes256gcm_ABYTES);
 	                unsigned long long plaintext_len;
 
-                    printf("decrypting the content...\n");
 	                if (contentSize < crypto_aead_aes256gcm_ABYTES ||
 		                crypto_aead_aes256gcm_decrypt(parcBuffer_Overlay(plaintext, 0), &plaintext_len,
 		                                              NULL,
@@ -623,7 +589,6 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                     PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
                     unsigned long long ciphertext_len;
 
-                    printf("encrypting the content...\n");
                 	crypto_aead_aes256gcm_encrypt(parcBuffer_Overlay(ciphertext, 0), &ciphertext_len,
 		                                          parcBuffer_Overlay(contentWireFormat, 0), contentSize,
 		                                          NULL, 0,
@@ -638,6 +603,9 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 parcBuffer_Release(&symKeyBuffer);
                 parcBuffer_Release(&nonceBuffer);
                 parcBuffer_Release(&contentWireFormat);
+
+                parcBuffer_Release(&encryptKey);
+                ccnxName_Release(&interestName);
             }
 
             //
@@ -658,6 +626,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                 parcBitVector_Release(&result);
             }
         }
+        parcBitVector_Release(&egressVector);
         athenaPITValue_Release(&value);
     }
 
@@ -775,10 +744,13 @@ athena_ForwarderEngine(void *arg) {
             ccnxMessage = athenaTransportLinkAdapter_Receive(athena->athenaTransportLinkAdapter,
                                                              &ingressVector, receiveTimeout);
             if (ccnxMessage) {
-                athena_ProcessMessage(athena, ccnxMessage, ingressVector);
+                CCNxMetaMessage *result = athena_ProcessMessage(athena, ccnxMessage, ingressVector);
+                if (result != NULL) {
+                    ccnxMetaMessage_Release(&result);
+                }
 
                 parcBitVector_Release(&ingressVector);
-                ccnxMetaMessage_Release(&ccnxMessage);
+//                ccnxMetaMessage_Release(&ccnxMessage);
             }
         }
         usleep(1000); // workaround for coordinating with test infrastructure

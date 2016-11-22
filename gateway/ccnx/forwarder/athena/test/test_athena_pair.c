@@ -142,6 +142,7 @@ LONGBOW_TEST_CASE(Global, athena_pair_ForwardInterest)
 
     CCNxName *interestName = ccnxName_ComposeNAME(producerName, "foo");
     CCNxInterest *interest = ccnxInterest_CreateSimple(interestName);
+    ccnxName_Release(&interestName);
 
     // Send the interest to gatewayA
     PARCBitVector *ingressVector = parcBitVector_Create();
@@ -154,7 +155,6 @@ LONGBOW_TEST_CASE(Global, athena_pair_ForwardInterest)
     // Ensure that the original interest matches the unwrapped interest
     assertTrue(ccnxInterest_Equals(interest, originalInterest), "The original input interest did not match the output decapsulated interest");
 
-    ccnxName_Release(&interestName);
     ccnxName_Release(&producerName);
 
     ccnxInterest_Release(&interest);

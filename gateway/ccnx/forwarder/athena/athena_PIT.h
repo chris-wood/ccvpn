@@ -94,7 +94,7 @@ PARCBitVector *athenaPITValue_GetVector(AthenaPITValue *value);
 CCNxName *athenaPITValue_GetName(AthenaPITValue *value);
 
 void athenaPITValue_Release(AthenaPITValue **valuePtr);
-AthenaPITValue *athenaPITValue(const AthenaPITValue *value);
+AthenaPITValue *athenaPITValue_Acquire(const AthenaPITValue *value);
 
 /**
  * @typedef AthenaPITResolution

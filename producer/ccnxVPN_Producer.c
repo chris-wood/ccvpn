@@ -168,27 +168,38 @@ _ccnxVPNServer_Run(CCNxVPNServer *server)
             }
 
             CCNxInterest *interest = ccnxMetaMessage_GetInterest(request);
-            if (interest != NULL) {
-                CCNxName *interestName = ccnxInterest_GetName(interest);
+            if (ccnxMetaMessage_IsInterest(request)) {
+                if (interest != NULL) {
+                    CCNxName *interestName = ccnxInterest_GetName(interest);
 
-                // Extract the size of the payload response from the client
-                CCNxNameSegment *sizeSegment = ccnxName_GetSegment(interestName, sizeIndex);
-                char *segmentString = ccnxNameSegment_ToString(sizeSegment);
-                int size = atoi(segmentString);
-                size = size > ccnxVPN_MaxPayloadSize ? ccnxVPN_MaxPayloadSize : size;
+                    // Extract the size of the payload response from the client
+                    CCNxNameSegment *sizeSegment = ccnxName_GetSegment(interestName, sizeIndex);
+                    char *segmentString = ccnxNameSegment_ToString(sizeSegment);
+                    int size = atoi(segmentString);
+                    size = size > ccnxVPN_MaxPayloadSize ? ccnxVPN_MaxPayloadSize : size;
 
-                PARCBuffer *payload = _ccnxVPNServer_MakePayload(server, size);
+                    PARCBuffer *payload = _ccnxVPNServer_MakePayload(server, size);
+                    CCNxContentObject *contentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, payload);
 
-                CCNxContentObject *contentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, payload);
-                CCNxMetaMessage *message = ccnxMetaMessage_CreateFromContentObject(contentObject);
+                    // debug
+                    char *responseName = ccnxName_ToString(interestName);
+                    printf("Replying to: %s\n", responseName);
+                    parcMemory_Deallocate(&responseName);
 
-                if (ccnxPortal_Send(server->portal, message, CCNxStackTimeout_Never) == false) {
-                    fprintf(stderr, "ccnxPortal_Send failed: %d\n", ccnxPortal_GetError(server->portal));
+                    CCNxMetaMessage *message = ccnxMetaMessage_CreateFromContentObject(contentObject);
+
+                    if (ccnxPortal_Send(server->portal, message, CCNxStackTimeout_Never) == false) {
+                        fprintf(stderr, "ccnxPortal_Send failed: %d\n", ccnxPortal_GetError(server->portal));
+                    }
+
+                    ccnxMetaMessage_Release(&message);
+                    parcBuffer_Release(&payload);
+
                 }
-
-                ccnxMetaMessage_Release(&message);
-                parcBuffer_Release(&payload);
-
+            } else {
+                printf("Received a control message\n");
+                ccnxMetaMessage_Display(request, 0);
+                exit(1);
             }
             ccnxMetaMessage_Release(&request);
         }

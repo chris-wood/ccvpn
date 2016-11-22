@@ -154,6 +154,7 @@ typedef struct athena_pitEntry {
     PARCBuffer *encapKey; // one-time encryption key used to decapsulate the response
     _Time *expiration; // not predecessor lifetime, but longest for all
     _Time *creationTime; // not predecessor lifetime, but longest for all
+    bool isEncap;
 } _AthenaPITEntry;
 
 static void
@@ -167,6 +168,9 @@ _athenaPITEntry_Destroy(_AthenaPITEntry**entryHandle)
         parcBitVector_Release(&entry->egress);
         if (entry->encapKey != NULL) {
             parcBuffer_Release(&entry->encapKey);
+        }
+        if (entry->originalName != NULL) {
+            ccnxName_Release(&entry->originalName);
         }
         _time_Release(&entry->expiration);
         _time_Release(&entry->creationTime);
@@ -212,6 +216,7 @@ _athenaPITEntry_Create(const PARCBuffer *key,
                        const PARCBitVector *egress,
                        CCNxName *originalName,
                        PARCBuffer *encapKey,
+                       bool isEncap,
                        time_t expiration,
                        time_t creationTime)
 {
@@ -223,6 +228,7 @@ _athenaPITEntry_Create(const PARCBuffer *key,
         entry->egress = parcBitVector_Acquire(egress);
         entry->originalName = originalName == NULL ? NULL : ccnxName_Acquire(originalName);
         entry->encapKey = encapKey == NULL ? NULL : parcBuffer_Acquire(encapKey);
+        entry->isEncap = isEncap;
         entry->expiration = _time_Create(expiration);
         entry->creationTime = _time_Create(creationTime);
     }
@@ -279,6 +285,7 @@ struct athena_pit_value {
     PARCBitVector *vector;
     PARCBuffer *key;
     CCNxName *name;
+    bool isEncap;
 };
 
 static void
@@ -312,6 +319,7 @@ athenaPITValue_Create(void)
         value->vector = parcBitVector_Create();
         value->key = NULL;
         value->name = NULL;
+        value->isEncap = false;
     }
     return value;
 }
@@ -595,6 +603,9 @@ athenaPIT_AddInterest(AthenaPIT *athenaPIT,
     uint64_t now = parcClock_GetTime(athenaPIT->clock);
     expiration += now;
 
+    // XXX: temp
+    bool isEncap = false;
+
     // Get the most restrictive key
     PARCBuffer *key = _athenaPIT_acquireInterestKey(ccnxInterestMessage);
     _AthenaPITEntry *entry = (_AthenaPITEntry *) parcHashMap_Get(athenaPIT->entryTable, key);
@@ -611,7 +622,8 @@ athenaPIT_AddInterest(AthenaPIT *athenaPIT,
 
             // Add the default entry which contains the Interest name
             _AthenaPITEntry *newEntry =
-                _athenaPITEntry_Create(key, ccnxInterestMessage, ingressVector, newEgressVector, originalName, encapKey, expiration, now);
+                _athenaPITEntry_Create(key, ccnxInterestMessage, ingressVector, newEgressVector,
+                                       originalName, encapKey, isEncap, expiration, now);
 
             parcHashMap_Put(athenaPIT->entryTable, key, newEntry);
             ++athenaPIT->interestCount;
@@ -627,7 +639,8 @@ athenaPIT_AddInterest(AthenaPIT *athenaPIT,
                 PARCBuffer *namelessKey = _athenaPIT_createCompoundKey(NULL, contentId, NULL);
 
                 _AthenaPITEntry *namelessEntry =
-                        _athenaPITEntry_Create(namelessKey, ccnxInterestMessage, ingressVector, newEgressVector, originalName, encapKey, expiration, now);
+                        _athenaPITEntry_Create(namelessKey, ccnxInterestMessage, ingressVector, newEgressVector,
+                                               originalName, encapKey, isEncap, expiration, now);
                 parcHashMap_Put(athenaPIT->entryTable, namelessKey, namelessEntry);
 
                 _athenaPIT_addInterestToLinkCleanupList(athenaPIT, ingressVector, namelessEntry);
@@ -728,9 +741,15 @@ _athenaPIT_LookupKey(AthenaPIT *athenaPIT, PARCBuffer *key, AthenaPITValue *valu
         // Set the egress vector
         parcBitVector_SetVector(value->vector, entry->ingress);
         if (entry->encapKey != NULL) {
+            if (value->key != NULL) {
+                parcBuffer_Release(&value->key);
+            }
             value->key = parcBuffer_Acquire(entry->encapKey);
         }
         if (entry->originalName != NULL) {
+            if (value->name != NULL) {
+                ccnxName_Release(&value->name);
+            }
             value->name = ccnxName_Acquire(entry->originalName);
         }
 
