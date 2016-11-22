@@ -246,6 +246,7 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
     size_t plaintextLength = parcBuffer_Remaining(interestKeyBuffer);
 
     // Encrypt the encapsulated interest
+    printf("encrypting the interest...\n");
     PARCBuffer *encapsulatedInterest = parcBuffer_Allocate(plaintextLength + crypto_box_SEALBYTES);
     crypto_box_seal(parcBuffer_Overlay(encapsulatedInterest, 0), parcBuffer_Overlay(interestKeyBuffer, 0),
                     plaintextLength, parcBuffer_Overlay(keyBuffer, 0));
@@ -265,6 +266,8 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
 static CCNxMetaMessage *
 _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressVector) {
     uint8_t hoplimit;
+
+    CCNxInterest *originalInterest = ccnxInterest_Acquire(interest);
 
     //
     // *   (0) Hoplimit check, exclusively on interest messages
@@ -296,6 +299,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         if (result) { // failed channels - client will resend interest unless we wish to optimize things here
             parcBitVector_Release(&result);
         }
+        ccnxInterest_Release(&originalInterest);
         return NULL;
     }
 
@@ -318,7 +322,6 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
     CCNxInterest *newInterest = ccnxInterest_Acquire(interest);
     PARCBuffer *symKeyBuffer = NULL;
-    CCNxInterest *originalInterest = ccnxInterest_Acquire(interest);
 
     // Check to see if this interest has a prefix that is meant for us (our public prefix)
     // If so, then it contains an encapsulated interest. So we must decrypt the interest.
@@ -332,6 +335,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         PARCBuffer *publicKey = athena->publicKey;
         PARCBuffer *decrypted = parcBuffer_Allocate(interestPayloadSize);
 
+        printf("decrypting the interest...\n");
         if (0 != crypto_box_seal_open(
                                  parcBuffer_Overlay(decrypted, 0),
                                  parcBuffer_Overlay(interestPayload, 0),
@@ -342,6 +346,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         {
 		    /* message corrupted or not intended for this recipient */
 		    printf("Not decyphered\n");
+            ccnxInterest_Release(&originalInterest);
             return NULL;
         }
 
@@ -489,15 +494,17 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             }
         }
 
-        if (athenaPIT_RemoveInterest(athena->athenaPIT, interest, ingressVector) != true) {
-            if (ccnxName) {
-                const char *name = ccnxName_ToString(ccnxName);
-                parcLog_Error(athena->log, "Unable to remove interest (%s) from the PIT.", name);
-                parcMemory_Deallocate(&name);
-            } else {
-                parcLog_Error(athena->log, "Unable to remove interest () from the PIT.");
-            }
-        }
+        // We shouldn't try to remove something from the PIT here because we didn't yet add it (that's the last step)
+//        if (athenaPIT_RemoveInterest(athena->athenaPIT, interest, ingressVector) != true) {
+//            if (ccnxName) {
+//                const char *name = ccnxName_ToString(ccnxName);
+//                parcLog_Error(athena->log, "Unable to remove interest (%s) from the PIT.", name);
+//                parcMemory_Deallocate(&name);
+//            } else {
+//                parcLog_Error(athena->log, "Unable to remove interest () from the PIT.");
+//            }
+//        }
+
         if (ccnxName) {
             const char *name = ccnxName_ToString(ccnxName);
             parcLog_Debug(athena->log, "Name (%s) not found in FIB and no default route. Message dropped.", name);
@@ -552,6 +559,8 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
     PARCBuffer *keyId = ccnxContentObject_GetKeyId(contentObject);
     PARCBuffer *digest = _createMessageHash(contentObject);
 
+    CCNxContentObject *returnContent = ccnxContentObject_Acquire(contentObject);
+
     AthenaPITValue *value = athenaPIT_Match(athena->athenaPIT, name, keyId, digest, ingressVector);
     PARCBitVector *egressVector = athenaPITValue_GetVector(value);
 
@@ -559,7 +568,6 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
         if (parcBitVector_NumberOfBitsSet(egressVector) > 0) {
             PARCBuffer *encryptKey = athenaPITValue_GetKey(value);
             CCNxName *interestName = athenaPITValue_GetName(value);
-            CCNxContentObject *newContentObject = NULL;
 
             if (encryptKey != NULL) {
                 PARCBuffer *contentWireFormat = athenaTransportLinkModule_CreateMessageBuffer(contentObject);
@@ -580,13 +588,14 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 
                 // THIS IF SHOULD TELL IF THIS IS THE ENCRYPTING (GW2) OR DECRYPTING (GW1) gateway.
                 bool isPrefix = ccnxName_StartsWith(interestName, athena->publicName);
-                if (!isPrefix) {
+                if (!isPrefix) { // this content object's payload carries the encapsulated content object
                     PARCBuffer *payload = ccnxContentObject_GetPayload(contentObject);
                     contentSize = parcBuffer_Remaining(payload);
 
                     PARCBuffer* plaintext = parcBuffer_Allocate(contentSize - crypto_aead_aes256gcm_ABYTES);
 	                unsigned long long plaintext_len;
 
+                    printf("decrypting the content...\n");
 	                if (contentSize < crypto_aead_aes256gcm_ABYTES ||
 		                crypto_aead_aes256gcm_decrypt(parcBuffer_Overlay(plaintext, 0), &plaintext_len,
 		                                              NULL,
@@ -606,20 +615,23 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 
                     // Recover the serialized message
                     CCNxMetaMessage *rawMessage = ccnxMetaMessage_CreateFromWireFormatBuffer(plaintext);
-                    contentObject = ccnxContentObject_Acquire(ccnxMetaMessage_GetContentObject(rawMessage));
+                    ccnxContentObject_Release(&returnContent);
+                    returnContent = ccnxContentObject_Acquire(ccnxMetaMessage_GetContentObject(rawMessage));
                     ccnxMetaMessage_Release(&rawMessage);
                     parcBuffer_Release(&plaintext);
                 } else {
                     PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
                     unsigned long long ciphertext_len;
 
+                    printf("encrypting the content...\n");
                 	crypto_aead_aes256gcm_encrypt(parcBuffer_Overlay(ciphertext, 0), &ciphertext_len,
 		                                          parcBuffer_Overlay(contentWireFormat, 0), contentSize,
 		                                          NULL, 0,
                                                   NULL,
                                                   (unsigned char *) parcBuffer_Overlay(nonceBuffer, 0), (unsigned char *) parcBuffer_Overlay(symKeyBuffer, 0));
 
-                    contentObject = ccnxContentObject_CreateWithNameAndPayload(interestName, ciphertext);
+                    ccnxContentObject_Release(&returnContent);
+                    returnContent = ccnxContentObject_CreateWithNameAndPayload(interestName, ciphertext);
                     parcBuffer_Release(&ciphertext);
                 }
 
@@ -631,7 +643,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             //
             // *   (2) Add to the Content Store
             //
-            athenaContentStore_PutContentObject(athena->athenaContentStore, contentObject);
+            athenaContentStore_PutContentObject(athena->athenaContentStore, returnContent);
 
             //
             // *   (3) Reverse path forward it via PIT entries
@@ -639,7 +651,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             const char *egressVectorString = parcBitVector_ToString(egressVector);
             parcLog_Debug(athena->log, "Content Object forwarded to %s.", egressVectorString);
             parcMemory_Deallocate(&egressVectorString);
-            PARCBitVector *result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, contentObject, egressVector);
+            PARCBitVector *result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, returnContent, egressVector);
 
             if (result) {
                 // if there are failed channels, client will resend interest unless we wish to retry here
@@ -649,7 +661,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
         athenaPITValue_Release(&value);
     }
 
-    return contentObject;
+    return returnContent;
 }
 
 static CCNxMetaMessage *

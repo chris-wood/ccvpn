@@ -76,6 +76,8 @@
 #include <ccnx/forwarder/athena/athena_About.h>
 #include <ccnx/forwarder/athena/athena_InterestControl.h>
 
+#include <parc/algol/parc_RandomAccessFile.h>
+
 static char *_athenaDefaultConnectionURI = AthenaDefaultConnectionURI;
 static size_t _contentStoreSizeInMB = AthenaDefaultContentStoreSize;
 
@@ -283,20 +285,56 @@ int
 main(int argc, char *argv[])
 {
     _athenaLogo();
+    sodium_init();
     printf("\n");
 
+    // Command line parameters
     printf("Starting with name: %s\n", argv[1]);
 
+    // Build the public name
     CCNxName *name = ccnxName_CreateFromCString(argv[1]);
+
+    // Create the athena instance
     Athena *athena = athena_Create(name, AthenaDefaultContentStoreSize);
     ccnxName_Release(&name);
+
+    // Determine how many gateway links we have to create
+    int numLinks = atoi(argv[2]);
+
+    // Create each link
+    // They will be in the form of a name and then public/shared key path
+    for (int i = 0; i < numLinks; i++) {
+        char *prefixString = argv[3 + (i * 2)];
+        char *connectionString = argv[4 + (i * 2)];
+
+        // Build the prefix
+        CCNxName *prefix = ccnxName_CreateFromCString(prefixString);
+
+        // XXX: also read in the link information to create the link and add it to the forwarder
+        PARCURI *connectionURI = parcURI_Parse(connectionString);
+        const char *linkName = athenaTransportLinkAdapter_Open(athena->athenaTransportLinkAdapter, connectionURI);
+        assertTrue(linkName != NULL, "athenaTransportLinkAdapter_Open failed(%s)", strerror(errno));
+        parcURI_Release(&connectionURI);
+
+        // Create the corresponding link vector
+        int linkId = athenaTransportLinkAdapter_LinkNameToId(athena->athenaTransportLinkAdapter, linkName);
+        PARCBitVector *linkVector = parcBitVector_Create();
+        parcBitVector_Set(linkVector, linkId);
+
+        // Add the translation route as needed
+        athenaFIB_AddRoute(athena->athenaFIB, prefix, linkVector);
+
+        parcBitVector_Release(&linkVector);
+        ccnxName_Release(&prefix);
+    }
 
     // Passing in a reference that will be released by athena_Process.  athena_Process is used
     // in athena_InterestControl.c:_Control_Command as the entry point for spawned instances.
     // Spawned instances may not have have time to acquire a reference before our reference is
     // released so the reference is acquired for them.
     if (athena) {
-        _parseCommandLine(athena, argc - 1, &argv[1]); // we already ate the first parameter
+        printf("Processing %d arguments at index %d\n", argc - (numLinks * 2) - 2, 2 + (numLinks * 2));
+        _parseCommandLine(athena, argc - (numLinks * 2) - 2, &argv[2 + (numLinks * 2)]); // we already ate the first parameters
         (void) athena_ForwarderEngine(athena_Acquire(athena));
     }
     athena_Release(&athena);

@@ -22,7 +22,7 @@ set(ATHENA_PRIVATE_SOURCE_FILES
 
 add_executable(athena_private_bin ${ATHENA_PRIVATE_SOURCE_FILES})
 target_link_libraries(athena_private_bin ${ATHENA_LINK_LIBRARIES} sodium)
-set_target_properties(athena_private_bin PROPERTIES OUTPUT_NAME athenav_private)
+set_target_properties(athena_private_bin PROPERTIES OUTPUT_NAME athena_private)
 
 install(TARGETS athena_private_bin RUNTIME DESTINATION bin)
 

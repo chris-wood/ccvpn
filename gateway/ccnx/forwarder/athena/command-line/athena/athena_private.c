@@ -285,6 +285,7 @@ int
 main(int argc, char *argv[])
 {
     _athenaLogo();
+    sodium_init();
     printf("\n");
 
     if (argc < 4) {
@@ -309,6 +310,7 @@ main(int argc, char *argv[])
     PARCBuffer *publicKey = parcBuffer_Allocate(parcFile_GetFileSize(file));
     parcRandomAccessFile_Read(raf, publicKey);
     parcRandomAccessFile_Release(&raf);
+    parcBuffer_Flip(publicKey);
     parcFile_Release(&file);
 
     // Now private
@@ -317,6 +319,7 @@ main(int argc, char *argv[])
     PARCBuffer *privateKey = parcBuffer_Allocate(parcFile_GetFileSize(file));
     parcRandomAccessFile_Read(raf, privateKey);
     parcRandomAccessFile_Release(&raf);
+    parcBuffer_Flip(privateKey);
     parcFile_Release(&file);
 
     // Now actually build the athena system

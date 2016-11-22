@@ -285,6 +285,7 @@ int
 main(int argc, char *argv[])
 {
     _athenaLogo();
+    sodium_init();
     printf("\n");
 
     if (argc < 3) {
@@ -308,11 +309,14 @@ main(int argc, char *argv[])
     // Create each link
     // They will be in the form of a name and then public/shared key path
     for (int i = 0; i < numLinks; i++) {
-        char *nameString = argv[3 + (i * 2)];
-        char *keyFile = argv[4 + (i * 2)];
+        char *inputNameString = argv[3 + (i * 4)];
+        char *outputNameString = argv[4 + (i * 4)];
+        char *keyFile = argv[5 + (i * 4)];
+        char *connectionString = argv[6 + (i * 4)];
 
-        // Build the prefix
-        CCNxName *prefix = ccnxName_CreateFromCString(nameString);
+        // Build the prefixes
+        CCNxName *inputName = ccnxName_CreateFromCString(inputNameString);
+        CCNxName *outputName = ccnxName_CreateFromCString(outputNameString);
 
         // Load the key
         PARCFile *file = parcFile_Create(keyFile);
@@ -320,12 +324,27 @@ main(int argc, char *argv[])
         PARCBuffer *keyBuffer = parcBuffer_Allocate(parcFile_GetFileSize(file));
         parcRandomAccessFile_Read(raf, keyBuffer);
         parcRandomAccessFile_Release(&raf);
+        parcBuffer_Flip(keyBuffer);
         parcFile_Release(&file);
 
         // XXX: also read in the link information to create the link and add it to the forwarder
+        PARCURI *connectionURI = parcURI_Parse(connectionString);
+        const char *linkName = athenaTransportLinkAdapter_Open(athena->athenaTransportLinkAdapter, connectionURI);
+        assertTrue(linkName != NULL, "athenaTransportLinkAdapter_Open failed(%s)", strerror(errno));
+        parcURI_Release(&connectionURI);
 
-        // XXX: then add the translation route as needed
-        //athenaFIB_AddTranslationRoute(athena->athenaFIB, inputName, outputName, key, linkVector)
+        // Create the corresponding link vector
+        int linkId = athenaTransportLinkAdapter_LinkNameToId(athena->athenaTransportLinkAdapter, linkName);
+        PARCBitVector *linkVector = parcBitVector_Create();
+        parcBitVector_Set(linkVector, linkId);
+
+        // Add the translation route as needed
+        athenaFIB_AddTranslationRoute(athena->athenaFIB, inputName, outputName, keyBuffer, linkVector);
+
+        parcBitVector_Release(&linkVector);
+        ccnxName_Release(&inputName);
+        ccnxName_Release(&outputName);
+        parcBuffer_Release(&keyBuffer);
     }
 
     // Passing in a reference that will be released by athena_Process.  athena_Process is used
@@ -333,9 +352,11 @@ main(int argc, char *argv[])
     // Spawned instances may not have have time to acquire a reference before our reference is
     // released so the reference is acquired for them.
     if (athena) {
-        _parseCommandLine(athena, argc - (numLinks * 2) - 1, &argv[1 + (numLinks * 2)]); // we already ate the first parameter
+        printf("Processing %d arguments at index %d\n", argc - (numLinks * 4) - 2, 2 + (numLinks * 4));
+        _parseCommandLine(athena, argc - (numLinks * 4) - 2, &argv[2 + (numLinks * 4)]); // we already ate the first parameters
         (void) athena_ForwarderEngine(athena_Acquire(athena));
     }
+
     athena_Release(&athena);
     pthread_exit(NULL); // wait for any residual threads to exit
 

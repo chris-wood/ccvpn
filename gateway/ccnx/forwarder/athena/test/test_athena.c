@@ -94,13 +94,13 @@ LONGBOW_TEST_RUNNER_TEARDOWN(athena)
 
 LONGBOW_TEST_FIXTURE(Global)
 {
-//      LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
-//      LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease);
+    LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
+    LONGBOW_RUN_TEST_CASE(Global, athena_Create_KeyRelease);
     LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
-    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
+//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
-//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObjectEncryption);
+////    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObjectEncryption);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestReturn);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ForwarderEngine);
@@ -149,15 +149,18 @@ LONGBOW_TEST_CASE(Global, athena_Create_KeyRelease)
     Athena *athena = athena_CreateWithKeyPair(testName, 100, secretKey, publicKey);
     ccnxName_Release(&testName);
 
+    parcBuffer_Release(&secretKey);
+    parcBuffer_Release(&publicKey);
+
     athena_Release(&athena);
 }
 
 LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
 {
-    PARCURI *connectionURI;
     CCNxName *testName = ccnxName_CreateFromCString("ccnx:/foo");
     Athena *athena = athena_Create(testName, 100);
     ccnxName_Release(&testName);
+
     CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
 
@@ -175,7 +178,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
     uint64_t nowInMillis = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
     ccnxContentObject_SetExpiryTime(contentObject, nowInMillis + 100000); // expire in 100 seconds
 
-    connectionURI = parcURI_Parse("tcp://localhost:50100/listener/name=TCPListener");
+    PARCURI *connectionURI = parcURI_Parse("tcp://localhost:50100/listener/name=TCPListener");
     const char *result = athenaTransportLinkAdapter_Open(athena->athenaTransportLinkAdapter, connectionURI);
     assertTrue(result != NULL, "athenaTransportLinkAdapter_Open failed(%s)", strerror(errno));
     parcURI_Release(&connectionURI);
@@ -201,11 +204,11 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
     athena_EncodeMessage(interest);
     athena_EncodeMessage(contentObject);
 
-    CCNxInterest* returnInterest = NULL;
+    CCNxInterest *returnInterest = NULL;
 
     // Before FIB entry interest should not be forwarded
     returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
-    if (returnInterest!=NULL){
+    if (returnInterest != NULL) {
         ccnxInterest_Release(&returnInterest);
     }
 
@@ -217,7 +220,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
 
     // Process exact interest match
     returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
-    if (returnInterest!=NULL){
+    if (returnInterest != NULL) {
         ccnxInterest_Release(&returnInterest);
     }
 
@@ -226,7 +229,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
     CCNxInterest *superInterest = ccnxInterest_CreateSimple(superName);
     athena_EncodeMessage(superInterest);
     returnInterest = athena_ProcessMessage(athena, superInterest, interestIngressVector);
-    if (returnInterest!=NULL){
+    if (returnInterest != NULL) {
         ccnxInterest_Release(&returnInterest);
     }
     ccnxName_Release(&superName);
@@ -237,20 +240,20 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
     CCNxInterest *noMatchInterest = ccnxInterest_CreateSimple(noMatchName);
     athena_EncodeMessage(noMatchInterest);
     returnInterest = athena_ProcessMessage(athena, noMatchInterest, interestIngressVector);
-    if (returnInterest!=NULL){
+    if (returnInterest != NULL) {
         ccnxInterest_Release(&returnInterest);
     }
+
     ccnxName_Release(&noMatchName);
     ccnxInterest_Release(&noMatchInterest);
 
     // Create a matching content object that the store should retain and reply to the following interest with
-    returnInterest = athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
-    if (returnInterest!=NULL){
-        ccnxInterest_Release(&returnInterest);
+    CCNxContentObject *returnContent = athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
+    if (returnContent != NULL) {
+        ccnxContentObject_Release(&returnContent);
     }
-
     returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
-    if (returnInterest!=NULL){
+    if (returnInterest != NULL) {
         ccnxInterest_Release(&returnInterest);
     }
 
@@ -259,7 +262,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterest)
 
     ccnxName_Release(&name);
     ccnxInterest_Release(&interest);
-    ccnxInterest_Release(&contentObject);
+    ccnxContentObject_Release(&contentObject);
     athena_Release(&athena);
 }
 
@@ -318,7 +321,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
 
     // Before FIB entry interest should not be forwarded
     returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
-    if (returnInterest!=NULL){
+    if (returnInterest != NULL) {
         ccnxInterest_Release(&returnInterest);
     }
 
@@ -338,7 +341,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
 
     // Process exact interest match/ Generates encapsulated interest
     returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
-
+    if (returnInterest != NULL) {
+        ccnxInterest_Release(&returnInterest);
+    }
 
 ////////SYMMETRIC DECRYPTION TEST STARTS HERE ///////////////////////////////////////////
 
@@ -370,12 +375,8 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     parcBuffer_Flip(symBuffer);
     parcBuffer_Release(&decrypted);
 
-    if (returnInterest!=NULL){
-        ccnxInterest_Release(&returnInterest);
-    }
-
     // This should trigger the symmetric decryption
-    ccnxInterest_Release(&contentObject);
+    ccnxContentObject_Release(&contentObject);
     payload = parcBuffer_WrapCString("this is a payload");
 
     size_t contentSize = parcBuffer_Remaining(payload);
