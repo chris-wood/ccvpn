@@ -97,8 +97,8 @@ LONGBOW_TEST_FIXTURE(Global)
     LONGBOW_RUN_TEST_CASE(Global, athena_CreateRelease);
     LONGBOW_RUN_TEST_CASE(Global, athena_Create_KeyRelease);
     LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterest);
-//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
-//    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
+    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestEncapsulation);
+    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessInterestDecapsulation);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObject);
 ////    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessContentObjectEncryption);
 //    LONGBOW_RUN_TEST_CASE(Global, athena_ProcessControl);
@@ -275,7 +275,9 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     Athena *athena = athena_Create(testName, 100);
     ccnxName_Release(&testName);
     CCNxName *name = ccnxName_CreateFromCString("lci:/foo/bar/baz");
+    CCNxName *otherName = ccnxName_CreateFromCString("lci:/foo/bar/other");
     CCNxInterest *interest = ccnxInterest_CreateSimple(name);
+    CCNxInterest *otherInterest = ccnxInterest_CreateSimple(otherName);
 
     uint64_t chunkNum = 0;
     CCNxNameSegment *chunkSegment = ccnxNameSegmentNumber_Create(CCNxNameLabelType_CHUNK, chunkNum);
@@ -326,27 +328,51 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     }
 
     // Creating public/secret keys for gateway2
-    unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
-    unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
-    crypto_box_keypair(recipient_pk, recipient_sk);
+    unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES+1];
+    unsigned char recipient_sk[crypto_box_SECRETKEYBYTES+1];
+    unsigned char sym_key[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES+1];
+    // Reading the key pair from /tmp
+    // should run keygen before running this code.
+    FILE* sk = fopen("/tmp/key.sec","r");
+    assertNotNull(sk, "Could not open secret key file for reading");
+    fread(recipient_sk,sizeof(char),crypto_box_SECRETKEYBYTES+1,sk);
+    fclose(sk);
+    FILE* pk = fopen("/tmp/key.pub","r");
+    assertNotNull(pk, "Could not open public key file for reading");
+    fread(recipient_pk,sizeof(char),crypto_box_PUBLICKEYBYTES+1,pk);
+    fclose(pk);
+    FILE* ek = fopen("/tmp/key.sym","r");
+    assertNotNull(pk, "Could not open public key file for reading");
+    fread(sym_key,sizeof(char),crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES+1,ek);
+    fclose(ek);
+
+    PARCBuffer *secretKey = parcBuffer_WrapCString((char*)recipient_sk);
     PARCBuffer *publicKey = parcBuffer_WrapCString((char*)recipient_pk);
+    PARCBuffer *symmetricKey = parcBuffer_WrapCString((char*)sym_key);
+
    
     // Creating the translation prefix
     CCNxName *gw2Name = ccnxName_CreateFromCString("lci:/domain/2");
 
     // Adding translation route so that the encryption data path is taken
     athenaFIB_AddTranslationRoute(athena->athenaFIB, name, gw2Name, publicKey, contentObjectIngressVector);
+    athenaFIB_AddTranslationRoute(athena->athenaFIB, otherName, gw2Name, symmetricKey, contentObjectIngressVector);
     CCNxName *defaultName = ccnxName_CreateFromCString("lci:/");
     athenaFIB_AddRoute(athena->athenaFIB, defaultName, contentObjectIngressVector);
 
-    // Process exact interest match/ Generates encapsulated interest
+    // Encapsulated interest with public key
     returnInterest = athena_ProcessMessage(athena, interest, interestIngressVector);
+    if (returnInterest != NULL) {
+        ccnxInterest_Release(&returnInterest);
+    }
+    // Encapsulated interest with shared secret key
+    returnInterest = athena_ProcessMessage(athena, otherInterest, interestIngressVector);
     if (returnInterest != NULL) {
         ccnxInterest_Release(&returnInterest);
     }
 
 ////////SYMMETRIC DECRYPTION TEST STARTS HERE ///////////////////////////////////////////
-
+/*
     CCNxName *encapName = ccnxInterest_GetName(returnInterest);
     
     PARCBuffer *symBuffer = NULL;
@@ -416,18 +442,22 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     if (returnInterest!=NULL){
         ccnxInterest_Release(&returnInterest);
     }
-
 /////////////SYMMETRIC DECRYPTION TEST ENDS HERE/////////////////////////////////////////////////////////////////
-
+*/
     ccnxName_Release(&defaultName);
     ccnxName_Release(&gw2Name);
     parcBuffer_Release(&publicKey);
+    parcBuffer_Release(&secretKey);
+    parcBuffer_Release(&symmetricKey);
 
     parcBitVector_Release(&interestIngressVector);
     parcBitVector_Release(&contentObjectIngressVector);
 
     ccnxName_Release(&name);
     ccnxInterest_Release(&interest);
+    ccnxName_Release(&otherName);
+    ccnxInterest_Release(&otherInterest);
+
 
     ccnxInterest_Release(&contentObject);
     athena_Release(&athena);
@@ -438,21 +468,30 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
 {
 //    assertTrue(sodium_init()!=-1,"Crypto lib sodium not available");
 
-    unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES];
-    unsigned char recipient_sk[crypto_box_SECRETKEYBYTES];
 
+
+    // Creating public/secret keys for gateway2
+    unsigned char recipient_pk[crypto_box_PUBLICKEYBYTES+1];
+    unsigned char recipient_sk[crypto_box_SECRETKEYBYTES+1];
+    unsigned char sym_key[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES+1];
     // Reading the key pair from /tmp
     // should run keygen before running this code.
     FILE* sk = fopen("/tmp/key.sec","r");
     assertNotNull(sk, "Could not open secret key file for reading");
-    fread(recipient_sk,sizeof(char),crypto_box_SECRETKEYBYTES,sk);
+    fread(recipient_sk,sizeof(char),crypto_box_SECRETKEYBYTES+1,sk);
     fclose(sk);
     FILE* pk = fopen("/tmp/key.pub","r");
     assertNotNull(pk, "Could not open public key file for reading");
-    fread(recipient_pk,sizeof(char),crypto_box_PUBLICKEYBYTES,pk);
+    fread(recipient_pk,sizeof(char),crypto_box_PUBLICKEYBYTES+1,pk);
     fclose(pk);
+    FILE* ek = fopen("/tmp/key.sym","r");
+    assertNotNull(pk, "Could not open symmetric key file for reading");
+    fread(sym_key,sizeof(char),crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES+1,ek);
+    fclose(ek);
+
     PARCBuffer *secretKey = parcBuffer_WrapCString((char*)recipient_sk);
     PARCBuffer *publicKey = parcBuffer_WrapCString((char*)recipient_pk);
+    PARCBuffer *symmetricKey = parcBuffer_WrapCString((char*)sym_key);
 
     PARCURI *connectionURI;
 
@@ -514,13 +553,10 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
 
     // Add route for the decapsulated (original) interest
     athenaFIB_AddRoute(athena->athenaFIB, name, contentObjectIngressVector);
-    if (returnInterest!=NULL){
-        ccnxInterest_Release(&returnInterest);
-    }
 
     // Creating encapsulated interest
-    unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES];
-    randombytes_buf(symmetricKey, sizeof(symmetricKey));
+    unsigned char symmetricKey2[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES];
+    randombytes_buf(symmetricKey2, sizeof(symmetricKey2));
 
     CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, publicKey, domainName, symmetricKey);
     assertNotNull(encryptedInterest, "Failed to encapsulate the interest");
@@ -531,13 +567,13 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
         ccnxInterest_Release(&returnInterest);
     }
 
-
+/*
     // Should encrypt and forward the content using the symmetric key
     returnInterest = athena_ProcessMessage(athena, contentObject, contentObjectIngressVector);
     if (returnInterest!=NULL){
         ccnxInterest_Release(&returnInterest);
     }
-
+*/
     ccnxInterest_Release(&encryptedInterest);
     ccnxInterest_Release(&interest);
     ccnxContentObject_Release(&contentObject);
