@@ -112,10 +112,12 @@ _setupForwarder(char *forwarderName)
 {
     unsigned char publicKeyABuffer[crypto_box_PUBLICKEYBYTES];
     unsigned char secretKeyABuffer[crypto_box_SECRETKEYBYTES];
-    crypto_box_keypair(publicKeyABuffer, secretKeyABuffer);
-    PARCBuffer *publicKeyA = parcBuffer_CreateFromArray(publicKeyABuffer, crypto_box_PUBLICKEYBYTES);
+    publicKeyABuffer[0] = '1';
+    secretKeyABuffer[0] = '1';
+    crypto_box_keypair(&(publicKeyABuffer[1]), &(secretKeyABuffer[1]));
+    PARCBuffer *publicKeyA = parcBuffer_CreateFromArray(publicKeyABuffer, 1 + crypto_box_PUBLICKEYBYTES);
     parcBuffer_Flip(publicKeyA);
-    PARCBuffer *secretKeyA = parcBuffer_CreateFromArray(secretKeyABuffer, crypto_box_SECRETKEYBYTES);
+    PARCBuffer *secretKeyA = parcBuffer_CreateFromArray(secretKeyABuffer, 1 + crypto_box_SECRETKEYBYTES);
     parcBuffer_Flip(secretKeyA);
 
     CCNxName *gatewayAName = ccnxName_CreateFromCString(forwarderName);
@@ -153,6 +155,8 @@ LONGBOW_TEST_CASE(Global, athena_pair_ForwardInterest)
     CCNxInterest *originalInterest = athena_ProcessMessage(gatewayB, encapsulatedInterest, ingressVector);
 
     // Ensure that the original interest matches the unwrapped interest
+    ccnxInterest_Display(interest, 0);
+    ccnxInterest_Display(originalInterest, 0);
     assertTrue(ccnxInterest_Equals(interest, originalInterest), "The original input interest did not match the output decapsulated interest");
 
     ccnxName_Release(&producerName);

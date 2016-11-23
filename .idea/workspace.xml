@@ -68,7 +68,13 @@
     </ADDITIONAL_GENERATION_ENVIRONMENT>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e2432ac9-fba3-45ab-a31e-4bcf28068c7e" name="Default" comment="" />
+    <list default="true" id="e2432ac9-fba3-45ab-a31e-4bcf28068c7e" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena_keygen.c" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/athena_keygen.c" afterPath="$PROJECT_DIR$/athena_keygen.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.c" afterPath="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_pair.c" afterPath="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_pair.c" />
+    </list>
     <ignored path="ccvpn.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -87,108 +93,44 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="athenactl_main.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athenactl/athenactl_main.c">
+      <file leaf-file-name="athena.c" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2058">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="648">
+              <caret line="444" column="0" selection-start-line="444" selection-start-column="0" selection-end-line="444" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="athena_main.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_main.c">
+      <file leaf-file-name="athena_keygen.c" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/athena_keygen.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="137">
-              <caret line="256" column="16" selection-start-line="256" selection-start-column="16" selection-end-line="256" selection-end-column="16" />
+            <state relative-caret-position="322">
+              <caret line="23" column="23" selection-start-line="23" selection-start-column="23" selection-end-line="23" selection-end-column="23" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="athena_FIB.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena_FIB.c">
+      <file leaf-file-name="AEAD.c" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/examples/AEAD.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="321">
-              <caret line="252" column="1" selection-start-line="252" selection-start-column="1" selection-end-line="252" selection-end-column="1" />
+            <state relative-caret-position="345">
+              <caret line="35" column="4" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="22" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="athena_private.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_private.c">
+      <file leaf-file-name="test_athena_pair.c" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_pair.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-842">
-              <caret line="189" column="24" selection-start-line="189" selection-start-column="24" selection-end-line="189" selection-end-column="24" />
+            <state relative-caret-position="508">
+              <caret line="91" column="1" selection-start-line="91" selection-start-column="1" selection-end-line="91" selection-end-column="1" />
               <folding>
-                <element signature="e#3357#3376#0" expanded="true" />
+                <element signature="e#3324#3346#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="parc_RandomAccessFile.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../CCNx_Distillery/usr/include/parc/algol/parc_RandomAccessFile.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="403" column="7" selection-start-line="403" selection-start-column="7" selection-end-line="403" selection-end-column="7" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="athena.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="282">
-              <caret line="179" column="3" selection-start-line="179" selection-start-column="3" selection-end-line="179" selection-end-column="3" />
-              <folding>
-                <marker date="1479690445815" expanded="true" signature="4103:4400" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="athena_gateway.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_gateway.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="627">
-              <caret line="326" column="56" selection-start-line="326" selection-start-column="56" selection-end-line="326" selection-end-column="56" />
-              <folding>
-                <element signature="e#3357#3376#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="athena_FIB.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena_FIB.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="678">
-              <caret line="177" column="85" selection-start-line="177" selection-start-column="85" selection-end-line="177" selection-end-column="85" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_athena.c" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="669">
-              <caret line="178" column="59" selection-start-line="178" selection-start-column="59" selection-end-line="178" selection-end-column="59" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/CMakeLists.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="448">
-              <caret line="32" column="110" selection-start-line="32" selection-start-column="110" selection-end-line="32" selection-end-column="110" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -210,15 +152,16 @@
         <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_InterestControl.c" />
         <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena.c" />
         <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_FIB.c" />
         <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena_PIT.c" />
-        <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.c" />
-        <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_pair.c" />
         <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.h" />
         <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_private.c" />
         <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_gateway.c" />
+        <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena.c" />
+        <option value="$PROJECT_DIR$/athena_keygen.c" />
+        <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.c" />
+        <option value="$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_pair.c" />
       </list>
     </option>
   </component>
@@ -456,6 +399,20 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ccvpn" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ccvpn" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="examples" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -466,6 +423,7 @@
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="GO_FMT" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../yield" />
+    <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///home/caw/dev/ccvpn/gateway/ccnx/forwarder/athena/test/test_athena.c" />
   </component>
   <component name="RunManager" selected="Application.test_athena_pair">
     <configuration default="true" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" PASS_PARENT_ENVS_2="true" TEST_MODE="SUITE_TEST">
@@ -927,21 +885,21 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23518632" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37960044" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3280757" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32912722" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32912722" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2818086" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37960044" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3802817" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28277355" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32912722" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.38" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1005,19 +963,102 @@
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_pair.c</url>
-          <line>223</line>
-          <option name="timeStamp" value="36" />
+          <url>file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.c</url>
+          <line>390</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.c</url>
+          <line>522</line>
+          <option name="timeStamp" value="44" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="37" />
+      <option name="time" value="48" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_main.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3584">
+          <caret line="256" column="16" selection-start-line="256" selection-start-column="16" selection-end-line="256" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena_FIB.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3528">
+          <caret line="252" column="1" selection-start-line="252" selection-start-column="1" selection-end-line="252" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_private.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2646">
+          <caret line="189" column="24" selection-start-line="189" selection-start-column="24" selection-end-line="189" selection-end-column="24" />
+          <folding>
+            <element signature="e#3357#3376#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../CCNx_Distillery/usr/include/parc/algol/parc_RandomAccessFile.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5642">
+          <caret line="403" column="7" selection-start-line="403" selection-start-column="7" selection-end-line="403" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2506">
+          <caret line="179" column="3" selection-start-line="179" selection-start-column="3" selection-end-line="179" selection-end-column="3" />
+          <folding>
+            <marker date="1479690445815" expanded="true" signature="4103:4400" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_gateway.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4564">
+          <caret line="326" column="35" selection-start-line="326" selection-start-column="35" selection-end-line="326" selection-end-column="35" />
+          <folding>
+            <element signature="e#3357#3376#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena_FIB.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2478">
+          <caret line="177" column="85" selection-start-line="177" selection-start-column="85" selection-end-line="177" selection-end-column="85" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="448">
+          <caret line="32" column="110" selection-start-line="32" selection-start-column="110" selection-end-line="32" selection-end-column="110" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_pair.c">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2856">
@@ -1032,7 +1073,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1876">
           <caret line="134" column="0" selection-start-line="134" selection-start-column="0" selection-end-line="134" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1092,10 +1132,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1479581239991" expanded="true" signature="9173:9223" ph="{...}" />
-            <marker date="1479581239991" expanded="true" signature="25082:25416" ph="{...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1118,13 +1155,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3836">
           <caret line="274" column="11" selection-start-line="274" selection-start-column="11" selection-end-line="274" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="24" column="27" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
         </state>
       </provider>
     </entry>
@@ -1153,30 +1183,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="220">
           <caret line="264" column="26" selection-start-line="264" selection-start-column="21" selection-end-line="264" selection-end-column="34" />
-          <folding>
-            <element signature="e#3324#3362#0" expanded="false" />
-            <marker date="1479357090911" expanded="true" signature="3543:3718" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="3848:3907" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="4043:4083" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="4114:4710" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="4827:5154" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="5209:9613" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="9685:12385" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="12444:13030" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="13094:13696" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="13751:14344" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="14492:16142" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="16198:16786" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="16843:17433" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="20900:20962" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="20999:21039" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="21091:21749" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="21789:22116" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="22161:22164" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="22199:22239" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="22277:22604" ph="{...}" />
-            <marker date="1479357090911" expanded="true" signature="22639:22856" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1184,15 +1190,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="84">
           <caret line="6" column="20" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-12">
-          <caret line="62" column="24" selection-start-line="62" selection-start-column="24" selection-end-line="62" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1200,7 +1197,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="217">
           <caret line="277" column="27" selection-start-line="277" selection-start-column="27" selection-end-line="277" selection-end-column="27" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1211,29 +1207,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/local/include/sodium/crypto_aead_aes256gcm.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="48" column="4" selection-start-line="48" selection-start-column="4" selection-end-line="48" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../CCNx_Distillery/src/Libccnx-common/ccnx/common/ccnx_Name.c">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1876">
           <caret line="134" column="0" selection-start-line="134" selection-start-column="0" selection-end-line="134" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_pair.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2856">
-          <caret line="204" column="37" selection-start-line="204" selection-start-column="37" selection-end-line="204" selection-end-column="37" />
-          <folding>
-            <element signature="e#3324#3346#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1241,15 +1218,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2590">
           <caret line="185" column="31" selection-start-line="185" selection-start-column="31" selection-end-line="185" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8148">
-          <caret line="582" column="0" selection-start-line="582" selection-start-column="0" selection-end-line="582" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1257,10 +1225,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="8526">
           <caret line="609" column="68" selection-start-line="609" selection-start-column="68" selection-end-line="609" selection-end-column="68" />
-          <folding>
-            <marker date="1479581239991" expanded="true" signature="9173:9223" ph="{...}" />
-            <marker date="1479581239991" expanded="true" signature="25082:25416" ph="{...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1276,13 +1241,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2968">
           <caret line="212" column="35" selection-start-line="212" selection-start-column="35" selection-end-line="212" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athenactl/athenactl_main.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2058">
+        <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
@@ -1298,7 +1262,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena_FIB.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="321">
+        <state relative-caret-position="3528">
           <caret line="252" column="1" selection-start-line="252" selection-start-column="1" selection-end-line="252" selection-end-column="1" />
           <folding />
         </state>
@@ -1306,7 +1270,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena_FIB.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="678">
+        <state relative-caret-position="2478">
           <caret line="177" column="85" selection-start-line="177" selection-start-column="85" selection-end-line="177" selection-end-column="85" />
           <folding />
         </state>
@@ -1314,7 +1278,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_main.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
+        <state relative-caret-position="3584">
           <caret line="256" column="16" selection-start-line="256" selection-start-column="16" selection-end-line="256" selection-end-column="16" />
           <folding />
         </state>
@@ -1322,7 +1286,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_private.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-842">
+        <state relative-caret-position="2646">
           <caret line="189" column="24" selection-start-line="189" selection-start-column="24" selection-end-line="189" selection-end-column="24" />
           <folding>
             <element signature="e#3357#3376#0" expanded="true" />
@@ -1332,7 +1296,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../CCNx_Distillery/usr/include/parc/algol/parc_RandomAccessFile.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
+        <state relative-caret-position="5642">
           <caret line="403" column="7" selection-start-line="403" selection-start-column="7" selection-end-line="403" selection-end-column="7" />
           <folding />
         </state>
@@ -1340,7 +1304,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="282">
+        <state relative-caret-position="2506">
           <caret line="179" column="3" selection-start-line="179" selection-start-column="3" selection-end-line="179" selection-end-column="3" />
           <folding>
             <marker date="1479690445815" expanded="true" signature="4103:4400" ph="{...}" />
@@ -1350,19 +1314,85 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/command-line/athena/athena_gateway.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="627">
-          <caret line="326" column="56" selection-start-line="326" selection-start-column="56" selection-end-line="326" selection-end-column="56" />
+        <state relative-caret-position="4564">
+          <caret line="326" column="35" selection-start-line="326" selection-start-column="35" selection-end-line="326" selection-end-column="35" />
           <folding>
             <element signature="e#3357#3376#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file:///usr/local/include/sodium/crypto_aead_aes256gcm.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="37" column="4" selection-start-line="37" selection-start-column="4" selection-end-line="37" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="669">
-          <caret line="178" column="59" selection-start-line="178" selection-start-column="59" selection-end-line="178" selection-end-column="59" />
+        <state relative-caret-position="158">
+          <caret line="342" column="34" selection-start-line="342" selection-start-column="31" selection-end-line="342" selection-end-column="34" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-686">
+          <caret line="62" column="24" selection-start-line="62" selection-start-column="24" selection-end-line="62" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena_keygen.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="23" column="6" selection-start-line="23" selection-start-column="6" selection-end-line="23" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="448">
+          <caret line="44" column="0" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/AEAD.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="35" column="4" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/athena_keygen.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="322">
+          <caret line="23" column="23" selection-start-line="23" selection-start-column="23" selection-end-line="23" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/athena.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="648">
+          <caret line="444" column="0" selection-start-line="444" selection-start-column="0" selection-end-line="444" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gateway/ccnx/forwarder/athena/test/test_athena_pair.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="508">
+          <caret line="91" column="1" selection-start-line="91" selection-start-column="1" selection-end-line="91" selection-end-column="1" />
+          <folding>
+            <element signature="e#3324#3346#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
