@@ -256,13 +256,24 @@ _encryptInterestSym(Athena *athena, CCNxInterest *interest, PARCBuffer *symKeyBu
                                   NULL,
                                   (unsigned char *) parcBuffer_Overlay(nonceBuffer, 0), (unsigned char *) parcBuffer_Overlay(symKeyBuffer, 0));
 
-    // Create the new interest and add the ciphertext as the payload
+    unsigned char hash[crypto_generichash_BYTES];
+    size_t keySize = parcBuffer_Remaining(symKeyBuffer);
+
+    crypto_generichash(hash, sizeof hash,
+                   parcBuffer_Overlay(symKeyBuffer, 0), keySize,
+                   NULL, 0);
+
+    PARCBuffer *payload = parcBuffer_Allocate(plaintextLength + crypto_aead_aes256gcm_ABYTES + sizeof hash);
+    parcBuffer_PutArray(interestKeyBuffer, sizeof hash, hash);
+    parcBuffer_PutBuffer(payload, encapsulatedInterest);
+   // Create the new interest and add the ciphertext as the payload
     CCNxInterest *newInterest = ccnxInterest_CreateSimple(prefix);
-    ccnxInterest_SetPayloadAndId(newInterest, encapsulatedInterest);
+    ccnxInterest_SetPayloadAndId(newInterest, payload);
 
     parcBuffer_Release(&interestWireFormat);
     parcBuffer_Release(&interestKeyBuffer);
     parcBuffer_Release(&encapsulatedInterest);
+    parcBuffer_Release(&payload);
 
     return newInterest;
 }
@@ -289,13 +300,24 @@ _encryptInterestPub(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffe
     crypto_box_seal(parcBuffer_Overlay(encapsulatedInterest, 0), parcBuffer_Overlay(interestKeyBuffer, 0),
                     plaintextLength, parcBuffer_Overlay(keyBuffer, 0));
  
+    unsigned char hash[crypto_generichash_BYTES];
+    size_t keySize = parcBuffer_Remaining(keyBuffer);
+
+    crypto_generichash(hash, sizeof hash,
+                   parcBuffer_Overlay(keyBuffer, 0), keySize,
+                   NULL, 0);
+
+    PARCBuffer *payload = parcBuffer_Allocate(plaintextLength + crypto_box_SEALBYTES + sizeof hash);
+    parcBuffer_PutArray(interestKeyBuffer, sizeof hash, hash);
+    parcBuffer_PutBuffer(payload, encapsulatedInterest);
    // Create the new interest and add the ciphertext as the payload
     CCNxInterest *newInterest = ccnxInterest_CreateSimple(prefix);
-    ccnxInterest_SetPayloadAndId(newInterest, encapsulatedInterest);
+    ccnxInterest_SetPayloadAndId(newInterest, payload);
 
     parcBuffer_Release(&interestWireFormat);
     parcBuffer_Release(&interestKeyBuffer);
     parcBuffer_Release(&encapsulatedInterest);
+    parcBuffer_Release(&payload);
 
     return newInterest;
 }

@@ -354,8 +354,8 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     CCNxName *gw2Name = ccnxName_CreateFromCString("lci:/domain/2");
 
     // Adding translation route so that the encryption data path is taken
-    athenaFIB_AddTranslationRoute(athena->athenaFIB, name, gw2Name, publicKey, contentObjectIngressVector);
-//    athenaFIB_AddTranslationRoute(athena->athenaFIB, otherName, gw2Name, symmetricKey, contentObjectIngressVector);
+//    athenaFIB_AddTranslationRoute(athena->athenaFIB, name, gw2Name, publicKey, contentObjectIngressVector);
+    athenaFIB_AddTranslationRoute(athena->athenaFIB, otherName, gw2Name, symmetricKey, contentObjectIngressVector);
     CCNxName *defaultName = ccnxName_CreateFromCString("lci:/");
     athenaFIB_AddRoute(athena->athenaFIB, defaultName, contentObjectIngressVector);
 
