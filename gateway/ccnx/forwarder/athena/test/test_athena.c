@@ -354,7 +354,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestEncapsulation)
     CCNxName *gw2Name = ccnxName_CreateFromCString("lci:/domain/2");
 
     // Adding translation route so that the encryption data path is taken
-    athenaFIB_AddTranslationRoute(athena->athenaFIB, name, gw2Name, publicKey, contentObjectIngressVector);
+//    athenaFIB_AddTranslationRoute(athena->athenaFIB, name, gw2Name, publicKey, contentObjectIngressVector);
     athenaFIB_AddTranslationRoute(athena->athenaFIB, otherName, gw2Name, symmetricKey, contentObjectIngressVector);
     CCNxName *defaultName = ccnxName_CreateFromCString("lci:/");
     athenaFIB_AddRoute(athena->athenaFIB, defaultName, contentObjectIngressVector);
@@ -551,7 +551,7 @@ LONGBOW_TEST_CASE(Global, athena_ProcessInterestDecapsulation)
     unsigned char symmetricKey[crypto_aead_aes256gcm_KEYBYTES+crypto_aead_aes256gcm_NPUBBYTES];
     randombytes_buf(symmetricKey, sizeof(symmetricKey));
 
-    CCNxInterest *encryptedInterest = _encryptInterest(athena, interest, publicKey, domainName, symmetricKey);
+    CCNxInterest *encryptedInterest = _encryptInterestPub(athena, interest, publicKey, domainName, symmetricKey);
     assertNotNull(encryptedInterest, "Failed to encapsulate the interest");
 
     // Process encapsulated interest. The result is the forwarding of the original decapsulated interest. Symmetric key is stored in the PIT.
