@@ -249,7 +249,6 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
     PARCBuffer *keyFlag = parcBuffer_Allocate(symmetricKeyLen + interestSize);
     parcBuffer_PutUint8(keyFlag, parcBuffer_GetUint8(keyBuffer));
     parcBuffer_Flip(keyFlag);
-    printf("entrou %s\n",parcBuffer_Overlay(keyFlag, 0));
 
     if('1' == ((char*)parcBuffer_Overlay(keyFlag, 0))[0]){
         // public key encapsulation
@@ -268,22 +267,17 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
         }
         parcBuffer_Flip(symKeyBuffer);
 
-        printf("entrou %s\n",parcBuffer_Overlay(symKeyBuffer, 0));
-
         for (size_t i = 0; i < crypto_aead_aes256gcm_NPUBBYTES; i++) {
             parcBuffer_PutUint8(nonceBuffer, parcBuffer_GetUint8(keyBuffer));
         }
         parcBuffer_Flip(nonceBuffer);
 
-        printf("ok\n");
         int ciphertext_len;
         crypto_aead_aes256gcm_encrypt(parcBuffer_Overlay(encapsulatedInterest, 0), &ciphertext_len,
                                       parcBuffer_Overlay(interestKeyBuffer, 0), plaintextLength,
                                       NULL, 0,
                                       NULL,
                                       (unsigned char *) parcBuffer_Overlay(nonceBuffer, 0), (unsigned char *) parcBuffer_Overlay(symKeyBuffer, 0));
-
-        printf("ok\n");
 
         parcBuffer_Release(&symKeyBuffer);
         parcBuffer_Release(&nonceBuffer);
