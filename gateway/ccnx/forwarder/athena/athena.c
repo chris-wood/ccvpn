@@ -250,7 +250,7 @@ _encryptInterest(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffer, 
     parcBuffer_PutUint8(keyFlag, parcBuffer_GetUint8(keyBuffer));
     parcBuffer_Flip(keyFlag);
 
-    if('1' == ( (char*)parcBuffer_Overlay(keyFlag,0) )[0] ) {
+    if ('1' == ((char*)parcBuffer_Overlay(keyFlag,0))[0]) {
         // public key encapsulation
         encapsulatedInterest = parcBuffer_Allocate(plaintextLength + crypto_box_SEALBYTES);
         crypto_box_seal(parcBuffer_Overlay(encapsulatedInterest, 0), parcBuffer_Overlay(interestKeyBuffer, 0),
