@@ -151,8 +151,6 @@ LONGBOW_TEST_CASE(Global, athena_pair_ForwardInterestWithSymmetricKey)
     CCNxInterest *originalInterest = athena_ProcessMessage(gatewayB, encapsulatedInterest, ingressVector);
 
     // Ensure that the original interest matches the unwrapped interest
-    ccnxInterest_Display(interest, 0);
-    ccnxInterest_Display(originalInterest, 0);
     assertTrue(ccnxInterest_Equals(interest, originalInterest), "The original input interest did not match the output decapsulated interest");
 
     ccnxName_Release(&producerName);
@@ -215,9 +213,7 @@ LONGBOW_TEST_CASE(Global, athena_pair_ForwardInterest)
     // Send the encrypted interest to gatewayB
     CCNxInterest *originalInterest = athena_ProcessMessage(gatewayB, encapsulatedInterest, ingressVector);
 
-    // Ensure that the original interest matches the unwrapped interest
-    ccnxInterest_Display(interest, 0);
-    ccnxInterest_Display(originalInterest, 0);
+    // Ensure that the original interest matches the unwrapped interests
     assertTrue(ccnxInterest_Equals(interest, originalInterest), "The original input interest did not match the output decapsulated interest");
 
     ccnxName_Release(&producerName);
