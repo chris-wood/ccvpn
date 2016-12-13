@@ -7,10 +7,10 @@ NUMBER_PRODUCERS=$3
 # Producer default port
 export METIS_PORT=9695
 
-# Store process PIDs to shut them down later...
-PIDS=()
+# Store process PIDs to shut them down later...3
+PIDS=
 
-func start_producer() {
+StartProducer() {
     INDEX=$1
     PREFIX=${COMMON_PREFIX}/${INDEX}
 
@@ -18,19 +18,23 @@ func start_producer() {
     
     ${SERVER_BINARY} -l ${PREFIX} &
     PID=$!
-    PIDS+=(${PID})
+    echo $PID
+    PIDS+=$($PID)
+    echo $PIDS
 }
 
 for i in `seq 1 ${NUMBER_PRODUCERS}`;
 do
-    start_producer ${i}
+    StartProducer ${i}
 done   
 
 echo "Press any key to kill the servers..."
 read killswitch
 
-for i in `seq 1 ${NUMBER_PRODUCERS}`;
-do
-    kill -INT ${PIDS[$i]}
-done
+killall "ccnxVPN_Server"
+
+#for i in `seq 1 ${NUMBER_PRODUCERS}`;
+#do
+#    kill -INT ${PIDS[$i]}
+#done
 
