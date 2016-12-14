@@ -180,3 +180,13 @@ ccnxVPNStats_Display(CCNxVPNStats *stats)
     }
     return false;
 }
+
+void
+storeThroughput(CCNxVPNStats *stats, long long int payloadSize)
+{
+    long long unsigned int delay = stats->totalRtt / stats->totalReceived;
+    FILE* fp = fopen("throughput.csv", "a");
+    long long int thgp = (1000.0 * stats->totalReceived * payloadSize) / delay;
+    fprintf(fp, "%llu\n", thgp);
+    fclose(fp);
+}

@@ -4,7 +4,6 @@ echo "\n\nUsage: sh run_clients.sh <NUMBER_CLIENTS> <PACKET_RATE> <RESPONSE_SIZE
 echo "setup_network.sh must be running with the same <NUMBER_PRODUCERS> parameter\n\n"
 
 rm throughput.csv
-
 NUMBER_CLIENTS=$1
 PACKET_RATE=$2
 RESPONSE_SIZE=$3

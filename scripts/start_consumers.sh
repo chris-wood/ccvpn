@@ -29,9 +29,9 @@ do
     StartConsumer ${i}
 done
 
-echo "Press any key to kill the consumers..."
+echo "Press any key to quit..."
 read killswitch
 
-killall "ccnxVPN_Client"
+#killall "ccnxVPN_Client"
 
 

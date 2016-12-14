@@ -365,6 +365,8 @@ _ccnxVPN_DisplayStatistics(CCNxVPNConsumer *client)
     bool ableToCompute = ccnxVPNStats_Display(client->stats);
     if (!ableToCompute) {
         parcDisplayIndented_PrintLine(0, "No packets were received. Check to make sure the client and server are configured correctly and that the forwarder is running.\n");
+    }else {
+        storeThroughput(client->stats,client->payloadSize);
     }
 }
 
