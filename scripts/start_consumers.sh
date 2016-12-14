@@ -17,30 +17,21 @@ NUMBER_PACKETS=$6
 # Consumer default port
 export METIS_PORT=9696
 
-# Store process PIDs to shut them down later...
-PIDS=()
-
-func start_consumer() {
+StartConsumer() {
     INDEX=$1
     PREFIX=${COMMON_PREFIX}/${INDEX}
-
     echo Starting consumer at ${PREFIX}
-    
     ${CLIENT_BINARY} -l ${PREFIX} -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} &
-    PID=$!
-    PIDS+=(${PID})
 }
 
 for i in `seq 1 ${NUMBER_CLIENTS}`;
 do
-    start_consumer ${i}
-done   
+    StartConsumer ${i}
+done
 
-echo "Press any key to kill the servers..."
+echo "Press any key to kill the consumers..."
 read killswitch
 
-for i in `seq 1 ${NUMBER_CLIENTS}`;
-do
-    kill -INT ${PIDS[$i]}
-done
+killall "ccnxVPN_Client"
+
 

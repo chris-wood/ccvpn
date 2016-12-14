@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+
+echo "\n\nUsage: sh run_clients.sh <NUMBER_CLIENTS> <PACKET_RATE> <RESPONSE_SIZE> <NUMBER_PACKETS>\n"
+echo "setup_network.sh must be running with the same <NUMBER_PRODUCERS> parameter\n\n"
+NUMBER_CLIENTS=$1
+PACKET_RATE=$2
+RESPONSE_SIZE=$3
+NUMBER_PACKETS=$4
+
+sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS $PACKET_RATE $RESPONSE_SIZE $NUMBER_PACKETS

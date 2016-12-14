@@ -7,9 +7,6 @@ NUMBER_PRODUCERS=$3
 # Producer default port
 export METIS_PORT=9695
 
-# Store process PIDs to shut them down later...3
-PIDS=
-
 StartProducer() {
     INDEX=$1
     PREFIX=${COMMON_PREFIX}/${INDEX}
@@ -19,8 +16,6 @@ StartProducer() {
     ${SERVER_BINARY} -l ${PREFIX} &
     PID=$!
     echo $PID
-    PIDS+=$($PID)
-    echo $PIDS
 }
 
 for i in `seq 1 ${NUMBER_PRODUCERS}`;
