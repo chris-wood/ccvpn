@@ -670,7 +670,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         default :
             avg_interest_time = updateAvg(avg_interest_time, n_interest_time, time_stamp_after - time_stamp_before);
             n_interest_time++;
-            printf("Avg. Regular interest computation time: %d\n\n", (int)avg_interest_time);    
+            printf("Avg. Regular interest  computation time: %d\n\n", (int)avg_interest_time);    
             break;
     }    
 
