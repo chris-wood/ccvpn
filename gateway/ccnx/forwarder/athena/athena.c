@@ -706,6 +706,11 @@ _createMessageHash(const CCNxMetaMessage *metaMessage) {
 
 static CCNxMetaMessage *
 _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitVector *ingressVector) {
+    // Start measuring time
+    time_stamp_before = current_time();
+    // Type of time measurement variable
+    uint8_t type = 0;
+
     //
     // *   (1) If it does not match anything in the PIT, drop it
     //
@@ -726,7 +731,6 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             if (encryptKey != NULL && interestName != NULL) {
                 encryptKey = parcBuffer_Acquire(encryptKey);
                 interestName = ccnxName_Acquire(interestName);
-
 //                ccnxName_Display(interestName, 0);
 
                 PARCBuffer *contentWireFormat = athenaTransportLinkModule_CreateMessageBuffer(contentObject);
@@ -754,6 +758,8 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 
                     PARCBuffer* plaintext = parcBuffer_Allocate(contentSize - crypto_aead_aes256gcm_ABYTES);
 	                unsigned long long plaintext_len;
+                    
+                    type = 2;
 
 	                if (contentSize < crypto_aead_aes256gcm_ABYTES ||
 		                crypto_aead_aes256gcm_decrypt(parcBuffer_Overlay(plaintext, 0), &plaintext_len,
@@ -782,6 +788,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
                     PARCBuffer* ciphertext = parcBuffer_Allocate(contentSize + crypto_aead_aes256gcm_ABYTES);
                     unsigned long long ciphertext_len;
 
+                    type = 1;
                 	crypto_aead_aes256gcm_encrypt(parcBuffer_Overlay(ciphertext, 0), &ciphertext_len,
 		                                          parcBuffer_Overlay(contentWireFormat, 0), contentSize,
 		                                          NULL, 0,
@@ -821,6 +828,26 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
         }
         parcBitVector_Release(&egressVector);
         athenaPITValue_Release(&value);
+    }
+
+    // Compute total time
+    time_stamp_after = current_time();
+    switch (type) {
+        case 1 :
+            avg_vpn_enc_content_time = updateAvg(avg_vpn_enc_content_time, n_vpn_enc_content_time, time_stamp_after - time_stamp_before);
+            n_vpn_enc_content_time++;
+            printf("Avg. VPN Encryption content computation time: %d\n\n", (int)avg_vpn_enc_content_time);    
+            break;
+        case 2 :
+            avg_vpn_dec_content_time = updateAvg(avg_vpn_dec_content_time, n_vpn_dec_content_time, time_stamp_after - time_stamp_before);
+            n_vpn_dec_content_time++;
+            printf("Avg. VPN Decryp. content computation time: %d\n\n", (int)avg_vpn_dec_content_time);    
+            break;
+        default :
+            avg_content_time = updateAvg(avg_content_time, n_content_time, time_stamp_after - time_stamp_before);
+            n_content_time++;
+            printf("Avg. Regular content  computation time: %d\n\n", (int)avg_content_time);    
+            break;
     }
 
     return returnContent;
