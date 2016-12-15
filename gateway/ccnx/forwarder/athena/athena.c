@@ -80,6 +80,47 @@
 
 #include <parc/logging/parc_LogReporterTextStdout.h>
 
+#include <parc/algol/parc_Clock.h>
+
+// TIME MEASUREMENT GLOBAL VARIABLES /////////////
+
+uint64_t time_stamp_before, time_stamp_after;
+
+uint64_t avg_interest_time;
+uint64_t n_interest_time;
+
+uint64_t avg_vpn_enc_interest_time;
+uint64_t n_vpn_enc_interest_time;
+
+uint64_t avg_vpn_dec_interest_time;
+uint64_t n_vpn_dec_interest_time;
+
+uint64_t avg_content_time;
+uint64_t n_content_time;
+
+uint64_t avg_vpn_enc_content_time;
+uint64_t n_vpn_enc_content_time;
+
+uint64_t avg_vpn_dec_content_time;
+uint64_t n_vpn_dec_content_time;
+
+uint64_t
+current_time()
+{
+    struct timeval currentTimeVal;
+    gettimeofday(&currentTimeVal, NULL);
+    uint64_t microseconds = currentTimeVal.tv_sec * 1000000 + currentTimeVal.tv_usec;
+    return microseconds;
+}
+
+uint64_t 
+updateAvg(uint64_t currentAvg, uint64_t nSamples, uint64_t newValue)
+{
+    return (currentAvg * nSamples + newValue) / (nSamples + 1) ;
+}
+
+// END TIME MEASUREMENT /////////////////////////
+
 static PARCLog *
 _athena_logger_create(void) {
 
@@ -336,6 +377,11 @@ _encryptInterestPub(Athena *athena, CCNxInterest *interest, PARCBuffer *keyBuffe
 
 static CCNxMetaMessage *
 _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressVector) {
+    // Start measuring time
+    time_stamp_before = current_time();
+    // Type of time measurement variable
+    uint8_t type = 0;
+
     uint8_t hoplimit;
     //
     // *   (0) Hoplimit check, exclusively on interest messages
@@ -380,6 +426,8 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     bool isPrefix = ccnxName_StartsWith(originalInterestName, athena->publicName);
     bool hasPayload = ccnxInterest_GetPayload(interest) != NULL;
     if (isPrefix && hasPayload) {
+        type = 2;
+
         PARCBuffer *interestPayload = ccnxInterest_GetPayload(interest);
         PARCBuffer *secretKey = athena->secretKey;
         PARCBuffer *publicKey = athena->publicKey;
@@ -460,7 +508,8 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         ccnxMetaMessage_Release(&rawMessage);
 
         parcBuffer_Release(&interestBuffer);
-        parcBuffer_Release(&decrypted);
+        parcBuffer_Release(&decrypted);     
+
     }
 
     //
@@ -504,6 +553,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             PARCBuffer *keyBuffer = athenaFIBValue_GetKey(vector);
             CCNxName *targetPrefix = athenaFIBValue_GetOutputPrefix(vector);
             if (keyBuffer != NULL && targetPrefix != NULL) {
+                type = 1;
 
                 // XXX: figure out how this is being modified in place
                 
@@ -603,6 +653,26 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     if (symKeyBuffer != NULL) {
         parcBuffer_Release(&symKeyBuffer);
     }
+
+    // Compute total time
+    time_stamp_after = current_time();
+    switch (type) {
+        case 1 :
+            avg_vpn_enc_interest_time = updateAvg(avg_vpn_enc_interest_time, n_vpn_enc_interest_time, time_stamp_after - time_stamp_before);
+            n_vpn_enc_interest_time++;
+            printf("Avg. VPN Encap. interest computation time: %d\n\n", (int)avg_vpn_enc_interest_time);    
+            break;
+        case 2 :
+            avg_vpn_dec_interest_time = updateAvg(avg_vpn_dec_interest_time, n_vpn_dec_interest_time, time_stamp_after - time_stamp_before);
+            n_vpn_dec_interest_time++;
+            printf("Avg. VPN Decap. interest computation time: %d\n\n", (int)avg_vpn_dec_interest_time);    
+            break;
+        default :
+            avg_interest_time = updateAvg(avg_interest_time, n_interest_time, time_stamp_after - time_stamp_before);
+            n_interest_time++;
+            printf("Avg. Regular interest computation time: %d\n\n", (int)avg_interest_time);    
+            break;
+    }    
 
     return newInterest;
 }

@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 
+rm interest.csv
+rm content.csv
+
 NUMBER_PRODUCERS=$1
 
 echo "\n\nUsage: sh setup_network.sh <NUMBER_PRODUCERS>\n\n"
