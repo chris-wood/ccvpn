@@ -102,6 +102,26 @@ typedef struct Athena {
     PARCBuffer *publicKey;
 
     struct {
+        uint64_t avg_interest_time;
+        uint64_t n_interest_time;
+
+        uint64_t avg_vpn_enc_interest_time;
+        uint64_t n_vpn_enc_interest_time;
+
+        uint64_t avg_vpn_dec_interest_time;
+        uint64_t n_vpn_dec_interest_time;
+
+        uint64_t avg_content_time;
+        uint64_t n_content_time;
+
+        uint64_t avg_vpn_enc_content_time;
+        uint64_t n_vpn_enc_content_time;
+
+        uint64_t avg_vpn_dec_content_time;
+        uint64_t n_vpn_dec_content_time;
+    } time;
+
+    struct {
         uint64_t numProcessedInterests;
         uint64_t numProcessedContentObjects;
         uint64_t numProcessedInterestReturns;
