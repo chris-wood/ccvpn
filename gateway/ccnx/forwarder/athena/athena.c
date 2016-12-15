@@ -654,6 +654,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         parcBuffer_Release(&symKeyBuffer);
     }
 
+
     // Compute total time
     time_stamp_after = current_time();
     switch (type) {
@@ -671,8 +672,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             avg_interest_time = updateAvg(avg_interest_time, n_interest_time, time_stamp_after - time_stamp_before);
             n_interest_time++;
             printf("Avg. Regular interest  computation time: %d\n\n", (int)avg_interest_time);    
-            break;
-    }    
+    }
 
     return newInterest;
 }
@@ -846,8 +846,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
         default :
             avg_content_time = updateAvg(avg_content_time, n_content_time, time_stamp_after - time_stamp_before);
             n_content_time++;
-            printf("Avg. Regular content  computation time: %d\n\n", (int)avg_content_time);    
-            break;
+            printf("Avg. Regular content computation time: %d\n\n", (int)avg_content_time);    
     }
 
     return returnContent;

@@ -32,6 +32,6 @@ done
 echo "Press any key to quit..."
 read killswitch
 
-#killall "ccnxVPN_Client"
+killall "ccnxVPN_Client"
 
 
