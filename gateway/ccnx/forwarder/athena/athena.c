@@ -101,6 +101,34 @@ updateAvg(uint64_t currentAvg, uint64_t nSamples, uint64_t newValue)
     return (currentAvg * nSamples + newValue) / (nSamples + 1) ;
 }
 
+void
+printTimeCSV(Athena *athena, FILE *fp)
+{   
+    if (fp == NULL) {
+        printf("intReg,intEncap,intDecap,contReg,contEnc,contDec\n");
+
+        printf("%d,%d,%d,%d,%d,%d\n",
+            (int)athena->time.avg_interest_time,
+            (int)athena->time.avg_vpn_enc_interest_time,
+            (int)athena->time.avg_vpn_dec_interest_time,
+            (int)athena->time.avg_content_time,
+            (int)athena->time.avg_vpn_enc_content_time,
+            (int)athena->time.avg_vpn_dec_content_time
+        );
+    } else {
+        fprintf(fp, "intReg,intEncap,intDecap,contReg,contEnc,contDec\n");
+
+        fprintf(fp, "%d,%d,%d,%d,%d,%d\n",
+            (int)athena->time.avg_interest_time,
+            (int)athena->time.avg_vpn_enc_interest_time,
+            (int)athena->time.avg_vpn_dec_interest_time,
+            (int)athena->time.avg_content_time,
+            (int)athena->time.avg_vpn_enc_content_time,
+            (int)athena->time.avg_vpn_dec_content_time
+        );
+    }
+}
+
 // END TIME MEASUREMENT /////////////////////////
 
 static PARCLog *
@@ -643,17 +671,17 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         case 1 :
             athena->time.avg_vpn_enc_interest_time = updateAvg( athena->time.avg_vpn_enc_interest_time, athena->time.n_vpn_enc_interest_time, time_stamp_after - time_stamp_before );
             athena->time.n_vpn_enc_interest_time++;
-            printf("Avg. VPN Encap. interest computation time: %d\n\n", (int)athena->time.avg_vpn_enc_interest_time);    
+            //printf("Avg. VPN Encap. interest computation time: %d\n\n", (int)athena->time.avg_vpn_enc_interest_time);    
             break;
         case 2 :
             athena->time.avg_vpn_dec_interest_time = updateAvg(athena->time.avg_vpn_dec_interest_time, athena->time.n_vpn_dec_interest_time, time_stamp_after - time_stamp_before);
             athena->time.n_vpn_dec_interest_time++;
-            printf("Avg. VPN Decap. interest computation time: %d\n\n", (int)athena->time.avg_vpn_dec_interest_time);    
+            //printf("Avg. VPN Decap. interest computation time: %d\n\n", (int)athena->time.avg_vpn_dec_interest_time);    
             break;
         default :
             athena->time.avg_interest_time = updateAvg(athena->time.avg_interest_time, athena->time.n_interest_time, time_stamp_after - time_stamp_before);
             athena->time.n_interest_time++;
-            printf("Avg. Regular interest  computation time: %d\n\n", (int)athena->time.avg_interest_time);   
+            //printf("Avg. Regular interest  computation time: %d\n\n", (int)athena->time.avg_interest_time);   
     }
 
     return newInterest;
@@ -818,17 +846,17 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
         case 1 :
             athena->time.avg_vpn_enc_content_time = updateAvg(athena->time.avg_vpn_enc_content_time, athena->time.n_vpn_enc_content_time, time_stamp_after - time_stamp_before);
             athena->time.n_vpn_enc_content_time++;
-            printf("Avg. VPN Encrypt. content computation time: %d\n\n", (int)athena->time.avg_vpn_enc_content_time);
+            //printf("Avg. VPN Encrypt. content computation time: %d\n\n", (int)athena->time.avg_vpn_enc_content_time);
             break;
         case 2 :
             athena->time.avg_vpn_dec_content_time = updateAvg(athena->time.avg_vpn_dec_content_time, athena->time.n_vpn_dec_content_time, time_stamp_after - time_stamp_before);
             athena->time.n_vpn_dec_content_time++;
-            printf("Avg. VPN Decryp. content computation time: %d\n\n", (int)athena->time.avg_vpn_dec_content_time);    
+            //printf("Avg. VPN Decryp. content computation time: %d\n\n", (int)athena->time.avg_vpn_dec_content_time);    
             break;
         default :
             athena->time.avg_content_time = updateAvg(athena->time.avg_content_time, athena->time.n_content_time, time_stamp_after - time_stamp_before);
             athena->time.n_content_time++;
-            printf("Avg. Regular content computation time: %d\n\n", (int)athena->time.avg_content_time);    
+            //printf("Avg. Regular content computation time: %d\n\n", (int)athena->time.avg_content_time);    
     }
 
     return returnContent;
@@ -949,7 +977,7 @@ athena_ForwarderEngine(void *arg) {
                 if (result != NULL) {
                     ccnxMetaMessage_Release(&result);
                 }
-
+                printTimeCSV(athena,NULL);
                 parcBitVector_Release(&ingressVector);
 //                ccnxMetaMessage_Release(&ccnxMessage);
             }
