@@ -977,11 +977,11 @@ athena_ForwarderEngine(void *arg) {
                 if (result != NULL) {
                     ccnxMetaMessage_Release(&result);
                 }
-                printTimeCSV(athena,NULL);
                 parcBitVector_Release(&ingressVector);
 //                ccnxMetaMessage_Release(&ccnxMessage);
             }
         }
+        printTimeCSV(athena,NULL);
         usleep(1000); // workaround for coordinating with test infrastructure
         athena_Release(&athena);
     }
