@@ -23,8 +23,9 @@ do
     StartProducer ${i}
 done   
 
-echo "Press any key to kill the servers..."
-read killswitch
+wait;
+#echo "Press any key to kill the servers..."
+#read killswitch
 
 killall "ccnxVPN_Server"
 

@@ -32,6 +32,10 @@ done
 echo "Press any key to quit..."
 read killswitch
 
+${CLIENT_BINARY} -l ccnx:/producer/kill -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} &
+
+sleep 2s
+ 
 killall "ccnxVPN_Client"
 
 

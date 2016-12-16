@@ -64,6 +64,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <sodium.h>
+#include <string.h>
 
 #include <ccnx/forwarder/athena/athena.h>
 #include <ccnx/forwarder/athena/athena_Control.h>
@@ -104,6 +105,7 @@ updateAvg(uint64_t currentAvg, uint64_t nSamples, uint64_t newValue)
 void
 printTimeCSV(Athena *athena, FILE *fp)
 {   
+    printf("\n");
     if (fp == NULL) {
         printf("intReg,intEncap,intDecap,contReg,contEnc,contDec\n");
 
@@ -127,6 +129,7 @@ printTimeCSV(Athena *athena, FILE *fp)
             (int)athena->time.avg_vpn_dec_content_time
         );
     }
+    printf("\n");
 }
 
 // END TIME MEASUREMENT /////////////////////////
@@ -928,7 +931,6 @@ athena_ProcessMessage(Athena *athena, CCNxMetaMessage *ccnxMessage, PARCBitVecto
         athena->stats.numProcessedContentObjects++;
     } else if (ccnxMetaMessage_IsControl(ccnxMessage)) {
         parcLog_Debug(athena->log, "Processing Control Message");
-
         CCNxControl *control = ccnxMetaMessage_GetControl(ccnxMessage);
         outputMessage = _processControl(athena, control, ingressVector);
         athena->stats.numProcessedControlMessages++;
@@ -975,13 +977,53 @@ athena_ForwarderEngine(void *arg) {
             if (ccnxMessage) {
                 CCNxMetaMessage *result = athena_ProcessMessage(athena, ccnxMessage, ingressVector);
                 if (result != NULL) {
+
+                    if (ccnxMetaMessage_IsInterest(result)) {
+                            const CCNxName *ccnxName = ccnxInterest_GetName(result);
+                            if (ccnxName) {
+                                const char *name = ccnxName_ToString(ccnxName);
+                                char namePrefix[20];
+                                memcpy(namePrefix,name,19);
+                                namePrefix[19] = '\0';
+                                if (!strcmp(namePrefix,"ccnx:/producer/kill")) {
+                                    //printf("kill command interest\n");
+                                    parcMemory_Deallocate(&name);
+                                    ccnxMetaMessage_Release(&result);
+                                    parcBitVector_Release(&ingressVector);
+                                    break;
+                                }
+                                parcMemory_Deallocate(&name);
+                            }
+                    }
+
                     ccnxMetaMessage_Release(&result);
                 }
                 parcBitVector_Release(&ingressVector);
 //                ccnxMetaMessage_Release(&ccnxMessage);
+                // Checks for kill interest
+                if (ccnxMetaMessage_IsInterest(ccnxMessage)) {
+                        const CCNxName *ccnxName = ccnxInterest_GetName(ccnxMessage);
+                        if (ccnxName) {
+                            const char *name = ccnxName_ToString(ccnxName);
+                            char namePrefix[20];
+                            memcpy(namePrefix,name,19);
+                            namePrefix[19] = '\0';
+                            if (!strcmp(namePrefix,"ccnx:/producer/kill")) {
+                                //printf("\nKill command interest\n");
+                                parcMemory_Deallocate(&name);
+                                break;
+                            }
+                            parcMemory_Deallocate(&name);
+                        }
+                }
+
             }
         }
-        printTimeCSV(athena,NULL);
+        char fname[20];
+        sprintf(fname,"times_%s.csv",getpid());
+        FILE* fp = fopen(fname,"w");
+        printTimeCSV(athena,fp);
+        fclose(fp);
         usleep(1000); // workaround for coordinating with test infrastructure
         athena_Release(&athena);
     }
