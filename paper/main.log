@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.10.13)  13 DEC 2016 09:53
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2016.12.19)  19 DEC 2016 16:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **main.tex
 (./main.tex
 LaTeX2e <2011/06/27>
-Babel <3.9h> and hyphenation patterns for 78 languages loaded.
+Babel <3.9h> and hyphenation patterns for 2 languages loaded.
 (./IEEEtran.cls
 Document Class: IEEEtran 2015/08/26 V1.8b by Michael Shell
 -- See the "IEEEtran_HOWTO" manual for usage information.
@@ -446,8 +446,13 @@ ne 202.
 
 LaTeX Warning: Citation `benchmarks' on page 3 undefined on input line 216.
 
+[3]
+
+LaTeX Warning: Reference `create_figure' on page 4 undefined on input line 241.
+
+
 No file main.bbl.
-** WARNING: \IEEEbiography is locked out when in conference mode (line 252).
+** WARNING: \IEEEbiography is locked out when in conference mode (line 260).
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -459,18 +464,23 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[3] (./main.aux)
+[4
+
+] (./main.aux)
 
 LaTeX Warning: There were undefined references.
 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
  ) 
 Here is how much of TeX's memory you used:
- 6370 strings out of 493304
- 102580 string characters out of 6139870
- 226078 words of memory out of 5000000
- 9628 multiletter control sequences out of 15000+600000
- 40294 words of font info for 162 fonts, out of 8000000 for 9000
- 960 hyphenation exceptions out of 8191
+ 6378 strings out of 495028
+ 102660 string characters out of 6181496
+ 221809 words of memory out of 5000000
+ 9381 multiletter control sequences out of 15000+600000
+ 40532 words of font info for 166 fonts, out of 8000000 for 9000
+ 17 hyphenation exceptions out of 8191
  38i,9n,38p,1227b,362s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
@@ -484,10 +494,10 @@ cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb>
 live/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on main.pdf (3 pages, 197907 bytes).
+Output written on main.pdf (4 pages, 200146 bytes).
 PDF statistics:
- 118 PDF objects out of 1000 (max. 8388607)
- 95 compressed objects within 1 object stream
+ 121 PDF objects out of 1000 (max. 8388607)
+ 97 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  21510 words of extra memory for PDF output out of 24883 (max. 10000000)
 

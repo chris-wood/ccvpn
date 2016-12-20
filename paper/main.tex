@@ -159,7 +159,7 @@ $C_p$ = Dec($k_r$,$cipherText$)\\
 
 For clarity, we have defined a \textit{Consumer} and a \textit{Producer} domain. However, in reality, a single gateway can implement the functions of both $G_c$ and $G_p$. Therefore, consumers and producers can exist in both the domains and interests for contents can be issued from both sides. Also, it is worth to mention that, within the created CCVPNs, content caching would work just as it works in regular CCNs,  i.e., routers would be able to cache contents and respond to interests that were previously requested, enabling better resource usage and lower communication delays. Finally, we emphasize that $G_c$ encapsulation and decryption functions can also run inside the Consumer host. Conversely, $G_p$ can be implemented within the \textit{Producer} host. This enables its usage for one-to-one communication that would be completely anonymous to any  other entity in the network.  
 
-\section{Discussion and Analysis}
+\section{Discussion and Analysis}\label{sec:analysis}
 
 In this section we analyze and discuss the overhead of the CCVPN design with respect 
 to the additional processing time and state consumption needed to handle traffic. 
@@ -235,6 +235,14 @@ must be taken to ensure that all cryptographic operations are performed in-place
 \section{Experiments}
 
 \subsection{Experimental Methodology}
+
+In this section we empirically evaluate the CCVPN design paying special attention to the metrics that were earlier discussed in Sec.~\ref{sec:analysis}, i.e., processing overhead, network throughput, and state consumption. In our evaluation we consider the two versions of CCVPN: public key version, and symmetric key version. We here recall that the symmetric key version relies on the assumption that a secure key agreement protocol is performed between the domain's gateways prior to the CCVPN protocol execution.
+
+Our testbed network consists of a butterfly topology, in which the consumers' side and the producers' side gateways are directly interconnected. $N$ producers are connected to the producers' domain gateway and $M$ consumers are connected to the consumers' domain gateway (see Fig.~\ref{create_figure}).
+
+To investigate the processing overhead we measure the average time demand for computing the interests' encapsulation (in public and symmetric key versions), interest decapsulation, content encryption, and content decryption for different content packet sizes. We also measure the state consumption for these same four functions.
+
+To compute the overall network throughput, we consider four content packet sizes ($4096$, $10 \times 4096$, $10^2 \times 4096$, and $10^3 \times 4096$). For each content packet size, we measure the average data-rate for transmissions of 1 to 100,000 different interests issues per consumer. We also vary the number of consumers and producers from 1 to 10 of each. Finally, in addition to the network throughput, we also exhibit the total transmission delay for each of the experiments.
 
 \subsection{Results}
 
