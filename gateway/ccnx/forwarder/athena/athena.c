@@ -118,7 +118,7 @@ printTimeCSV(Athena *athena, FILE *fp)
             (int)athena->time.avg_vpn_dec_content_time
         );
     } else {
-        fprintf(fp, "intReg,intEncap,intDecap,contReg,contEnc,contDec\n");
+        //fprintf(fp, "intReg,intEncap,intDecap,contReg,contEnc,contDec\n");
 
         fprintf(fp, "%d,%d,%d,%d,%d,%d\n",
             (int)athena->time.avg_interest_time,
@@ -404,9 +404,9 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         hoplimit = ccnxInterest_GetHopLimit(interest);
         if (hoplimit == 0) {
             // We should never receive a message with a hoplimit of 0 from a non-local source.
-            parcLog_Error(athena->log,
-                          "Received a message with a hoplimit of zero from a non-local source (%s).",
-                          athenaTransportLinkAdapter_LinkIdToName(athena->athenaTransportLinkAdapter, linkId));
+//            parcLog_Error(athena->log,
+//                          "Received a message with a hoplimit of zero from a non-local source (%s).",
+//                          athenaTransportLinkAdapter_LinkIdToName(athena->athenaTransportLinkAdapter, linkId));
             return NULL;
         }
         ccnxInterest_SetHopLimit(interest, hoplimit - 1);
@@ -419,7 +419,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     CCNxMetaMessage *content = athenaContentStore_GetMatch(athena->athenaContentStore, interest);
     if (content) {
         const char *ingressVectorString = parcBitVector_ToString(ingressVector);
-        parcLog_Debug(athena->log, "Forwarding content from store to %s", ingressVectorString);
+        //parcLog_Debug(athena->log, "Forwarding content from store to %s", ingressVectorString);
         parcMemory_Deallocate(&ingressVectorString);
         PARCBitVector *result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, content,
                                                                 ingressVector);
@@ -544,7 +544,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             if (ccnxWireFormatMessage_ConvertInterestToInterestReturn(newInterest,
                                                                       CCNxInterestReturn_ReturnCode_NoRoute)) {
                 // NOTE: The Interest has been modified in-place. It is now an InterestReturn.
-                parcLog_Debug(athena->log, "Returning Interest as InterestReturn (code: NoRoute)");
+                //parcLog_Debug(athena->log, "Returning Interest as InterestReturn (code: NoRoute)");
                 PARCBitVector *failedLinks = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter,
                                                                              newInterest, ingressVector);
                 if (failedLinks != NULL) {
@@ -553,11 +553,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             } else {
                 if (ccnxName) {
                     const char *name = ccnxName_ToString(ccnxName);
-                    parcLog_Error(athena->log, "Unable to return Interest (%s) as InterestReturn (code: NoRoute).",
-                                  name);
+                    //parcLog_Error(athena->log, "Unable to return Interest (%s) as InterestReturn (code: NoRoute).",
+                    //              name);
                     parcMemory_Deallocate(&name);
                 } else {
-                    parcLog_Error(athena->log, "Unable to return Interest () as InterestReturn (code: NoRoute).");
+                    //parcLog_Error(athena->log, "Unable to return Interest () as InterestReturn (code: NoRoute).");
                 }
             }
         } else {
@@ -605,11 +605,11 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
             // debug
             char *interestString = ccnxInterest_ToString(newInterest);
-            parcLog_Info(athena->log, "Sent: %s", interestString);
+            //parcLog_Info(athena->log, "Sent: %s", interestString);
             parcMemory_Deallocate(&interestString);
 
             char *nameString = ccnxName_ToString(originalInterestName);
-            parcLog_Info(athena->log, "Adding the interest name: %s", nameString);
+            //parcLog_Info(athena->log, "Adding the interest name: %s", nameString);
             parcMemory_Deallocate(&nameString);
 
             PARCBitVector *expectedReturnVector;
@@ -617,7 +617,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             if ((result = athenaPIT_AddInterest(athena->athenaPIT, newInterest, ingressVector, originalInterestName, symKeyBuffer,
                                                 &expectedReturnVector)) != AthenaPITResolution_Forward) {
                 if (result == AthenaPITResolution_Error) {
-                    parcLog_Error(athena->log, "PIT resolution error");
+                    //parcLog_Error(athena->log, "PIT resolution error");
                 }
                 ccnxInterest_Release(&newInterest);
                 return NULL;
@@ -638,7 +638,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         if (ccnxWireFormatMessage_ConvertInterestToInterestReturn(newInterest,
                                                                   CCNxInterestReturn_ReturnCode_NoRoute)) {
             // NOTE: The Interest has been modified in-place. It is now an InterestReturn.
-            parcLog_Debug(athena->log, "Returning Interest as InterestReturn (code: NoRoute)");
+            //parcLog_Debug(athena->log, "Returning Interest as InterestReturn (code: NoRoute)");
             PARCBitVector *failedLinks = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, newInterest,
                                                                          ingressVector);
             if (failedLinks != NULL) {
@@ -647,19 +647,19 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         } else {
             if (ccnxName) {
                 const char *name = ccnxName_ToString(ccnxName);
-                parcLog_Error(athena->log, "Unable to return Interest (%s) as InterestReturn (code: NoRoute).", name);
+                //parcLog_Error(athena->log, "Unable to return Interest (%s) as InterestReturn (code: NoRoute).", name);
                 parcMemory_Deallocate(&name);
             } else {
-                parcLog_Error(athena->log, "Unable to return Interest () as InterestReturn (code: NoRoute).");
+                //parcLog_Error(athena->log, "Unable to return Interest () as InterestReturn (code: NoRoute).");
             }
         }
 
         if (ccnxName) {
             const char *name = ccnxName_ToString(ccnxName);
-            parcLog_Debug(athena->log, "Name (%s) not found in FIB and no default route. Message dropped.", name);
+            //parcLog_Debug(athena->log, "Name (%s) not found in FIB and no default route. Message dropped.", name);
             parcMemory_Deallocate(&name);
         } else {
-            parcLog_Debug(athena->log, "Name () not found in FIB and no default route. Message dropped.");
+            //parcLog_Debug(athena->log, "Name () not found in FIB and no default route. Message dropped.");
         }
     }
 
@@ -830,7 +830,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             // *   (3) Reverse path forward it via PIT entries
             //
             const char *egressVectorString = parcBitVector_ToString(egressVector);
-            parcLog_Debug(athena->log, "Content Object forwarded to %s.", egressVectorString);
+            //parcLog_Debug(athena->log, "Content Object forwarded to %s.", egressVectorString);
             parcMemory_Deallocate(&egressVectorString);
             PARCBitVector *result = athenaTransportLinkAdapter_Send(athena->athenaTransportLinkAdapter, returnContent, egressVector);
 
@@ -909,10 +909,10 @@ athena_ProcessMessage(Athena *athena, CCNxMetaMessage *ccnxMessage, PARCBitVecto
         const CCNxName *ccnxName = ccnxInterest_GetName(ccnxMessage);
         if (ccnxName) {
             const char *name = ccnxName_ToString(ccnxName);
-            parcLog_Debug(athena->log, "Processing Interest Message: %s", name);
+            //parcLog_Debug(athena->log, "Processing Interest Message: %s", name);
             parcMemory_Deallocate(&name);
         } else {
-            parcLog_Debug(athena->log, "Received Interest Message without a name.");
+            //parcLog_Debug(athena->log, "Received Interest Message without a name.");
         }
         CCNxInterest *interest = ccnxMetaMessage_GetInterest(ccnxMessage);
         outputMessage = _processInterest(athena, interest, ingressVector);
@@ -921,27 +921,27 @@ athena_ProcessMessage(Athena *athena, CCNxMetaMessage *ccnxMessage, PARCBitVecto
         const CCNxName *ccnxName = ccnxContentObject_GetName(ccnxMessage);
         if (ccnxName) {
             const char *name = ccnxName_ToString(ccnxName);
-            parcLog_Debug(athena->log, "Processing Content Object Message: %s", name);
+            //parcLog_Debug(athena->log, "Processing Content Object Message: %s", name);
             parcMemory_Deallocate(&name);
         } else {
-            parcLog_Debug(athena->log, "Received Content Object Message without a name.");
+            //parcLog_Debug(athena->log, "Received Content Object Message without a name.");
         }
         CCNxContentObject *contentObject = ccnxMetaMessage_GetContentObject(ccnxMessage);
         outputMessage = _processContentObject(athena, contentObject, ingressVector);
         athena->stats.numProcessedContentObjects++;
     } else if (ccnxMetaMessage_IsControl(ccnxMessage)) {
-        parcLog_Debug(athena->log, "Processing Control Message");
+        //parcLog_Debug(athena->log, "Processing Control Message");
         CCNxControl *control = ccnxMetaMessage_GetControl(ccnxMessage);
         outputMessage = _processControl(athena, control, ingressVector);
         athena->stats.numProcessedControlMessages++;
     } else if (ccnxMetaMessage_IsInterestReturn(ccnxMessage)) {
-        parcLog_Debug(athena->log, "Processing Interest Return Message");
+        //parcLog_Debug(athena->log, "Processing Interest Return Message");
 
         CCNxInterestReturn *interestReturn = ccnxMetaMessage_GetInterestReturn(ccnxMessage);
         outputMessage = _processInterestReturn(athena, interestReturn, ingressVector);
         athena->stats.numProcessedInterestReturns++;
     } else if (ccnxMetaMessage_IsManifest(ccnxMessage)) {
-        parcLog_Debug(athena->log, "Processing Interest Return Message");
+        //parcLog_Debug(athena->log, "Processing Interest Return Message");
 
         CCNxManifest *manifest = ccnxMetaMessage_GetManifest(ccnxMessage);
         outputMessage =  _processManifest(athena, manifest, ingressVector);
@@ -1019,10 +1019,8 @@ athena_ForwarderEngine(void *arg) {
 
             }
         }
-        char fname[20];
-        sprintf(fname,"times_%s.csv",getpid());
-        FILE* fp = fopen(fname,"w");
-        printTimeCSV(athena,fp);
+        FILE* fp = fopen("./times.csv","a");
+        printTimeCSV(athena,NULL);
         fclose(fp);
         usleep(1000); // workaround for coordinating with test infrastructure
         athena_Release(&athena);

@@ -183,7 +183,7 @@ _ccnxVPNServer_Run(CCNxVPNServer *server)
 
                     // debug
                     char *responseName = ccnxName_ToString(interestName);
-                    printf("Replying to: %s\n", responseName);
+                    //printf("Replying to: %s\n", responseName);
                     parcMemory_Deallocate(&responseName);
 
                     CCNxMetaMessage *message = ccnxMetaMessage_CreateFromContentObject(contentObject);

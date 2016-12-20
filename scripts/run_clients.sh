@@ -3,6 +3,10 @@
 echo "\n\nUsage: sh run_clients.sh <NUMBER_CLIENTS> <PACKET_RATE> <RESPONSE_SIZE> <NUMBER_PACKETS>\n"
 echo "setup_network.sh must be running with the same <NUMBER_PRODUCERS> parameter\n\n"
 
+echo "intReg,intEncap,intDecap,contReg,contEnc,contDec" > times.csv
+
+chmod +w times.csv
+
 rm throughput.csv
 
 NUMBER_CLIENTS=$1
