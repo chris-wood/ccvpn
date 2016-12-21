@@ -14,3 +14,4 @@ sh start_producers.sh ../b/ccnxVPN_Server ccnx:/producer $NUMBER_PRODUCERS
 
 killall "athena_private"
 killall "athena_gateway"
+killall "ccnxVPN_Client"

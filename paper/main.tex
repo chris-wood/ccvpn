@@ -1,5 +1,7 @@
 \documentclass[conference,letterpaper,10pt]{IEEEtran}
 \usepackage{blindtext, graphicx}
+
+
 % Add the compsoc option for Computer Society conferences.
 %
 % If IEEEtran.cls has not been installed into the LaTeX system files,
@@ -29,8 +31,7 @@
 
 \usepackage{microtype}
 
-\usepackage[caption=false,font=footnotesize]{subfig}
-
+\usepackage[tight,footnotesize]{subfigure}
 \usepackage{fixltx2e}
 
 \usepackage{multirow}
@@ -276,12 +277,43 @@ $65536$B & 519$\mu s$        & 702$\mu s$        \\ \hline
 \end{tabular}
 \end{table}
 
-\begin{figure}[!ht]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{throughput_pk_1x1}
-\caption{Throughput in public key mode}
-\label{throughput1x1}
-\end{figure}
+  \subfigure[]{\includegraphics[width=2.2in]{throughput_pk_1x1.png}\label{fig_first_case}}
+  \hfil
+  \subfigure[]{\includegraphics[width=2.2in]{throughput_pk_1x5.png}\label{fig_second_case}}
+  \hfil
+  \subfigure[]{\includegraphics[width=2.2in]{throughput_pk_5x5.png}\label{fig_third_case}}
+\caption{Throughput in public key modee}\label{fig_reenc}
+\end{figure*}
+
+
+\section{Conclusion}\label{conclusion}
+
+
+\ifCLASSOPTIONcaptionsoff
+  \newpage
+\fi
+
+\tiny
+\bibliographystyle{IEEEtran}
+\bibliography{main}
+
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{picture}}]{John Doe}
+\blindtext
+\end{IEEEbiography}
+
+
+\end{document}
+
+el{fig_first_case}}
+  \hfil
+  \subfigure[]{\includegraphics[width=2.2in]{throughput_pk_1x5.png}\label{fig_second_case}}
+  \hfil
+  \subfigure[]{\includegraphics[width=2.2in]{throughput_pk_5x5.png}\label{fig_third_case}}
+\caption{Throughput in public key modee}\label{fig_reenc}
+\end{figure*}
+
 
 \section{Conclusion}\label{conclusion}
 
