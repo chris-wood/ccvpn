@@ -27,14 +27,15 @@ StartConsumer() {
 for i in `seq 1 ${NUMBER_CLIENTS}`;
 do
     StartConsumer ${i}
+    wait;
 done
 
-echo "Press any key to quit..."
-read killswitch
+#echo "Press any key to quit..."
+#read killswitch
 
-${CLIENT_BINARY} -l ccnx:/producer/kill -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} &
+#${CLIENT_BINARY} -l ccnx:/producer/kill -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} &
 
-sleep 2s
+#sleep 2s
  
 killall "ccnxVPN_Client"
 
