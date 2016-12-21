@@ -13,7 +13,7 @@ RESPONSE_SIZE=$3
 NUMBER_PACKETS=$4
 MULT=10
 
-echo "25,50,100,200,400,800,1600,3200" > throughput.csv
+echo "25,50,100,200,400,800,1600,3200,na" > throughput.csv
 for i in `seq 1 100`;
 do
 	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS $PACKET_RATE $RESPONSE_SIZE 25

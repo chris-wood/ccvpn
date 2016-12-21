@@ -26,9 +26,10 @@ StartConsumer() {
 
 for i in `seq 1 ${NUMBER_CLIENTS}`;
 do
-    StartConsumer ${i}
-    wait;
+    StartConsumer 1
+#${i}
 done
+wait;
 
 #echo "Press any key to quit..."
 #read killswitch
