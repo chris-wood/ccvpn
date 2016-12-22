@@ -26,7 +26,8 @@ StartConsumer() {
 
 for i in `seq 1 ${NUMBER_CLIENTS}`;
 do
-    StartConsumer ${i}
+    StartConsumer 1
+#${i}
 done
 wait;
 
