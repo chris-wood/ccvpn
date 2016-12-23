@@ -10,8 +10,9 @@ RESPONSE_SIZE=$3
 MODE=$4
 
 echo "n_pkt,thput" > throughput.csv
-for i in `seq 1 10`;
+for i in `seq 1 5`;
 do
+	echo "\nround $i\n"
 	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 5 $RESPONSE_SIZE 5
 	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 25 $RESPONSE_SIZE 25
 	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 50 $RESPONSE_SIZE 50

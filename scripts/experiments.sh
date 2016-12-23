@@ -33,6 +33,10 @@ sleep 2s
 sh run_clients.sh 4 4 $PACKET_SIZE sk
 sleep 2s
 
+cp *sk*.png ../experiments/symm_key
+cp *sk*.csv ../experiments/symm_key
+sleep 10
+
 ##SETUP NETWORK W/ 4 procuccers in public key mode
 sh experiments_clean.sh
 sleep 2s
@@ -65,9 +69,6 @@ sh run_clients.sh 4 4 $PACKET_SIZE pk
 sleep 2s
 
 sh experiments_clean.sh
-
-cp *sk*.png ../experiments/symm_key
-cp *sk*.csv ../experiments/symm_key
 
 cp *pk*.png ../experiments/public_key
 cp *pk*.csv ../experiments/public_key
