@@ -66,3 +66,9 @@ sleep 2s
 
 sh experiments_clean.sh
 
+cp *sk*.png ../experiments/symm_key
+cp *sk*.csv ../experiments/symm_key
+
+cp *pk*.png ../experiments/public_key
+cp *pk*.csv ../experiments/public_key
+
