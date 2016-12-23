@@ -1,6 +1,6 @@
 v = read.csv("throughput.csv",sep=',')
 a=aggregate(v,by=list(v$n_pkt),FUN=mean)
 png("throughput.png")
-barplot(8*(a$thput)/1000000,names=a$n_pkt,xlab="Number of interests issued per consumer",ylab="Througput [mbps]")
+barplot(8*(a$thput)/1000000,names=a$n_pkt,xlab="Interest issuance rate per consumer per second",ylab="Data rate per consumer[mbps]")
 grid(10,10)
 dev.off()

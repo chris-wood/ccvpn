@@ -23,10 +23,10 @@ do
     StartProducer ${i}
 done   
 
-echo "Press any key to kill the servers..."
-read killswitch
+#echo "Press any key to kill the servers..."
+#read killswitch
 
-killall "ccnxVPN_Server"
+#killall "ccnxVPN_Server"
 
 #for i in `seq 1 ${NUMBER_PRODUCERS}`;
 #do
