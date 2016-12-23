@@ -13,12 +13,10 @@ if [ "$2" = "pk" ]; then
 	../b/gateway/ccnx/forwarder/athena/command-line/athena/athena_private ccnx:/gateway /tmp/key.pub /tmp/key.sec &
 	../b/gateway/ccnx/forwarder/athena/command-line/athena/athena_gateway ccnx:/foo 1 ccnx:/producer ccnx:/gateway /tmp/key.pub tcp://localhost:9695/name=tunnel/local=false -c tcp://localhost:9696/listener/local=false &
 else
+	echo "SYMM KEY MODE"
 
-echo "SYMM KEY MODE"
-
-../b/gateway/ccnx/forwarder/athena/command-line/athena/athena_private ccnx:/gateway /tmp/key.pub /tmp/key.sym &
-../b/gateway/ccnx/forwarder/athena/command-line/athena/athena_gateway ccnx:/foo 1 ccnx:/producer ccnx:/gateway /tmp/key.sym tcp://localhost:9695/name=tunnel/local=false -c tcp://localhost:9696/listener/local=false &
-
+	../b/gateway/ccnx/forwarder/athena/command-line/athena/athena_private ccnx:/gateway /tmp/key.pub /tmp/key.sym &
+	../b/gateway/ccnx/forwarder/athena/command-line/athena/athena_gateway ccnx:/foo 1 ccnx:/producer ccnx:/gateway /tmp/key.sym tcp://localhost:9695/name=tunnel/local=false -c tcp://localhost:9696/listener/local=false &
 fi
 
 sleep 1s

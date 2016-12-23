@@ -1,11 +1,8 @@
 #!/usr/bin/bash
 
-echo "\n\nUsage: sh run_clients.sh <NUMBER_CLIENTS> <NUMBER_SERVERS> <RESPONSE_SIZE> <MODE>\n"
-echo "setup_network.sh must be running with the same <NUMBER_PRODUCERS> parameter\n\n"
+chmod +w times.csv
 
 echo "intReg,intEncap,intDecap,contReg,contEnc,contDec" > times.csv
-
-chmod +w times.csv
 
 NUMBER_CLIENTS=$1
 NUMBER_SERVERS=$2
@@ -32,7 +29,3 @@ sleep 1s
 mv throughput.png "throughput_"$MODE"_"$NUMBER_CLIENTS"_"$NUMBER_SERVERS".png"
 mv throughput.csv "throughput_"$MODE"_"$NUMBER_CLIENTS"_"$NUMBER_SERVERS".csv"
 
-killall "athena_private"
-killall "athena_gateway"
-killall "ccnxVPN_Client"
-killall "ccnxVPN_Server"

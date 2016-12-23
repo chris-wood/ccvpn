@@ -36,7 +36,6 @@ wait;
 #${CLIENT_BINARY} -l ccnx:/producer/kill -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} &
 
 #sleep 2s
- 
-killall "ccnxVPN_Client"
 
+killall "ccnxVPN_Client"
 
