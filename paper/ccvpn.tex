@@ -1,106 +1,85 @@
-\documentclass[conference]{sig-alternate-05-2015}
+\documentclass[conference,letterpaper,10pt]{IEEEtran}
+\usepackage{blindtext, graphicx, url, paralist}
 
-\usepackage{todonotes,times,amssymb,amsmath}
-\usepackage{algorithm}
-\usepackage{algorithmic}
-\usepackage{url}
-\usepackage{mdframed}
-\usepackage{amsmath}
-\usepackage{paralist}
-\usepackage{multirow,paralist}
-\usepackage{fancybox}
-\usepackage{subcaption}
+
+% Add the compsoc option for Computer Society conferences.
+%
+% If IEEEtran.cls has not been installed into the LaTeX system files,
+% manually specify the path to it like:
+% \documentclass[conference]{../sty/IEEEtran}
+
+% *** GRAPHICS RELATED PACKAGES ***
+%
+\ifCLASSINFOpdf
+  % \usepackage[pdftex]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../pdf/}{../jpeg/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\else
+  % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
+  % will default to the driver specified in the system graphics.cfg if no
+  % driver is specified.
+  % \usepackage[dvips]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../eps/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.eps}
+\fi
+
+\usepackage{microtype}
+
+\usepackage[tight,footnotesize]{subfigure}
+\usepackage{fixltx2e}
+
 \usepackage{multirow}
-\usepackage{color, colortbl}
-\usepackage{transparent}
-\usepackage{balance}
-\usepackage{url}
-\usepackage{graphicx}
-\usepackage{paralist}
-\usepackage{amssymb, framed, graphics}
-\usepackage{bytefield}
-\usepackage[group-separator={,}]{siunitx}
-\usepackage[underline=true]{pgf-umlsd}
-\usepackage{hyphenat}
-\usepackage{cite}
-\usepackage{fancybox,fancyvrb}
-\usepackage{url}
-\usepackage{framed}
-\usepackage{xspace}
-\usepackage{listings}
-\usepackage{array}
-\usepackage{threeparttable}
 
-\makeatletter
-\makeatother
+\usepackage{algorithm2e}
 
-\newcommand{\ccnname}[1]{\path{#1}}
-\newcommand{\Adv}{{\sf Adv}}
-\newcommand{\mAdv}{\mathsf{Adv}}
-\newcommand{\advc}{{\sf Adv}$^C$}
-\newcommand{\madvc}{\mathsf{Adv}^C}
-\newcommand{\advl}{{\sf Adv}$^L$}
-\newcommand{\madvl}{\mathsf{Adv}^L}
-\newcommand{\advi}{{\sf Adv}$^I$}
-\newcommand{\madvi}{\mathsf{Adv}^I}
-\newcommand{\adve}{{\sf Adv}$_E$}
-\newcommand{\advo}{{\sf Adv}$_O$}
-\newcommand{\advd}{{\sf Adv}$_D$}
-\newcommand{\NN}{\bar{N}}
-
-\makeatletter
-\newcommand{\thickhline}{%
-    \noalign {\ifnum 0=`}\fi \hrule height 1pt
-    \futurelet \reserved@a \@xhline
-}
-\makeatother
-\mathchardef\mhyphen="2D
-\newcommand{\E}[1]{\mathrm{E} #1}
-\newcommand{\NE}[1]{\mathrm{E}\mhyphen #1}
-
-\newcolumntype{!}{@{\hskip\tabcolsep\vrule width 1pt\hskip\tabcolsep}}
-\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
-\newcolumntype{N}{@{}m{0pt}@{}}
-
-%\newtheorem{proof}{\textbf{Proof}}
-\newtheorem{defn}{\textbf{Definition}}
-\newtheorem{define}{\textbf{Definition}}
-\newtheorem{thm}{\textbf{Theorem}}
-\newtheorem{cor}{\textbf{Corollary}}
-\newtheorem{lemma}{\textbf{Lemma}}
-
-\newcolumntype{!}{@{\hskip\tabcolsep\vrule width 1pt\hskip\tabcolsep}}
-\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
-\newcolumntype{N}{@{}m{0pt}@{}}
-
-\renewcommand{\algorithmicrequire}{\textbf{Input:}}
-\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\hyphenation{op-tical net-works semi-conduc-tor}
 
 \begin{document}
 
-\title{Tunneling in Content Centric Networks}
-\numberofauthors{1}
-\author{
-\alignauthor
-%Cesar Ghali \quad Gene Tsudik \quad Christopher A. Wood\titlenote{Supported by the NSF Graduate Research Fellowship DGE-1321846.}\\
-%       \affaddr{Computer Science Department, University of California Irvine}\\
-%       \email{\{cghali, gene.tsudik, woodc1\}@uci.edu}
-}
+\title{CCVPN: Content Centric Virtual Private Networking}
 
 
 \maketitle
-\pagestyle{plain}
+
 
 \begin{abstract}
-TODO
+
 \end{abstract}
 
-% meat and potatoes
-%\input{01-introduction}
+\begin{IEEEkeywords}
+%Human Mobility, Group Detection, Group Dynamics, Periodicity, Opportunistic Routing.
+\end{IEEEkeywords}
 
-%\section{Conclusion and Future Work} \label{sec:conclusion}
+\IEEEpeerreviewmaketitle
 
-\bibliographystyle{abbrv}
+\input{01-introduction}
+\input{02-overview}
+\input{03-related}
+\input{04-design}
+\input{05-analysis}
+\input{06-experiment}
+\input{07-security}
+
+\section{Conclusion}\label{conclusion}
+TODO
+
+\ifCLASSOPTIONcaptionsoff
+  \newpage
+\fi
+
+\tiny
+
+\bibliographystyle{IEEEtran}
 \bibliography{references}
+
+% \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{picture}}]{John Doe}
+% \blindtext
+% \end{IEEEbiography}
 
 \end{document}

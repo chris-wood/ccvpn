@@ -1,0 +1,26 @@
+\section{Related Work} \label{sec:related}
+
+\begin{itemize}
+\item \cite{tsudik2016ac3n}
+\item \cite{dibenedetto2011andana}
+\item ...
+\end{itemize}
+
+Content-based encryption is arguably the most popular technique for protecting CCN content from
+unauthorized disclosure. This technique permits content to be disseminated throughout
+the network since it cannot be decrypted by adversaries without the appropriate decryption key(s).
+Many variations of this approach have been proposed based on general
+group-based encryption \cite{Smetters2010}, broadcast encryption \cite{Misra2013,Ion2013} and
+proxy re-encryption \cite{Wood2014}. Kurihara et al. \cite{ifip15} generalized these specialized
+approaches in a framework called CCN-AC, an encryption-based access control framework
+that shows how to use manifests to explicitly specify and enforce other encryption-based
+access control policies. Consumers use information in the manifest to (1) request appropriate
+decryption keys and (2) use them to decrypt content object(s). The NDN NBAC \cite{yu2015name}
+scheme is similar to \cite{ifip15} in that it allows decryption keys to be
+flexibly specified by a data owner. However, it does this based on name engineering rules instead of
+configuration. Interest-based access control \cite{ghali2015interest} is a different
+type of access control scheme wherein content was optionally encrypted. Access
+was protected by making the names of content derivable by only authorized consumers.
+NDN-ACE \cite{shangndn} is a recent access control framework for IoT environments
+which includes a key exchange protocol for distributing secret keys to sensors.
+We revisit NDN-ACE in Section \ref{sec:compare}.

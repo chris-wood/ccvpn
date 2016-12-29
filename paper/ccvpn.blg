@@ -1,0 +1,62 @@
+This is BibTeX, Version 0.99d (TeX Live 2016)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: ccvpn.aux
+The style file: IEEEtran.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: references.bib
+Warning--I didn't find a database entry for "tor"
+Warning--I didn't find a database entry for "ac3n"
+Warning--I didn't find a database entry for "sodium"
+-- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+Warning--empty journal in shangndn
+Warning--empty year in shangndn
+
+Done.
+You've used 15 entries,
+            4087 wiz_defined-function locations,
+            900 strings with 9553 characters,
+and the built_in function-call counts, 8088 in all, are:
+= -- 594
+> -- 199
+< -- 27
++ -- 99
+- -- 41
+* -- 377
+:= -- 1278
+add.period$ -- 33
+call.type$ -- 15
+change.case$ -- 16
+chr.to.int$ -- 66
+cite$ -- 17
+duplicate$ -- 654
+empty$ -- 777
+format.name$ -- 55
+if$ -- 1858
+int.to.chr$ -- 0
+int.to.str$ -- 15
+missing$ -- 127
+newline$ -- 68
+num.names$ -- 14
+pop$ -- 346
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 2
+skip$ -- 611
+stack$ -- 0
+substring$ -- 171
+swap$ -- 412
+text.length$ -- 5
+text.prefix$ -- 0
+top$ -- 5
+type$ -- 15
+warning$ -- 2
+while$ -- 26
+width$ -- 17
+write$ -- 145
+(There were 5 warnings)

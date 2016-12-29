@@ -1,0 +1,64 @@
+\section{Preliminaries}
+This section presents an overview of the CCN architecture\footnote{Named-Data Networking \cite{jacobson2009networking}
+is an ICN architecture related to CCN. However, since CCNxKE was
+designed for ICNs that have features which are not supported by NDN (such
+as exact name matching), we do not focus on NDN in this work. However,
+CCNx could be retrofitted to work for NDN as well.} and work
+related to confidentiality, privacy, and transport security. Those familiar with these topics
+can skip it without loss of continuity.
+
+\subsection{CCN Overview}
+In contrast to IP networks, which focus on end-host names and addresses,
+CCN \cite{jacobson2009networking,mosko2016semantics} centers
+on content by making it named, addressable, and routable within the network. A
+content name is a URI-like string composed of one or more
+variable-length name segments, each separated by a \url{`/'} character. To
+obtain content, a user (consumer) issues a request, called an \emph{interest}
+message, with the name of the desired content. This interest can be
+\emph{satisfied} by either (1) a router cache or (2) the content producer. A
+\emph{content object} message is returned to the consumer upon satisfaction of
+the interest. Moreover, name matching in CCN is exact, e.g., an interest for
+\url{/edu/uci/ics/cs/fileA} can only be satisfied by a content object
+named \url{/edu/uci/ics/cs/fileA}.
+
+In addition to a payload, content objects include several fields. In this work,
+we are only interested in the following three: {\tt Name}, {\tt Validation}, and {\tt ExpiryTime}.
+The {\tt Validation} field is a composite of (1) validation algorithm information
+(e.g., the signature algorithm used, its parameters, and a link to the public
+verification key), and (2) validation payload (e.g., the signature). We use the
+term ``signature'' to refer to this field. {\tt ExpiryTime} is an optional,
+producer-recommended duration for the content objects to be cached.
+Conversely, interest messages carry a mandatory name, optional payload, and
+other fields that restrict the content object response. The reader is encouraged
+to review \cite{mosko2016semantics} for a complete description of all packet fields
+and their semantics.
+
+Packets are moved in the network by routers or forwarders. A forwarder is composed
+of at least the following two components:
+\begin{compactitem}
+\item {\em Forwarding Interest Base} (FIB) -- a table of name prefixes and
+  corresponding outgoing interfaces. The FIB is used to route interests based on
+  longest-prefix-matching (LPM) of their names.
+\item {\em Pending Interest Table} (PIT) -- a table of outstanding (pending)
+  interests and a set of corresponding incoming interfaces.
+\end{compactitem}
+%
+A forwarder may also maintain an optional {\em Content Store} (CS) used for content
+caching. The timeout for cached content is specified in the \texttt{ExpiryTime}
+field of the content header. From here on, we use the terms {\em CS} and
+{\em cache} interchangeably.
+
+Forwarders use the FIB to move interests from consumers towards producers and the PIT
+to forward content object messages along the reverse path towards consumers. More
+specifically, upon receiving an interest, a router $R$ first checks its cache
+(if present) to see if it can satisfy this interest locally. If the content is
+not in the cache, $R$ then consults the PIT to search for an outstanding
+version of the same interest. If there is a PIT match, the new incoming interface
+is added to the PIT entry. Otherwise, $R$ forwards the interest to the next hop
+according to its FIB (if possible). For each forwarded interest, $R$ stores
+some amount of state information in the PIT, including the name of the interest and the
+interface from which it arrived, so that content may be sent back to the
+consumer. When content is returned, $R$ forwards it to all interfaces listed in
+the matching PIT entry and said entry is removed. If a router receives a content object
+without a matching PIT entry, the message is deemed unsolicited and subsequently
+discarded.
