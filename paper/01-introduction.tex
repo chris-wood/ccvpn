@@ -15,35 +15,48 @@ signature are expected to carry the public verification key or certificate. If t
 authenticator is a MAC, then intermediate routers cannot verify it and should
 therefore not cache the content.
 
-One negative side effect of name-based requests is that any on-path or 
+One negative side effect of name-based requests is that any on-path or
 eavesdropping adversary between a consumer and producer can learn the identity
 and contents of all data in transit. In traditional IP-based networks, there are
 generally two types of mechanisms to solve this problem: (1) anonymity
-networks such as Tor \cite{tor} or (2) VPNs. As tools focused on anonymity, 
-the former help prevent linkability of packets to their requestors without 
+networks such as Tor \cite{tor} or (2) VPNs. As tools focused on anonymity,
+the former help prevent linkability of packets to their requestors without
 always protecting the identities or content themselves. In contrast, VPNs focus
 on packet confidentiality by creating a tunnel between two private networks
 or a consumer and single private network. All traffic over this tunnel is
 encrypted and thereby opaque to an eavesdropper. VPNs differ from anonymity
 networks such as Tor in that they are \emph{network-layer} mechanisms that
 typically only introduces a single layer of encryption to protect traffic.
-Thus, while Tor can be used to enable VPN-like functionality, it is often 
+Thus, while Tor can be used to enable VPN-like functionality, it is often
 far more inefficient since it operates above the network layer.
 
-In ICN (or more specifically, CCN and NDN), ANDaNA was the first anonymity network of its 
+In ICN (or more specifically, CCN and NDN), ANDaNA was the first anonymity network of its
 kind. Similar to Tor, ANDaNA uses circuits formed from anonymizing routers (ARs)
 to marshall requests and responses between consumers and producers. The former
 onion-encrypt interests and content using the public key(s) of the target ARs.
 A variant of ANDaNA uses symmetric keys for packet encapsulation but suffers from
 linkability. Tsudik et al. \cite{ac3n} proposed an optimized version of the symmetric-key
 ANDaNA variant that did not permit linkability. To the best of our knowledge, there
-is no anonymity network variant for ICN architectures. Though tunneling is only 
-useful for only a subset of ICN traffic, we believe it is a gap to be addressed 
-for this emerging technology, for a variety of reasons. {\bf First}, 
+is no anonymity network variant for ICN architectures. Though tunneling is only
+useful for only a subset of ICN traffic, we believe it is a gap to be addressed
+for this emerging technology, for a variety of reasons. {\bf First}, privacy
+continues to be an elusive property for CCN applications. Tunneling will help
+permit some degree of privacy within trusted AS domains from external passive
+eavesdroppers. {\bf Second}, multi-hop circuits as used in ANDaNA are overkill
+when trying to retain privacy instead of anonymity. {\bf Third}, end-to-end
+sessions such as those enabled by CCNxKE \cite{ccnxke} and similar protocols
+only serve those engaged in the session. In contrast, since the threat model is
+different, tunneled traffic has the potential to serve any number of consumers
+within the same trusted domain. Thus, while tunneling may contrast the content-centric
+nature of data transmission in CCN, it fills a needed void for this architecture.
 
-XXX: consumer privacy outside an AS is important, e.g., XXX
-XXX: 
-XXX: 
+In this paper, we present CCVPN, a secure tunneling protocol and system design for
+CCN. Similar to ANDaNA, CCVPN encrypts interests and content objects between producers
+and consumers. In contrast, CCVPN only encrypts packets between a \emph{single}
+source and destination to form a tunnel. In the standard configuration, both
+endpoints of the tunnel are gateways between two trusted domains. It is possible,
+however, for the source to be an individual consumer. In fact, the standard two-hope
+ANDaNA circuit is identical to a nested tunnel with the same source. In this way,
+CCVPN is more flexible than a general anonymity network.
 
-
-
+XXX

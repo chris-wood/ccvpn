@@ -21,6 +21,13 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{ccnxke}
+\BIBentryALTinterwordspacing
+M.~Mosko, E.~Uzun, and C.~Wood, ``{CCNx Key Exchange Protocol Version 1.0},''
+  Tech. Rep. draft-wood-ccnxkeyexchange-01, May 2016. [Online]. Available:
+  \url{https://raw.githubusercontent.com/PARC/ccnx-keyexchange-rfc/master/draft-wood-icnrg-ccnxkeyexchange-01.txt}
+\BIBentrySTDinterwordspacing
+
 \bibitem{jacobson2009networking}
 V.~Jacobson \emph{et~al.}, ``Networking named content,'' in \emph{CoNext},
   2009.
