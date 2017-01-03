@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  29 DEC 2016 22:47
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  3 JAN 2017 06:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -294,18 +294,18 @@ LaTeX Warning: Label `my-label' multiply defined.
 )
 \openout1 = `ccvpn.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 42.
+LaTeX Font Info:    ... okay on input line 42.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 42.
+LaTeX Font Info:    ... okay on input line 42.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 42.
+LaTeX Font Info:    ... okay on input line 42.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 42.
+LaTeX Font Info:    ... okay on input line 42.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 42.
+LaTeX Font Info:    ... okay on input line 42.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 42.
+LaTeX Font Info:    ... okay on input line 42.
 
 -- Lines per column: 56 (exact).
 (/usr/local/texlive/2016/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -368,7 +368,7 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Info: Redefining \microtypecontext on input line 43.
+LaTeX Info: Redefining \microtypecontext on input line 42.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -411,6 +411,10 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 6.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 6.
+ [1{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+
+
+]
 LaTeX Font Info:    Try loading font information for OT1+pcr on input line 25.
 
 (/usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/ot1pcr.fd
@@ -420,10 +424,8 @@ Package microtype Info: Loading generic settings for font family
 (microtype)             `pcr' (encoding: OT1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
- [1{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
-
-
-]) (./03-related.tex
+)
+(./03-related.tex
 
 LaTeX Warning: Reference `sec:compare' on page 2 undefined on input line 26.
 
@@ -442,11 +444,11 @@ LaTeX Warning: No positions in optional float specifier.
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `htbp') on input line 39.
 
+[3 <./images/architecture.pdf>]
 
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `htbp') on input line 56.
 
-[3 <./images/architecture.pdf>]
 
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `htbp') on input line 72.
@@ -561,7 +563,17 @@ Underfull \hbox (badness 1728) in paragraph at lines 26--30
 \OT1/ptm/m/n/8 (+20) wood-ccnxkeyexchange-01, May 2016. [On-line]. Avail-
  []
 
-)
+[5]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [6 <./throughput_pk_1x1.png> <./throughput_pk_2x1.png> <./throughput_pk_3x1.pn
+g> <./throughput_pk_4x1.png> <./throughput_pk_2x2.png> <./throughput_pk_3x3.png
+> <./throughput_pk_4x4.png> <./throughput_sk_1x1.png> <./throughput_sk_2x1.png>
+ <./throughput_sk_3x1.png> <./throughput_sk_4x1.png> <./throughput_sk_2x2.png> 
+<./throughput_sk_3x3.png> <./throughput_sk_4x4.png>])
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -573,11 +585,9 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[5] [6 <./throughput_pk_1x1.png> <./throughput_pk_2x1.png> <./throughput_pk_3x1
-.png> <./throughput_pk_4x1.png> <./throughput_pk_2x2.png> <./throughput_pk_3x3.
-png> <./throughput_pk_4x4.png> <./throughput_sk_1x1.png> <./throughput_sk_2x1.p
-ng> <./throughput_sk_3x1.png> <./throughput_sk_4x1.png> <./throughput_sk_2x2.pn
-g> <./throughput_sk_3x3.png> <./throughput_sk_4x4.png>] (./ccvpn.aux)
+[7
+
+] (./ccvpn.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -592,7 +602,7 @@ LaTeX Warning: There were multiply-defined labels.
 Here is how much of TeX's memory you used:
  5867 strings out of 493014
  95518 string characters out of 6133351
- 213983 words of memory out of 5000000
+ 214032 words of memory out of 5000000
  9077 multiletter control sequences out of 15000+600000
  51090 words of font info for 221 fonts, out of 8000000 for 9000
  1144 hyphenation exceptions out of 8191
@@ -612,10 +622,10 @@ texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2016/texmf-dist
 /fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2016/texmf-dist/fonts/ty
 pe1/urw/times/utmr8a.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/ti
 mes/utmri8a.pfb>
-Output written on ccvpn.pdf (6 pages, 322734 bytes).
+Output written on ccvpn.pdf (7 pages, 323649 bytes).
 PDF statistics:
- 164 PDF objects out of 1000 (max. 8388607)
- 107 compressed objects within 2 object streams
+ 169 PDF objects out of 1000 (max. 8388607)
+ 111 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  31820 words of extra memory for PDF output out of 35830 (max. 10000000)
 
