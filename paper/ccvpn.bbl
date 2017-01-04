@@ -36,15 +36,15 @@ V.~Jacobson \emph{et~al.}, ``Networking named content,'' in \emph{CoNext},
 M.~Mosko, I.~Solis, and C.~Wood, ``{CCNx} semantics,'' \emph{IRTF Draft, Palo
   Alto Research Center, Inc}, 2016.
 
+\bibitem{dibenedetto2011andana}
+S.~DiBenedetto, P.~Gasti, G.~Tsudik, and E.~Uzun, ``Andana: Anonymous named
+  data networking application,'' \emph{arXiv preprint arXiv:1112.2205}, 2011.
+
 \bibitem{tsudik2016ac3n}
 G.~Tsudik, E.~Uzun, and C.~A. Wood, ``Ac3n: Anonymous communication in
   content-centric networking,'' in \emph{2016 13th IEEE Annual Consumer
   Communications \& Networking Conference (CCNC)}.\hskip 1em plus 0.5em minus
   0.4em\relax IEEE, 2016, pp. 988--991.
-
-\bibitem{dibenedetto2011andana}
-S.~DiBenedetto, P.~Gasti, G.~Tsudik, and E.~Uzun, ``Andana: Anonymous named
-  data networking application,'' \emph{arXiv preprint arXiv:1112.2205}, 2011.
 
 \bibitem{Smetters2010}
 D.~K. Smetters, P.~Golle, and J.~D. Thornton, ``{CCNx} access control
