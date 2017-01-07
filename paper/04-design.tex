@@ -1,6 +1,8 @@
-\section{CCVPN Design}\label{metho}
+\section{CCVPN}\label{metho}
 
 Traditional Virtual Private Networks (VPNs) extend private networks across the Internet. They enable users to send and receive data across shared or public networks as if their computing devices were directly connected to the same private network~\cite{khanvilkar2004virtual}. The goal of CCVPN it to provide its users with the same functionality within the CCN Internet architecture. Therefore, the users can benefit from the features and security of a private network, even though the are not physically under the same private network.
+
+\subsection{CCVPN Design}
 
 In CCVPN, there are four main entities involved in the virtual private communication: \textit{Consumer}, \textit{Producer}, \textit{Consumer Side Gateway} ($G_c$), and \textit{Producer Side Gateway} ($G_p$). As in usual CCNs, the \textit{Consumer} is the network node that issues an interest for a given content (e.g., file, web page, video) that it wishes to retrieve. The Producer is the network node which originally created such content. $G_c$ and $G_p$ are the edge gateways responsible for ensuring the private communication among distinct domains. As we discuss later on, $G_c$ and $G_p$ can actually be implemented as a single network device, but we firstly present them as separate entities for the purpose of clarity.
 
@@ -88,3 +90,26 @@ $C_p$ = Dec($k_r$,$cipherText$)\\
 \end{algorithm}
 
 For clarity, we have defined a \textit{Consumer} and a \textit{Producer} domain. However, in reality, a single gateway can implement the functions of both $G_c$ and $G_p$. Therefore, consumers and producers can exist in both the domains and interests for contents can be issued from both sides. Also, it is worth to mention that, within the created CCVPNs, content caching would work just as it works in regular CCNs,  i.e., routers would be able to cache contents and respond to interests that were previously requested, enabling better resource usage and lower communication delays. Finally, we emphasize that $G_c$ encapsulation and decryption functions can also run inside the Consumer host. Conversely, $G_p$ can be implemented within the \textit{Producer} host. This enables its usage for one-to-one communication that would be completely anonymous to any  other entity in the network.
+
+\subsection{System and Security Model}
+
+Our security analysis considers the worst case scenario, in which the consumer issues an interest that has not been cached in any of the routers from the consumer nor producer domains. Therefore, the interest must traverse the whole network until reaching the content producer. Conversely, the content needs to be forwarded all the way back though the same path satifying the routers' PIT entries. A system that is secure in this worst case is also secure when the content has been previouly cached in some router along the way.
+
+\textbf{Adversary Goals and Capabilities.} The goal of the adversary is to link a given encapsulated interest to the original interest issued by the consumer or a given encrypted content to the original content issued by the producer. An adversary is also consired succesful if it is able to impersonate the content produccer by faking a content response. Since the original interest and the original content are visible inside the consumer and producer domains, we here assume that the adversary cannot eavesdrop or compromise hosts inside such domains \footnote{In the case that communication should be anonomous even to nodes inside the consumer and producer domains, $G_c$ and $G_p$ could be ran as processes within the consumer and producer hosts, respectively. This way, packects exchanged between them would remain anonimous to any other node in the network}. This also means that, as components of the producer and consumer domains, we assume that the gateways $G_c$ and $G_p$ cannot be compromised.
+
+In our model the adversary is allowed to perform the following actions (when outside the consumer and producer domains):
+
+\begin{itemize}
+	\item \textbf{Observe traffic replay and replace messages:}
+	\item \textbf{Deploy compromised routers:}
+	\item \textbf{Compromise existing routers:}
+	\item \textbf{Deploy compromised caches:}
+\end{itemize}
+
+\subsection{Additional Considerations}
+
+\textbf{Gateway-to-Gateway Authetication:}
+
+\textbf{Denial of Service:}
+
+
