@@ -100,14 +100,19 @@ Our security analysis considers the worst case scenario, in which the consumer i
 In our model the adversary is allowed to perform the following actions (when outside the consumer and producer domains):
 
 \begin{itemize}
-	\item \textbf{Observe traffic replay and replace messages:}
-	\item \textbf{Deploy compromised routers:}
-	\item \textbf{Compromise existing routers:}
-	\item \textbf{Deploy compromised caches:}
+	\item \textbf{Eavesdrop and replay traffic:} An adversary can eavesdrop on a link learning among other things the packet contents and traffic patterns.
+	\item \textbf{Deploy compromised routers or compromise existing routers:} An adversary is capable of deploying a compromised router ou compromised an existent router outside the VPN domains. By doing so the adversary becomes capable of maliciously injecting, delaying, altering, and dropping traffic. In addition, when an existing router is compromised, the adversary learns all of the private information contained in that router, such as private keys and cached content.
+	\item \textbf{Deploy compromised caches:} As a consequence of the ability to compromise and deploy compromised routers, an adversary is also able to deploy compromised caches. This includes monitoring the routers' cache contents and replying with corrupted or fake data.
 \end{itemize}
 
 \subsection{Additional Considerations}
 
-\textbf{Gateway-to-Gateway Authentication:}
+\textbf{Gateway-to-Gateway Authentication:} At this point one might have noticed that, in the CCVPN design, any host that possesses the producer -side gateway ($G_p$) public-key is able to initiate an anonymous communication link with $G_p$. In other words, the design does not include any authentication between the consumer-side gateway $G_c$ and $G_p$. Indeed, authentication is not required in CCVPN because is in not needed in some application scenarios.
 
-\textbf{Denial of Service:}
+Suppose, for instance, that a content provider offers its contents to any host in the Internet but it also  wants such hosts to be able to anonymously request and receive such content. In this case, since any host in the Internet should be able to requests the contents, there is no need for the consumer-side $G_c$ to authenticate it self to $G_p$.
+
+Another use case for CCVPN is the traditional VPN use case, in which two physically separated local networks (for instances to offices of the same company in different countries) should virtually behave as a private local network. In that case, it is necessary to prevent that a given $G_c$, which is not part of that corporation's network to connect to $G_p$ and become part of the VPN. To that purpose, standard host-to-host CCN authentication mechanisms such as \cite{} can be used to authenticate $G_p$ and $G_c$ to each other. This must be performed before any VPN communication to make sure that only the appropriate parties are communicating under the CCVPN architecture. We discuss the evaluation and specification of gateway-to-gateway authetication protocols as future work (see Sec.~\ref{conclusion}).
+
+\textbf{Denial of Service:} Since CCVPN gateways are connected to the public network they are clearly susceptible to DoS attacks. In the CCVPN architecture, both $G_c$ and $G_p$ are susceptible to DoS attacks. A DoS attack on $G_p$ would consist in flooding it with several fake encapsulated interests. Conversely, a DoS attack on $G_c$ would basically consist of flooding it with an enormous amount of encrypted content packets. In the case of $G_p$, such attacks are specially harmful since the interest decapsulation involves a public-key decryption operation.
+
+
