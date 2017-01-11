@@ -1,2 +1,21 @@
 \section{Security Analysis}\label{sec:sec-analysis}
- TODO
+
+\todo{TODO: Introductory text about the sec analysis}
+
+\begin{theorem}
+\textit{Let $Encapsulate_{pk}(I_p)$ denote the interest encapsulation routine described in Algorithm~\ref{alg:interestEncap}. Given any two interests $I_p^1$ and $I_p^2$ chosen by the adversary, if $Enc_{pk}$, used to construct $Encapsulate_{pk}$, is a CPA-secure public-key encryption scheme, then the adversary has only negligible advantage on determining a randomly selected bit $b$,  when $I_e^b = Encapsulate_{pk}(I_p^b)$ is given to the adversary.
+}\end{theorem}
+
+\textit{Proof--}
+\todo{TODO}
+
+\begin{theorem}
+\textit{Let $ContentEnc_{k_r}(C_p)$ denote the content encryption routine described in Algorithm~\ref{alg:contentEnc}. Given any two contents $C_p^1$ and $C_p^2$ chosen by the adversary, if $EncryptThenMAC_{k_r}$, used to construct $ContentEnc_{sk}$, is a CCA-secure symmetric-key encryption scheme , then:
+\begin{enumerate}
+\item the adversary has only negligible advantage on determining a randomly selected bit $b$, when $C_e^b = ContentEnc_{k_r}(C_p^b)$ is given to the adversary;
+\item the adversary has negligible probability of successfully forging an encrypted content $I_c'$.
+\end{enumerate}
+}\end{theorem}
+
+\textit{Proof--}
+\todo{TODO}

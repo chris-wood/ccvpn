@@ -63,7 +63,7 @@ Upon receiving $C_p$, $G_p$ fetches for $C_p$'s name (which is equal to $I_p$'s 
 $name$ = getName($C_p$)\\
 $k_r$ = retrieveKeyFromPIT($name$)\\
 $Ie_{name}$ = retrieveNameFromPIT($name$)\\
-$payload$ = EncryptThenMAC($k_r$,$C_p$)\\
+$payload$ = $EncryptThenMAC_{k_r}(C_p)$\\
 $C_e$ = createNewContent($Ie_{name}$,$payload$)\\
 \Return $C_e$;\\
 \caption{Content encryption  (runs on $G_p$)}

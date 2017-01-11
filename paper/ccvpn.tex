@@ -37,7 +37,15 @@
 
 \usepackage{algorithm2e}
 
+\usepackage{xcolor}
+\newcommand\todo[1]{\textcolor{red}{#1}}
+
 \hyphenation{op-tical net-works semi-conduc-tor}
+
+
+\newtheorem{theorem}{\textbf{Theorem}}[section]
+\newtheorem{corollary}{\textbf{Corollary}}[theorem]
+\newtheorem{lemma}[theorem]{\textbf{Lemma}}
 
 \begin{document}
 
@@ -64,10 +72,10 @@
 \input{05-sec-analysis}
 \input{06-perf-analysis}
 \input{07-experiment}
-\input{08-security}
+%\input{08-security}
 
 \section{Conclusion}\label{conclusion}
-TODO
+\todo{TODO}
 
 \ifCLASSOPTIONcaptionsoff
   \newpage
