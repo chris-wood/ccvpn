@@ -12,7 +12,7 @@ To compute the overall network throughput we measure the average data-rate for t
 
 \subsection{Results}
 
-\todo{TODO: Improve result figures (less figures more results in same figure)}
+\todo{TODO: Add results discussion}
 
 \begin{table}[!h]
 \centering
@@ -44,52 +44,26 @@ $65536$B & 519$\mu s$        & 702$\mu s$        \\ \hline
 
 \begin{figure}[!t]
 \centering
-  \subfigure[1 Consumer x 1 Producer]{\includegraphics[width=1.5in]{throughput_pk_1_1.png}\label{1a}}
+  \subfigure[1 Consumer x 1 Producer]{\includegraphics[width=1.5in]{images/throughput_1_1.png}\label{1a}}
   \hfil
-  \subfigure[2 Consumers x 1 Producer]{\includegraphics[width=1.5in]{throughput_pk_2_1.png}\label{1b}}
+  \subfigure[2 Consumers x 1 Producer]{\includegraphics[width=1.5in]{images/throughput_2_1.png}\label{1b}}
   \hfil
-  \subfigure[3 Consumers x 1 Producer]{\includegraphics[width=1.5in]{throughput_pk_3_1.png}\label{1c}}
+  \subfigure[3 Consumers x 1 Producer]{\includegraphics[width=1.5in]{images/throughput_3_1.png}\label{1c}}
   \hfil
-  \subfigure[4 Consumers x 1 Producer]{\includegraphics[width=1.5in]{throughput_pk_4_1.png}\label{1d}}
-\caption{Throughput per consumer in public key mode. 1 Producer N consumers}\label{exp1}
+  \subfigure[4 Consumers x 1 Producer]{\includegraphics[width=1.5in]{images/throughput_4_1.png}\label{1d}}
+\caption{Throughput per consumer. 1 Producer X N consumers}\label{exp1}
 \end{figure}
-
-\begin{figure}[!t]
-\centering
-  \subfigure[1 Consumer x 1 Producer]{\includegraphics[width=1.5in]{throughput_pk_1_1.png}\label{2a}}
-  \hfil
-  \subfigure[2 Consumers x 2 Producers]{\includegraphics[width=1.5in]{throughput_pk_2_2.png}\label{2b}}
-  \hfil
-  \subfigure[3 Consumers x 3 Producers]{\includegraphics[width=1.5in]{throughput_pk_3_3.png}\label{2c}}
-  \hfil
-  \subfigure[4 Consumers x 4 Producers]{\includegraphics[width=1.5in]{throughput_pk_4_4.png}\label{2d}}
-\caption{Throughput per consumer in public key mode. N Producers N consumers}\label{exp2}
-\end{figure}
-
-
 
 
 \begin{figure}[!t]
 \centering
-  \subfigure[1 Consumer x 1 Producer]{\includegraphics[width=1.5in]{throughput_sk_1_1.png}\label{3a}}
+  \subfigure[1 Consumer x 1 Producer]{\includegraphics[width=1.5in]{images/throughput_1_1.png}\label{4a}}
   \hfil
-  \subfigure[2 Consumers x 1 Producer]{\includegraphics[width=1.5in]{throughput_sk_2_1.png}\label{3b}}
+  \subfigure[2 Consumers x 2 Producers]{\includegraphics[width=1.5in]{images/throughput_2_2.png}\label{4b}}
   \hfil
-  \subfigure[3 Consumers x 1 Producer]{\includegraphics[width=1.5in]{throughput_sk_3_1.png}\label{3c}}
+  \subfigure[3 Consumers x 3 Producers]{\includegraphics[width=1.5in]{images/throughput_3_3.png}\label{4c}}
   \hfil
-  \subfigure[4 Consumers x 1 Producer]{\includegraphics[width=1.5in]{throughput_sk_4_1.png}\label{3d}}
-\caption{Throughput per consumer in symmetric key mode. 1 Producer N consumers}\label{exp3}
-\end{figure}
-
-\begin{figure}[!t]
-\centering
-  \subfigure[1 Consumer x 1 Producer]{\includegraphics[width=1.5in]{throughput_sk_1_1.png}\label{4a}}
-  \hfil
-  \subfigure[2 Consumers x 2 Producers]{\includegraphics[width=1.5in]{throughput_sk_2_1.png}\label{4b}}
-  \hfil
-  \subfigure[3 Consumers x 3 Producers]{\includegraphics[width=1.5in]{throughput_sk_3_1.png}\label{4c}}
-  \hfil
-  \subfigure[4 Consumers x 4 Producers]{\includegraphics[width=1.5in]{throughput_sk_4_1.png}\label{4d}}
-\caption{Throughput per consumer in symmetric key mode. N Producers N consumers}\label{exp4}
+  \subfigure[4 Consumers x 4 Producers]{\includegraphics[width=1.5in]{images/throughput_4_4.png}\label{4d}}
+\caption{Throughput per consumer. N Producers X N consumers}\label{exp4}
 \end{figure}
 
