@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.10.13)  11 JAN 2017 07:56
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.10.13)  11 JAN 2017 10:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -478,6 +478,9 @@ l.14 \end{figure*}
                   
 ? 
 
+LaTeX Warning: Reference `fig:ccvpn' on page 3 undefined on input line 16.
+
+
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `htbp') on input line 22.
 
@@ -525,36 +528,8 @@ File: throughput_pk_4_1.png Graphic file (type png)
  <use throughput_pk_4_1.png>
 Package pdftex.def Info: throughput_pk_4_1.png used on input line 53.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
-
-! Extra }, or forgotten \endgroup.
-\@endfloatbox ...pagefalse \outer@nobreak \egroup 
-                                                  \color@endbox 
-l.55 \end{figure*}
-                  
-? 
-! Too many }'s.
-\color@endbox ->\color@endgroup \egroup 
-                                        
-l.55 \end{figure*}
-                  
-? 
-
-! LaTeX Error: \begin{document} ended by \end{figure*}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.55 \end{figure*}
-                  
-? 
-! Extra \endgroup.
-<recently read> \endgroup 
-                          
-l.55 \end{figure*}
-                  
-? 
 File: throughput_pk_1_1.png Graphic file (type png)
+
 <use throughput_pk_1_1.png>
 Package pdftex.def Info: throughput_pk_1_1.png used on input line 59.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
@@ -576,139 +551,55 @@ File: throughput_pk_4_4.png Graphic file (type png)
 <use throughput_pk_4_4.png>
 Package pdftex.def Info: throughput_pk_4_4.png used on input line 65.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
-
-! Extra }, or forgotten \endgroup.
-\@endfloatbox ...pagefalse \outer@nobreak \egroup 
-                                                  \color@endbox 
-l.67 \end{figure*}
-                  
-? 
-! Too many }'s.
-\color@endbox ->\color@endgroup \egroup 
-                                        
-l.67 \end{figure*}
-                  
-? 
-
-! LaTeX Error: \begin{document} ended by \end{figure*}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.67 \end{figure*}
-                  
-? 
-! Extra \endgroup.
-<recently read> \endgroup 
-                          
-l.67 \end{figure*}
-                  
-? 
-<throughput_sk_1_1.png, id=40, 481.8pt x 481.8pt>
+ <throughput_sk_1_1.png, id=40, 481.8pt x 481.8pt>
 File: throughput_sk_1_1.png Graphic file (type png)
- <use throughput_sk_1_1.png>
+
+<use throughput_sk_1_1.png>
 Package pdftex.def Info: throughput_sk_1_1.png used on input line 74.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
-
-<throughput_sk_2_1.png, id=41, 481.8pt x 481.8pt>
+ <throughput_sk_2_1.png, id=41, 481.8pt x 481.8pt>
 File: throughput_sk_2_1.png Graphic file (type png)
- <use throughput_sk_2_1.png>
+
+<use throughput_sk_2_1.png>
 Package pdftex.def Info: throughput_sk_2_1.png used on input line 76.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
-
-<throughput_sk_3_1.png, id=42, 481.8pt x 481.8pt>
-File: throughput_sk_3_1.png Graphic file (type png)
- <use throughput_sk_3_1.png>
-Package pdftex.def Info: throughput_sk_3_1.png used on input line 78.
-(pdftex.def)             Requested size: 108.405pt x 108.40031pt.
-
-<throughput_sk_4_1.png, id=43, 481.8pt x 481.8pt>
-File: throughput_sk_4_1.png Graphic file (type png)
- <use throughput_sk_4_1.png>
-Package pdftex.def Info: throughput_sk_4_1.png used on input line 80.
-(pdftex.def)             Requested size: 108.405pt x 108.40031pt.
-
-! Extra }, or forgotten \endgroup.
-\@endfloatbox ...pagefalse \outer@nobreak \egroup 
-                                                  \color@endbox 
-l.82 \end{figure*}
-                  
-? 
-! Too many }'s.
-\color@endbox ->\color@endgroup \egroup 
-                                        
-l.82 \end{figure*}
-                  
-? 
-
-! LaTeX Error: \begin{document} ended by \end{figure*}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.82 \end{figure*}
-                  
-? 
-! Extra \endgroup.
-<recently read> \endgroup 
-                          
-l.82 \end{figure*}
-                  
-? 
-File: throughput_sk_1_1.png Graphic file (type png)
-<use throughput_sk_1_1.png>
-Package pdftex.def Info: throughput_sk_1_1.png used on input line 86.
-(pdftex.def)             Requested size: 108.405pt x 108.40031pt.
-File: throughput_sk_2_1.png Graphic file (type png)
- <use throughput_sk_2_1.png>
-Package pdftex.def Info: throughput_sk_2_1.png used on input line 88.
-(pdftex.def)             Requested size: 108.405pt x 108.40031pt.
+ <throughput_sk_3_1.png, id=42, 481.8pt x 481.8pt>
 File: throughput_sk_3_1.png Graphic file (type png)
 
 <use throughput_sk_3_1.png>
+Package pdftex.def Info: throughput_sk_3_1.png used on input line 78.
+(pdftex.def)             Requested size: 108.405pt x 108.40031pt.
+ <throughput_sk_4_1.png, id=43, 481.8pt x 481.8pt>
+File: throughput_sk_4_1.png Graphic file (type png)
+
+<use throughput_sk_4_1.png>
+Package pdftex.def Info: throughput_sk_4_1.png used on input line 80.
+(pdftex.def)             Requested size: 108.405pt x 108.40031pt.
+File: throughput_sk_1_1.png Graphic file (type png)
+ <use throughput_sk_1_1.png>
+Package pdftex.def Info: throughput_sk_1_1.png used on input line 86.
+(pdftex.def)             Requested size: 108.405pt x 108.40031pt.
+File: throughput_sk_2_1.png Graphic file (type png)
+
+<use throughput_sk_2_1.png>
+Package pdftex.def Info: throughput_sk_2_1.png used on input line 88.
+(pdftex.def)             Requested size: 108.405pt x 108.40031pt.
+File: throughput_sk_3_1.png Graphic file (type png)
+ <use throughput_sk_3_1.png>
 Package pdftex.def Info: throughput_sk_3_1.png used on input line 90.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
 File: throughput_sk_4_1.png Graphic file (type png)
- <use throughput_sk_4_1.png>
+
+<use throughput_sk_4_1.png>
 Package pdftex.def Info: throughput_sk_4_1.png used on input line 92.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
-
-! Extra }, or forgotten \endgroup.
-\@endfloatbox ...pagefalse \outer@nobreak \egroup 
-                                                  \color@endbox 
-l.94 \end{figure*}
-                  
-? 
-! Too many }'s.
-\color@endbox ->\color@endgroup \egroup 
-                                        
-l.94 \end{figure*}
-                  
-? 
-
-! LaTeX Error: \begin{document} ended by \end{figure*}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.94 \end{figure*}
-                  
-? 
-! Extra \endgroup.
-<recently read> \endgroup 
-                          
-l.94 \end{figure*}
-                  
-? 
 ) (./ccvpn.bbl
 Underfull \hbox (badness 1728) in paragraph at lines 26--30
 \OT1/ptm/m/n/8 (+20) wood-ccnxkeyexchange-01, May 2016. [On-line]. Avail-
  []
 
-[6])
+[6 <./throughput_pk_1_1.png> <./throughput_pk_2_1.png> <./throughput_pk_3_1.png
+> <./throughput_pk_4_1.png>])
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -720,9 +611,9 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[7
-
-] (./ccvpn.aux)
+[7 <./throughput_pk_2_2.png> <./throughput_pk_3_3.png> <./throughput_pk_4_4.png
+> <./throughput_sk_1_1.png> <./throughput_sk_2_1.png> <./throughput_sk_3_1.png>
+ <./throughput_sk_4_1.png>] (./ccvpn.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -731,10 +622,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 6753 strings out of 493304
- 103551 string characters out of 6139870
- 237140 words of memory out of 5000000
- 9867 multiletter control sequences out of 15000+600000
+ 6754 strings out of 493304
+ 103557 string characters out of 6139870
+ 233917 words of memory out of 5000000
+ 9868 multiletter control sequences out of 15000+600000
  52707 words of font info for 228 fonts, out of 8000000 for 9000
  960 hyphenation exceptions out of 8191
  38i,10n,35p,1469b,375s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -752,9 +643,9 @@ re/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texlive/te
 xmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/
 type1/urw/times/utmbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/time
 s/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on ccvpn.pdf (7 pages, 197858 bytes).
+Output written on ccvpn.pdf (7 pages, 272409 bytes).
 PDF statistics:
- 101 PDF objects out of 1000 (max. 8388607)
+ 112 PDF objects out of 1000 (max. 8388607)
  64 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  32317 words of extra memory for PDF output out of 35830 (max. 10000000)
