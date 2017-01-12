@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.10.13)  11 JAN 2017 15:56
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.10.13)  11 JAN 2017 18:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -409,9 +409,6 @@ LaTeX Warning: No \author given.
 
 LaTeX Warning: Citation `tor' on page 1 undefined on input line 22.
 
-
-LaTeX Warning: Citation `ac3n' on page 1 undefined on input line 38.
-
 ) (./02-overview.tex
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-cmr.cfg
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
@@ -499,10 +496,19 @@ LaTeX Warning: No positions in optional float specifier.
                Default added (so using `htbp') on input line 74.
 
 [4]) (./05-sec-analysis.tex
-Underfull \hbox (badness 1924) in paragraph at lines 10--13
-[][]\OT1/ptm/b/it/10 Definition \OT1/ptm/m/it/10 (+20) 5.1:  An in-ter-est en-c
-ap-su-la-tion al-go-rithm
+Underfull \hbox (badness 1924) in paragraph at lines 9--13
+[][]\OT1/ptm/b/it/10 Definition \OT1/ptm/m/it/10 (+20) 5.1: [] An in-ter-est en
+-cap-su-la-tion al-go-rithm
  []
+
+
+LaTeX Warning: Reference `theo1' on page 5 undefined on input line 22.
+
+
+LaTeX Warning: Reference `def1' on page 5 undefined on input line 22.
+
+
+LaTeX Warning: Reference `theo1' on page 5 undefined on input line 22.
 
 
 Underfull \hbox (badness 3492) in paragraph at lines 26--29
@@ -518,28 +524,28 @@ LaTeX Warning: Citation `sodium' on page 5 undefined on input line 20.
 
 LaTeX Warning: Reference `create_figure' on page 6 undefined on input line 7.
 
-<images/throughput_1_1.png, id=33, 481.8pt x 481.8pt>
+<images/throughput_1_1.png, id=34, 481.8pt x 481.8pt>
 File: images/throughput_1_1.png Graphic file (type png)
 
 <use images/throughput_1_1.png>
 Package pdftex.def Info: images/throughput_1_1.png used on input line 47.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
 
-<images/throughput_2_1.png, id=34, 481.8pt x 481.8pt>
+<images/throughput_2_1.png, id=35, 481.8pt x 481.8pt>
 File: images/throughput_2_1.png Graphic file (type png)
 
 <use images/throughput_2_1.png>
 Package pdftex.def Info: images/throughput_2_1.png used on input line 49.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
 
-<images/throughput_3_1.png, id=35, 481.8pt x 481.8pt>
+<images/throughput_3_1.png, id=36, 481.8pt x 481.8pt>
 File: images/throughput_3_1.png Graphic file (type png)
 
 <use images/throughput_3_1.png>
 Package pdftex.def Info: images/throughput_3_1.png used on input line 51.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
 
-<images/throughput_4_1.png, id=36, 481.8pt x 481.8pt>
+<images/throughput_4_1.png, id=37, 481.8pt x 481.8pt>
 File: images/throughput_4_1.png Graphic file (type png)
 
 <use images/throughput_4_1.png>
@@ -550,34 +556,32 @@ File: images/throughput_1_1.png Graphic file (type png)
 Package pdftex.def Info: images/throughput_1_1.png used on input line 60.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
 
-<images/throughput_2_2.png, id=37, 481.8pt x 481.8pt>
+<images/throughput_2_2.png, id=38, 481.8pt x 481.8pt>
 File: images/throughput_2_2.png Graphic file (type png)
 
 <use images/throughput_2_2.png>
 Package pdftex.def Info: images/throughput_2_2.png used on input line 62.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
 
-<images/throughput_3_3.png, id=38, 481.8pt x 481.8pt>
+<images/throughput_3_3.png, id=39, 481.8pt x 481.8pt>
 File: images/throughput_3_3.png Graphic file (type png)
 
 <use images/throughput_3_3.png>
 Package pdftex.def Info: images/throughput_3_3.png used on input line 64.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
 
-<images/throughput_4_4.png, id=39, 481.8pt x 481.8pt>
+<images/throughput_4_4.png, id=40, 481.8pt x 481.8pt>
 File: images/throughput_4_4.png Graphic file (type png)
 
 <use images/throughput_4_4.png>
 Package pdftex.def Info: images/throughput_4_4.png used on input line 66.
 (pdftex.def)             Requested size: 108.405pt x 108.40031pt.
-) (./ccvpn.bbl [6 <./images/throughput_1_1.png (PNG copy)> <./images/throughput
-_2_1.png (PNG copy)> <./images/throughput_3_1.png (PNG copy)> <./images/through
-put_4_1.png (PNG copy)>]
+) (./ccvpn.bbl
 Underfull \hbox (badness 1728) in paragraph at lines 26--30
 \OT1/ptm/m/n/8 (+20) wood-ccnxkeyexchange-01, May 2016. [On-line]. Avail-
  []
 
-)
+[6])
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -589,8 +593,10 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[7 <./images/throughput_2_2.png (PNG copy)> <./images/throughput_3_3.png (PNG c
-opy)> <./images/throughput_4_4.png (PNG copy)>] (./ccvpn.aux)
+[7 <./images/throughput_1_1.png (PNG copy)> <./images/throughput_2_1.png (PNG c
+opy)> <./images/throughput_3_1.png (PNG copy)> <./images/throughput_4_1.png (PN
+G copy)> <./images/throughput_2_2.png (PNG copy)> <./images/throughput_3_3.png 
+(PNG copy)> <./images/throughput_4_4.png (PNG copy)>] (./ccvpn.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -599,13 +605,13 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 6743 strings out of 493304
- 103255 string characters out of 6139870
- 232222 words of memory out of 5000000
- 9858 multiletter control sequences out of 15000+600000
- 52908 words of font info for 230 fonts, out of 8000000 for 9000
+ 6729 strings out of 493304
+ 103184 string characters out of 6139870
+ 233173 words of memory out of 5000000
+ 9841 multiletter control sequences out of 15000+600000
+ 53109 words of font info for 232 fonts, out of 8000000 for 9000
  960 hyphenation exceptions out of 8191
- 38i,10n,35p,1469b,375s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,10n,35p,1570b,375s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/
@@ -615,15 +621,16 @@ blic/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
 sfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
 cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.
 pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></
-usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/sha
-re/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texlive/te
-xmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/urw/times/utmbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/time
-s/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on ccvpn.pdf (7 pages, 283754 bytes).
+usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texl
+ive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
+rw/times/utmbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8
+a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on ccvpn.pdf (7 pages, 294053 bytes).
 PDF statistics:
- 97 PDF objects out of 1000 (max. 8388607)
- 64 compressed objects within 1 object stream
+ 101 PDF objects out of 1000 (max. 8388607)
+ 67 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  32297 words of extra memory for PDF output out of 35830 (max. 10000000)
 

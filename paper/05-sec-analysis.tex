@@ -6,20 +6,20 @@
 
 
 
-\begin{definition}
+\begin{definition}\label{def1}
 \textit{
 An interest encapsulation algorithm $Encapsulate(I_p)$ is an indistinguishable interest encapsulation iff, given any two interests $I_p^1$ and $I_p^2$, chosen by the adversary, and a randomly selected bit $b$, the adversary has only $1/2 + \epsilon$ probability of guessing the value of the bit $b$ when given $I_e^b = Encapsulate(I_p^b)$. Where $\epsilon$ is a negligible factor with regard to the security parameter $k$.
 }
 \end{definition}
 
-\begin{theorem}
+\begin{theorem}\label{theo1}
 \textit{
 Let $Encapsulate_{pk}(I_p)$ denote the interest encapsulation routine described in Algorithm~\ref{alg:interestEncap}. If $Enc_{pk}$, used to construct $Encapsulate_{pk}(I_p)$, is a CPA-secure public-key encryption scheme then $Encapsulate_{pk}(I_p)$ is an indistinguishable interest encapsulation algorithm.
 }
 \end{theorem}
 
-\textit{\textbf{Proof--}}
-\todo{TODO}
+\textit{\textbf{Proof--} Suppose that Theorem~\ref{theo1} is false. Then there exists a polynomial adversary $Adv$ capable of guessing the bit $b$ of Definition~\ref{def1} with non-negligible advantage, when given $I_e^b = Encapsulate(I_p^b)$ with $b \leftarrow \{0,1\}$ chosen at random. We show that if such adversary exists he can be used to construct an adversary $AdvCPA$ which breaks the CPA-security of $Enc_{pk}$. $AdvCPA$ plays the CPA-security game with a challenger sending him two messages $m^0$ and $m^1$. Following the CPA-security game, the challenger randomly chooses a value for the bit $b' \leftarrow \{0,1\}$ and gives back $C = Enc_{pk}(m^{b'})$ to $AdvCPA$. To break the CPA-security $AdvCPA$ must be able to guess the value of the bit $b'$ with non-negligible advantage. To that purpose $AdvCPA$ can query the challenger for the encryptions of $m^0$ and $m^1$ ($c^0 = Enc_{pk}(m^0)$ and $c^1 = Enc_{pk}(m^1)$) and then construct two interests $I_e^0 = createNewInterest(Gp_{name}, c^0)$ and $I_e^1 = createNewInterest(Gp_{name}, c^1)$, using the same $createNewInterest$ function used by algorithm~\ref{alg:interestEncap}, which is public (notice that $Gp_{name}$ is also public). Finally, $AdvCPA$ gives $I_e^0$ and $I_e^1$ as input to $Adv$ and outputs whatever $Adv$ outputs. Since under our assumption $Adv$ guesses the bit $b$ with non-negligible advantage, then $AdvCPA$ breaks the CPA-security of $Enc_{pk}$. But this violates the hypothesis of Theorem~\ref{theo1} and, therefore, such $Adv$ cannot exist.
+}
 
 
 \begin{definition}
