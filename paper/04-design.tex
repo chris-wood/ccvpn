@@ -2,8 +2,6 @@
 
 Traditional Virtual Private Networks (VPNs) extend private networks across the Internet. They enable users to send and receive data across shared or public networks as if their computing devices were directly connected to the same private network~\cite{khanvilkar2004virtual}. The goal of CCVPN it to provide its users with the same functionality within the CCN Internet architecture. Therefore, the users can benefit from the features and security of a private network, even though the are not physically under the same private network.
 
-\subsection{CCVPN Design}
-
 In CCVPN, there are four main entities involved in the virtual private communication: \textit{Consumer}, \textit{Producer}, \textit{Consumer Side Gateway} ($G_c$), and \textit{Producer Side Gateway} ($G_p$). As in usual CCNs, the \textit{Consumer} is the network node that issues an interest for a given content (e.g., file, web page, video) that it wishes to retrieve. The Producer is the network node which originally created such content. $G_c$ and $G_p$ are the edge gateways responsible for ensuring the private communication among distinct domains. As we discuss later on, $G_c$ and $G_p$ can actually be implemented as a single network device, but we firstly present them as separate entities for the purpose of clarity.
 
 \begin{figure*}[!ht]
@@ -90,29 +88,4 @@ $C_p$ = Dec($k_r$,$cipherText$)\\
 \end{algorithm}
 
 For clarity, we have defined a \textit{Consumer} and a \textit{Producer} domain. However, in reality, a single gateway can implement the functions of both $G_c$ and $G_p$. Therefore, consumers and producers can exist in both the domains and interests for contents can be issued from both sides. Also, it is worth to mention that, within the created CCVPNs, content caching would work just as it works in regular CCNs,  i.e., routers would be able to cache contents and respond to interests that were previously requested, enabling better resource usage and lower communication delays. Finally, we emphasize that $G_c$ encapsulation and decryption functions can also run inside the Consumer host. Conversely, $G_p$ can be implemented within the \textit{Producer} host. This enables its usage for one-to-one communication that would be completely anonymous to any  other entity in the network.
-
-\subsection{System and Security Model}
-
-Our security analysis considers the worst case scenario, in which the consumer issues an interest that has not been cached in any of the routers from the consumer nor producer domains. Therefore, the interest must traverse the whole network until reaching the content producer. Conversely, the content needs to be forwarded all the way back though the same path satisfying the routers' PIT entries. A system that is secure in this worst case is also secure when the content has been previously cached in some router along the way.
-
-\textbf{Adversary Goals and Capabilities.} The goal of the adversary is either 1) to retrieve any information associated with the original issued interest $I_p$ and/or the original content $C_p$ or 2) to retrieve the identities of the consumer and/or producer, thus violating the anonymity in the communication. An adversary is also considered successful if it is able to impersonate the content producer by faking a content response. Since the original interest and the original content are visible inside the consumer and producer domains, we here assume that the adversary cannot eavesdrop or compromise hosts inside such domains. It is also worth to emphasize that, by the conceptual design of the VPN, communication is anonymous to hosts from outside the VPN but not to hosts that belong to that VPN. Anyhow, one-to-one anonymous communication is still achievable sing the VPN paradigm if the communication must be anonymous to any other host in the network\footnote{In the case that communication should be anonymous even to nodes inside the consumer and producer domains, $G_c$ and $G_p$ could be ran as processes within the consumer and producer hosts, respectively. This way, packets exchanged between them would remain anonymous to any other node in the network}. This also means that, as components of the producer and consumer domains, we assume that the gateways $G_c$ and $G_p$ cannot be compromised.
-
-In our model the adversary is allowed to perform the following actions (when outside the consumer and producer domains):
-
-\begin{itemize}
-	\item \textbf{Eavesdrop and replay traffic:} An adversary can eavesdrop on a link learning among other things the packet contents and traffic patterns.
-	\item \textbf{Deploy compromised routers or compromise existing routers:} An adversary is capable of deploying a compromised router ou compromised an existent router outside the VPN domains. By doing so the adversary becomes capable of maliciously injecting, delaying, altering, and dropping traffic. In addition, when an existing router is compromised, the adversary learns all of the private information contained in that router, such as private keys and cached content.
-	\item \textbf{Deploy compromised caches:} As a consequence of the ability to compromise and deploy compromised routers, an adversary is also able to deploy compromised caches. This includes monitoring the routers' cache contents and replying with corrupted or fake data.
-\end{itemize}
-
-\subsection{Additional Considerations}
-
-\textbf{Gateway-to-Gateway Authentication:} At this point one might have noticed that, in the CCVPN design, any host that possesses the producer -side gateway ($G_p$) public-key is able to initiate an anonymous communication link with $G_p$. In other words, the design does not include any authentication between the consumer-side gateway $G_c$ and $G_p$. Indeed, authentication is not required in CCVPN because is in not needed in some application scenarios.
-
-Suppose, for instance, that a content provider offers its contents to any host in the Internet but it also  wants such hosts to be able to anonymously request and receive such content. In this case, since any host in the Internet should be able to requests the contents, there is no need for the consumer-side $G_c$ to authenticate it self to $G_p$.
-
-Another use case for CCVPN is the traditional VPN use case, in which two physically separated local networks (for instances to offices of the same company in different countries) should virtually behave as a private local network. In that case, it is necessary to prevent that a given $G_c$, which is not part of that corporation's network to connect to $G_p$ and become part of the VPN. To that purpose, standard host-to-host CCN authentication mechanisms such as \cite{} can be used to authenticate $G_p$ and $G_c$ to each other. This must be performed before any VPN communication to make sure that only the appropriate parties are communicating under the CCVPN architecture. We discuss the evaluation and specification of gateway-to-gateway authetication protocols as future work (see Sec.~\ref{conclusion}).
-
-\textbf{Denial of Service:} Since CCVPN gateways are connected to the public network they are clearly susceptible to DoS attacks. In the CCVPN architecture, both $G_c$ and $G_p$ are susceptible to DoS attacks. A DoS attack on $G_p$ would consist in flooding it with several fake encapsulated interests. Conversely, a DoS attack on $G_c$ would basically consist of flooding it with an enormous amount of encrypted content packets. In the case of $G_p$, such attacks are specially harmful since the interest decapsulation involves a public-key decryption operation.
-
 
