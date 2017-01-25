@@ -13,7 +13,7 @@ StartProducer() {
 
     echo Starting producer at ${PREFIX}
     
-    ${SERVER_BINARY} -l ${PREFIX} &
+    nice -n -15 ${SERVER_BINARY} -l ${PREFIX} &
     PID=$!
     echo $PID
 }
