@@ -442,10 +442,11 @@ _cloneNewLink(AthenaTransportLink *athenaTransportLink, struct ether_addr *peerA
         _ETHLinkData_Destroy(&newLinkData);
         athenaTransportLink_Release(&newTransportLink);
     } else {
-        parcLog_Info(athenaTransportLink_GetLogger(athenaTransportLink),
+/*        parcLog_Info(athenaTransportLink_GetLogger(athenaTransportLink),
                      "new link accepted by %s: %s %s",
                      athenaTransportLink_GetName(athenaTransportLink), derivedLinkName,
                      athenaTransportLink_IsNotLocal(athenaTransportLink) ? "" : "(Local)");
+*/
     }
 
     parcMemory_Deallocate(&derivedLinkName);

@@ -729,8 +729,8 @@ _TCPOpenConnection(AthenaTransportLinkModule *athenaTransportLinkModule, _URISpe
     athenaTransportLink_SetLogLevel(athenaTransportLink, parcLog_GetLevel(athenaTransportLinkModule_GetLogger(athenaTransportLinkModule)));
     _setConnectLinkState(athenaTransportLink, linkData);
 
-    parcLog_Info(athenaTransportLinkModule_GetLogger(athenaTransportLinkModule),
-                 "new link established: Name=\"%s\" (%s)", parameters->linkName, parameters->derivedLinkName);
+    //parcLog_Info(athenaTransportLinkModule_GetLogger(athenaTransportLinkModule),
+    //             "new link established: Name=\"%s\" (%s)", parameters->linkName, parameters->derivedLinkName);
 
     return athenaTransportLink;
 }
@@ -780,10 +780,11 @@ _TCPReceiveListener(AthenaTransportLink *athenaTransportLink)
         _TCPLinkData_Destroy(&newLinkData);
         athenaTransportLink_Release(&newTransportLink);
     } else {
-        parcLog_Info(athenaTransportLink_GetLogger(athenaTransportLink),
+/*        parcLog_Info(athenaTransportLink_GetLogger(athenaTransportLink),
                      "new link accepted by %s: %s %s",
                      athenaTransportLink_GetName(athenaTransportLink), derivedLinkName,
-                     athenaTransportLink_IsNotLocal(athenaTransportLink) ? "" : "(Local)");
+                     athenaTransportLink_IsNotLocal(athenaTransportLink) ? "" : "(Local)"); 
+*/
     }
 
     parcMemory_Deallocate(&derivedLinkName);

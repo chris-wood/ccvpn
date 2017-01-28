@@ -447,10 +447,12 @@ _cloneNewLink(AthenaTransportLink *athenaTransportLink, struct sockaddr_storage 
         _UDPLinkData_Destroy(&newLinkData);
         athenaTransportLink_Release(&newTransportLink);
     } else {
+/*
         parcLog_Info(athenaTransportLink_GetLogger(athenaTransportLink),
                      "new link accepted by %s: %s %s",
                      athenaTransportLink_GetName(athenaTransportLink), derivedLinkName,
                      athenaTransportLink_IsNotLocal(athenaTransportLink) ? "" : "(Local)");
+*/
     }
 
     parcMemory_Deallocate(&derivedLinkName);

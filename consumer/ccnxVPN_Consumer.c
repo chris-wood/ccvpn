@@ -249,7 +249,7 @@ _ccnxVPN_RunVPN(CCNxVPNConsumer *client, size_t totalVPNs, uint64_t delayInUs)
                 if (client->mode == CCNxVPNConsumerMode_VPNPong) {
                     size_t contentSize = parcBuffer_Remaining(ccnxContentObject_GetPayload(contentObject));
                     char *nameString = ccnxName_ToString(responseName);
-                    printf("%zu bytes from %s: time=%zu us\n", contentSize, nameString, delta);
+                    //printf("%zu bytes from %s: time=%zu us\n", contentSize, nameString, delta);
                     parcMemory_Deallocate(&nameString);
                 }
             }

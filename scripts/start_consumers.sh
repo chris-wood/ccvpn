@@ -20,7 +20,7 @@ export METIS_PORT=9696
 StartConsumer() {
     INDEX=$1
     PREFIX=${COMMON_PREFIX}/${INDEX}
-    echo Starting consumer at ${PREFIX}
+    #echo Starting consumer at ${PREFIX}
     nice -n -10 ${CLIENT_BINARY} -l ${PREFIX} -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} &
 }
 

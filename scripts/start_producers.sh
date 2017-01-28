@@ -11,11 +11,11 @@ StartProducer() {
     INDEX=$1
     PREFIX=${COMMON_PREFIX}/${INDEX}
 
-    echo Starting producer at ${PREFIX}
+    #echo Starting producer at ${PREFIX}
     
     nice -n -15 ${SERVER_BINARY} -l ${PREFIX} &
     PID=$!
-    echo $PID
+    #echo $PID
 }
 
 for i in `seq 1 ${NUMBER_PRODUCERS}`;

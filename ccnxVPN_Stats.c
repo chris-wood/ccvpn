@@ -187,6 +187,8 @@ storeThroughput(CCNxVPNStats *stats, long long int payloadSize)
     long long unsigned int delay = stats->totalRtt / stats->totalReceived;
     FILE* fp = fopen("throughput.csv", "a");
     long long int thgp = (1000000.0 * stats->totalReceived * payloadSize) / delay;
-    fprintf(fp, "%d,%llu\n", stats->totalSent, thgp);
+    if (delay != 0) {
+        fprintf(fp, "%d,%llu\n", stats->totalSent, thgp);
+    }
     fclose(fp);
 }

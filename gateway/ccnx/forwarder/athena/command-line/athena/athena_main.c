@@ -84,22 +84,22 @@ static size_t _contentStoreSizeInMB = AthenaDefaultContentStoreSize;
 static void
 _athenaLogo()
 {
-    printf("            ____   _    _                           " "\n");
-    printf("           / __ \\ | |_ | |      ___   __        __  " "\n");
-    printf("          | /__\\ || __|| |___  / _ \\ / /___   __> | " "\n");
-    printf("          | |  | || |_ | ___ ||  __/ | ___ \\ / __ \\ " "\n");
-    printf("          |_|  |_| \\__||_| |_| \\___| |_| |_| \\___/_\\" "\n");
+    //printf("            ____   _    _                           " "\n");
+    //printf("           / __ \\ | |_ | |      ___   __        __  " "\n");
+    //printf("          | /__\\ || __|| |___  / _ \\ / /___   __> | " "\n");
+    //printf("          | |  | || |_ | ___ ||  __/ | ___ \\ / __ \\ " "\n");
+    //printf("          |_|  |_| \\__||_| |_| \\___| |_| |_| \\___/_\\" "\n");
 }
 
 static void
 _usage()
 {
-    printf("usage: athena [-c <protocol>://<address>:<port>[/listener][/name=<name>][/local=<bool>]] [-s storeSize] [-o stateFile] [-d]\n");
-    printf("    -c | --connect    Transport link specification to create\n");
-    printf("    -s | --store      Size of the content store in mega bytes\n");
-    printf("    -o | --statefile  File to contain configuration state changes\n");
-    printf("    -i | --config     File containing configuration commands\n");
-    printf("    -d | --debug      Turn on debug logging\n");
+    //printf("usage: athena [-c <protocol>://<address>:<port>[/listener][/name=<name>][/local=<bool>]] [-s storeSize] [-o stateFile] [-d]\n");
+    //printf("    -c | --connect    Transport link specification to create\n");
+    //printf("    -s | --store      Size of the content store in mega bytes\n");
+    //printf("    -o | --statefile  File to contain configuration state changes\n");
+    //printf("    -i | --config     File containing configuration commands\n");
+    //printf("    -d | --debug      Turn on debug logging\n");
 }
 
 static struct option options[] = {
@@ -123,7 +123,7 @@ _parseConfigurationFile(Athena *athena, const char *configurationFile)
 
     FILE *input = fopen(configurationFile, "r");
     if (input == NULL) {
-        printf("Could not open %s: %s\n", configurationFile, strerror(errno));
+        //printf("Could not open %s: %s\n", configurationFile, strerror(errno));
         return -1;
     }
 
@@ -157,7 +157,7 @@ _parseConfigurationFile(Athena *athena, const char *configurationFile)
         // Run the command
         CCNxName *name = ccnxName_CreateFromCString(interestName);
         if (name == NULL) {
-            printf("Could not parse %s\n", interestName);
+            //printf("Could not parse %s\n", interestName);
             continue;
         }
         CCNxInterest *interest = ccnxInterest_CreateSimple(name);
@@ -168,7 +168,7 @@ _parseConfigurationFile(Athena *athena, const char *configurationFile)
             ccnxInterest_SetPayload(interest, payload);
             parcBuffer_Release(&payload);
         }
-        printf("[%d] %s %s\n", lineNumber++, interestName, interestPayload);
+        //printf("[%d] %s %s\n", lineNumber++, interestName, interestPayload);
         PARCBitVector *ingress = parcBitVector_Create();
         athena_ProcessMessage(athena, interest, ingress);
         parcBitVector_Release(&ingress);
@@ -223,7 +223,7 @@ _parseCommandLine(Athena *athena, int argc, char **argv)
                 break;
             }
             case 'v':
-                printf("%s\n", athenaAbout_Version());
+                //printf("%s\n", athenaAbout_Version());
                 exit(0);
             case 'd':
                 athenaTransportLinkAdapter_SetLogLevel(athena->athenaTransportLinkAdapter, PARCLogLevel_Debug);
@@ -267,8 +267,7 @@ _parseCommandLine(Athena *athena, int argc, char **argv)
         struct utsname name;
         if (uname(&name) == 0) {
             char nodeURIspecification[MAXPATHLEN];
-            sprintf(nodeURIspecification, "tcp://%s:%d/listener",
-                    name.nodename, AthenaDefaultListenerPort);
+            //sprintf(nodeURIspecification, "tcp://%s:%d/listener",name.nodename, AthenaDefaultListenerPort);
             PARCURI *nodeURI = parcURI_Parse(nodeURIspecification);
             if (athenaTransportLinkAdapter_Open(athena->athenaTransportLinkAdapter, nodeURI) == NULL) {
                 parcURI_Release(&nodeURI);
@@ -286,10 +285,10 @@ main(int argc, char *argv[])
 {
     _athenaLogo();
     sodium_init();
-    printf("\n");
+    //printf("\n");
 
     // Command line parameters
-    printf("Starting with name: %s\n", argv[1]);
+    //printf("Starting with name: %s\n", argv[1]);
 
     // Build the public name
     CCNxName *name = ccnxName_CreateFromCString(argv[1]);
@@ -333,7 +332,7 @@ main(int argc, char *argv[])
     // Spawned instances may not have have time to acquire a reference before our reference is
     // released so the reference is acquired for them.
     if (athena) {
-        printf("Processing %d arguments at index %d\n", argc - (numLinks * 2) - 2, 2 + (numLinks * 2));
+        //printf("Processing %d arguments at index %d\n", argc - (numLinks * 2) - 2, 2 + (numLinks * 2));
         _parseCommandLine(athena, argc - (numLinks * 2) - 2, &argv[2 + (numLinks * 2)]); // we already ate the first parameters
         (void) athena_ForwarderEngine(athena_Acquire(athena));
     }
