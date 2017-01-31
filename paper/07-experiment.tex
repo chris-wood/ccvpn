@@ -93,3 +93,22 @@ $65536$B & 519$\mu s$        & 702$\mu s$        \\ \hline
 \caption{Throughput per consumer. N Producers X N consumers. Content packet size: 10240B}\label{exp4}
 \end{figure}
 
+
+
+
+
+
+
+\begin{figure}[!t]
+\centering
+  \subfigure[Throughtput: Content size 1024B]{\includegraphics[width=1.5in]{images/1024_many_throughput.png}\label{4a}}
+  \hfil
+  \subfigure[Dropped packets: Content size 1024B]{\includegraphics[width=1.5in]{images/1024_many_dropped.png}\label{4b}}
+  \hfil
+  \subfigure[Throughtput: Content size 10240B]{\includegraphics[width=1.5in]{images/10240_many_throughput.png}\label{4c}}
+  \hfil
+  \subfigure[Dropped packets: Content size 10240B]{\includegraphics[width=1.5in]{images/10240_many_dropped.png}\label{4d}}
+\caption{Throughput per consumer with massive number of consumers/producers. Each consumer issues 5 interests}\label{exp4}
+\end{figure}
+
+

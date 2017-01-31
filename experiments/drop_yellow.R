@@ -1,0 +1,31 @@
+
+v1 = read.csv("./10240/public_key/dropped_pk_50_50.csv",sep=',')
+v2 = read.csv("./10240/symm_key/dropped_sk_50_50.csv",sep=',')
+
+v10 = read.csv("./10240/public_key/dropped_pk_100_100.csv",sep=',')
+v20 = read.csv("./10240/symm_key/dropped_sk_100_100.csv",sep=',')
+
+v100 = read.csv("./10240/public_key/dropped_pk_150_150.csv",sep=',')
+v200 = read.csv("./10240/symm_key/dropped_sk_150_150.csv",sep=',')
+
+v1000 = read.csv("./10240/public_key/dropped_pk_200_200.csv",sep=',')
+v2000 = read.csv("./10240/symm_key/dropped_sk_200_200.csv",sep=',')
+
+v10000 = read.csv("./10240/public_key/dropped_pk_250_250.csv",sep=',')
+v20000 = read.csv("./10240/symm_key/dropped_sk_250_250.csv",sep=',')
+
+v100000 = read.csv("./10240/public_key/dropped_pk_300_300.csv",sep=',')
+v200000 = read.csv("./10240/symm_key/dropped_sk_300_300.csv",sep=',')
+
+y1 = c(mean(v1$dropped),mean(v10$dropped),mean(v100$dropped),mean(v1000$dropped),mean(v10000$dropped),mean(v100000$dropped))
+
+y2 = c(mean(v2$dropped),mean(v20$dropped),mean(v200$dropped),mean(v2000$dropped),mean(v20000$dropped),mean(v200000$dropped))
+
+png("10240_many_dropped.png")
+barplot(cex.lab=1.5, cex.axis=1.5, cex.main=2.0, cex.sub=2.0,y1*100,names=c("50","100","150","200","250","300"),xlab="Number of consumers",ylab="Packets dropped [%]", col="darkgreen", ylim=c(0,100), space=1)
+par(new = TRUE)
+barplot(cex.lab=1.5, cex.axis=1.5, cex.main=2.0, cex.sub=2.0,y2*100, col="yellow",space=1.5, ylim=c(0,100))
+legend('topleft', c("Symmetric","PKE"), fill=c("darkgreen", "yellow"), cex=1.5)
+dev.off()
+
+

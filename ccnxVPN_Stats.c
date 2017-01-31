@@ -173,11 +173,16 @@ ccnxVPNStats_RecordResponse(CCNxVPNStats *stats, CCNxName *nameResponse, uint64_
 bool
 ccnxVPNStats_Display(CCNxVPNStats *stats)
 {
+    FILE* fp = fopen("dropped.csv", "a");
+    fprintf(fp, "%d,%.2f\n", stats->totalSent,1.0*(stats->totalSent - stats->totalReceived)/stats->totalSent);
+    fclose(fp);
+
     if (stats->totalReceived > 0) {
         parcDisplayIndented_PrintLine(0, "Sent = %zu : Received = %zu : AvgDelay %llu us",
                                       stats->totalSent, stats->totalReceived, stats->totalRtt / stats->totalReceived);
         return true;
     }
+
     return false;
 }
 
