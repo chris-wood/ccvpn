@@ -14,14 +14,19 @@ RESPONSE_SIZE=$5
 # Number of packets == total number of packets to send by the client
 NUMBER_PACKETS=$6
 
+# Identity file name and password prefixes
+IDENTITY_PREFIX="consumer_identity"
+
 # Consumer default port
 export METIS_PORT=9696
 
 StartConsumer() {
     INDEX=$1
     PREFIX=${COMMON_PREFIX}/${INDEX}
+    IDENTITY_FILE=${IDENTITY_PREFIX}_${INDEX}
+    IDENTITY_PASS=${IDENTITY_FILE}
     echo Starting consumer at ${PREFIX}
-    ${CLIENT_BINARY} -l ${PREFIX} -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} &
+    ${CLIENT_BINARY} -l ${PREFIX} -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} -i ${IDENTITY_FILE} -p ${IDENTITY_PASS} &
 }
 
 for i in `seq 1 ${NUMBER_CLIENTS}`;
@@ -37,7 +42,5 @@ wait;
 #${CLIENT_BINARY} -l ccnx:/producer/kill -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} &
 
 #sleep 2s
- 
+
 killall "ccnxVPN_Client"
-
-
