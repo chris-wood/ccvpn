@@ -102,11 +102,9 @@ extern const size_t smallNumberOfVPNs;
  *
  * @param [in] keystoreName The name of the file to save the new identity.
  * @param [in] keystorePassword The password of the file holding the identity.
- * @param [in] subjectName The name of the owner of the identity.
  *
  * @return A new instance of a CCNxPortalFactory initialized with a randomly created identity.
  */
 CCNxPortalFactory *ccnxVPNCommon_SetupPortalFactory(const char *keystoreName,
-                                                     const char *keystorePassword,
-                                                     const char *subjectName);
+                                                    const char *keystorePassword);
 #endif // ccnxVPNCommon_h.h

@@ -72,14 +72,14 @@ const size_t mediumNumberOfVPNs = 100;
 const size_t smallNumberOfVPNs = 10;
 
 static PARCIdentity *
-_ccnxVPNCommon_CreateAndGetIdentity(const char *keystoreName,
-                                     const char *keystorePassword,
-                                     const char *subjectName)
+_ccnxVPNCommon_CreateIdentityFromFile(const char *keystoreName,
+                                      const char *keystorePassword)
 {
     parcSecurity_Init();
 
     unsigned int keyLength = 1024;
     unsigned int validityDays = 30;
+    char *subjectName = "anonymous";
 
     bool success = parcPkcs12KeyStore_CreateFile(keystoreName, keystorePassword, subjectName, keyLength, validityDays);
     assertTrue(success,
@@ -96,9 +96,9 @@ _ccnxVPNCommon_CreateAndGetIdentity(const char *keystoreName,
 }
 
 CCNxPortalFactory *
-ccnxVPNCommon_SetupPortalFactory(const char *keystoreName, const char *keystorePassword, const char *subjectName)
+ccnxVPNCommon_SetupPortalFactory(const char *keystoreName, const char *keystorePassword)
 {
-    PARCIdentity *identity = _ccnxVPNCommon_CreateAndGetIdentity(keystoreName, keystorePassword, subjectName);
+    PARCIdentity *identity = _ccnxVPNCommon_CreateIdentityFromFile(keystoreName, keystorePassword);
     CCNxPortalFactory *result = ccnxPortalFactory_Create(identity);
     parcIdentity_Release(&identity);
 

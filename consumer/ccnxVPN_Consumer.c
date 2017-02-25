@@ -96,6 +96,9 @@ typedef struct ccnx_VPN_client {
     uint64_t intervalInMs;
     int payloadSize;
     int nonce;
+
+    char *keystoreName;
+    char *keystorePassword;
 } CCNxVPNConsumer;
 
 /**
@@ -105,13 +108,9 @@ typedef struct ccnx_VPN_client {
  * @return A new CCNxPortalFactory instance which must eventually be released by calling ccnxPortalFactory_Release().
  */
 static CCNxPortalFactory *
-_setupConsumerPortalFactory(void)
+_setupConsumerPortalFactory(char *keystoreName, char *keystorePassword)
 {
-    const char *keystoreName = "client.keystore";
-    const char *keystorePassword = "keystore_password";
-    const char *subjectName = "client";
-
-    return ccnxVPNCommon_SetupPortalFactory(keystoreName, keystorePassword, subjectName);
+    return ccnxVPNCommon_SetupPortalFactory(keystoreName, keystorePassword);
 }
 
 /**
@@ -202,7 +201,7 @@ _ccnxVPN_RunVPN(CCNxVPNConsumer *client, size_t totalVPNs, uint64_t delayInUs)
 {
     PARCClock *clock = parcClock_Wallclock();
 
-    CCNxPortalFactory *factory = _setupConsumerPortalFactory();
+    CCNxPortalFactory *factory = _setupConsumerPortalFactory(client->keystoreName, client->keystorePassword);
     client->portal = ccnxPortalFactory_CreatePortal(factory, ccnxPortalRTA_Message);
     ccnxPortalFactory_Release(&factory);
 
@@ -300,13 +299,14 @@ static bool
 _ccnxVPN_ParseCommandline(CCNxVPNConsumer *client, int argc, char *argv[argc])
 {
     static struct option longopts[] = {
-        { "ping",        no_argument,       NULL, 'p' },
         { "flood",       no_argument,       NULL, 'f' },
         { "count",       required_argument, NULL, 'c' },
         { "size",        required_argument, NULL, 's' },
-        { "interval",    required_argument, NULL, 'i' },
+        // { "interval",    required_argument, NULL, 'i' },
         { "locator",     required_argument, NULL, 'l' },
         { "outstanding", required_argument, NULL, 'o' },
+        { "identity file", required_argument, NULL, 'i' },
+        { "password",    required_argument, NULL, 'p' },
         { "help",        no_argument,       NULL, 'h' },
         { NULL,          0,                 NULL, 0   }
     };
@@ -314,26 +314,28 @@ _ccnxVPN_ParseCommandline(CCNxVPNConsumer *client, int argc, char *argv[argc])
     client->payloadSize = ccnxVPN_DefaultPayloadSize;
 
     int c;
-    while ((c = getopt_long(argc, argv, "phfc:s:i:l:o:", longopts, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "p:i:hfc:s:l:o:", longopts, NULL)) != -1) {
         switch (c) {
-            case 'p':
+            case 'f':
                 if (client->mode != CCNxVPNConsumerMode_None) {
                     return false;
                 }
                 client->mode = CCNxVPNConsumerMode_VPNPong;
                 break;
-            case 'f':
-                if (client->mode != CCNxVPNConsumerMode_None) {
-                    return false;
-                }
-                client->mode = CCNxVPNConsumerMode_Flood;
+            case 'i':
+                client->keystoreName = malloc(strlen(optarg) + 1);
+                strcpy(client->keystoreName, optarg);
+                break;
+            case 'p':
+                client->keystorePassword = malloc(strlen(optarg) + 1);
+                strcpy(client->keystorePassword, optarg);
                 break;
             case 'c':
                 sscanf(optarg, "%u", &(client->count));
                 break;
-            case 'i':
-                sscanf(optarg, "%llu", &(client->intervalInMs));
-                break;
+            // case 'i':
+            //     sscanf(optarg, "%llu", &(client->intervalInMs));
+            //     break;
             case 's':
                 sscanf(optarg, "%u", &(client->payloadSize));
                 break;

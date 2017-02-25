@@ -80,6 +80,9 @@ typedef struct ccnx_ping_server {
     size_t payloadSize;
 
     uint8_t generalPayload[ccnxVPN_MaxPayloadSize];
+
+    char *keystoreName;
+    char *keystorePassword;
 } CCNxVPNServer;
 
 /**
@@ -89,13 +92,9 @@ typedef struct ccnx_ping_server {
  * @return A new CCNxPortalFactory instance which must eventually be released by calling ccnxPortalFactory_Release().
  */
 static CCNxPortalFactory *
-_setupServerPortalFactory(void)
+_setupServerPortalFactory(char *keystoreName, char *keystorePassword)
 {
-    const char *keystoreName = "server.keystore";
-    const char *keystorePassword = "keystore_password";
-    const char *subjectName = "server";
-
-    return ccnxVPNCommon_SetupPortalFactory(keystoreName, keystorePassword, subjectName);
+    return ccnxVPNCommon_SetupPortalFactory(keystoreName, keystorePassword);
 }
 
 /**
@@ -150,7 +149,7 @@ _ccnxVPNServer_MakePayload(CCNxVPNServer *server, int size)
 static void
 _ccnxVPNServer_Run(CCNxVPNServer *server)
 {
-    CCNxPortalFactory *factory = _setupServerPortalFactory();
+    CCNxPortalFactory *factory = _setupServerPortalFactory(server->keystoreName, server->keystorePassword);
     server->portal = ccnxPortalFactory_CreatePortal(factory, ccnxPortalRTA_Message);
     ccnxPortalFactory_Release(&factory);
 
@@ -236,6 +235,8 @@ _ccnxVPNServer_ParseCommandline(CCNxVPNServer *server, int argc, char *argv[argc
         { "locator", required_argument, NULL, 'l' },
         { "size",    required_argument, NULL, 's' },
         { "help",    no_argument,       NULL, 'h' },
+        { "identity file", required_argument, NULL, 'i'},
+        { "password", required_argument, NULL, 'p'},
         { NULL,      0,                 NULL, 0   }
     };
 
@@ -243,7 +244,7 @@ _ccnxVPNServer_ParseCommandline(CCNxVPNServer *server, int argc, char *argv[argc
     server->payloadSize = ccnxVPN_MaxPayloadSize;
 
     int c;
-    while ((c = getopt_long(argc, argv, "l:s:h", longopts, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "l:s:i:p:h", longopts, NULL)) != -1) {
         switch (c) {
             case 'l':
                 server->prefix = ccnxName_CreateFromCString(optarg);
@@ -254,6 +255,14 @@ _ccnxVPNServer_ParseCommandline(CCNxVPNServer *server, int argc, char *argv[argc
                     _displayUsage(argv[0]);
                     return false;
                 }
+                break;
+            case 'i':
+                server->keystoreName = malloc(strlen(optarg) + 1);
+                strcpy(server->keystoreName, optarg);
+                break;
+            case 'p':
+                server->keystorePassword = malloc(strlen(optarg) + 1);
+                strcpy(server->keystorePassword, optarg);
                 break;
             case 'h':
                 _displayUsage(argv[0]);
