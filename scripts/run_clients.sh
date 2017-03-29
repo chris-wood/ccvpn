@@ -9,7 +9,7 @@ NUMBER_SERVERS=$2
 RESPONSE_SIZE=$3
 MODE=$4
 
-echo "n_pkt,thput" > throughput.csv
+echo "rtt,thput" > throughput.csv
 echo "n_pkt,dropped" > dropped.csv
 
 for i in `seq 1 5`;

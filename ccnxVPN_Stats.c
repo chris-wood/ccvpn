@@ -78,6 +78,8 @@ typedef struct vpn_stats_entry {
 
 struct vpn_stats {
     uint64_t totalRtt;
+    uint64_t firstTime;
+    uint64_t lastTime;
     size_t totalReceived;
     size_t totalSent;
     PARCHashMap *pings;
@@ -129,6 +131,8 @@ ccnxVPNStats_Create(void)
     stats->totalSent = 0;
     stats->totalReceived = 0;
     stats->totalRtt = 0;
+    stats->firstTime = 0;
+    stats->lastTime = 0;
 
     return stats;
 }
@@ -143,6 +147,11 @@ ccnxVPNStats_RecordRequest(CCNxVPNStats *stats, CCNxName *name, uint64_t current
     entry->sendTimeInUs = currentTime;
 
     stats->totalSent++;
+
+    if (currentTime < stats->firstTime || stats->firstTime == 0)
+    {
+        stats->firstTime = currentTime;
+    }
 
     parcHashMap_Put(stats->pings, name, entry);
 }
@@ -159,6 +168,11 @@ ccnxVPNStats_RecordResponse(CCNxVPNStats *stats, CCNxName *nameResponse, uint64_
         entry->receivedTimeInUs = currentTime;
         entry->rtt = entry->receivedTimeInUs - entry->sendTimeInUs;
         stats->totalRtt += entry->rtt;
+
+        if (currentTime > stats->lastTime || stats->lastTime == 0)
+        {
+               stats->lastTime = currentTime;
+        }
 
         CCNxContentObject *contentObject = ccnxMetaMessage_GetContentObject(message);
         PARCBuffer *payload = ccnxContentObject_GetPayload(contentObject);
@@ -189,11 +203,11 @@ ccnxVPNStats_Display(CCNxVPNStats *stats)
 void
 storeThroughput(CCNxVPNStats *stats, long long int payloadSize)
 {
-    long long unsigned int delay = stats->totalRtt / stats->totalReceived;
+    double delay = (stats->totalRtt / stats->totalReceived)/1000000.0; // converting time to seconds
     FILE* fp = fopen("throughput.csv", "a");
-    long long int thgp = (1000000.0 * stats->totalReceived * payloadSize) / delay;
+    double thgp = (stats->totalReceived * payloadSize * 8) / delay;
     if (delay != 0) {
-        fprintf(fp, "%d,%llu\n", stats->totalSent, thgp);
+        fprintf(fp, "%f,%f\n", delay, thgp);
     }
     fclose(fp);
 }
