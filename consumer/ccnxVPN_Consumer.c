@@ -391,7 +391,8 @@ _ccnxVPN_RunVPNPerformanceTest(CCNxVPNConsumer *client)
             _ccnxVPN_DisplayStatistics(client);
             break;
         case CCNxVPNConsumerMode_VPNPong:
-            _ccnxVPN_RunVPN(client, client->count, client->intervalInMs * 1000);
+            //TODO: check this
+            _ccnxVPN_RunVPN(client, client->count, client->intervalInMs * 0);
             _ccnxVPN_DisplayStatistics(client);
             break;
         case CCNxVPNConsumerMode_None:

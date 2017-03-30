@@ -9,7 +9,7 @@ NUMBER_SERVERS=$2
 RESPONSE_SIZE=$3
 MODE=$4
 
-echo "rtt,thput" > throughput.csv
+echo "rtt,thput,total_time,payload_size" > throughput.csv
 echo "n_pkt,dropped" > dropped.csv
 
 for i in `seq 1 5`;
@@ -23,7 +23,7 @@ do
 #	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 400 $RESPONSE_SIZE 400
 #	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 800 $RESPONSE_SIZE 800
 #	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 1600 $RESPONSE_SIZE 1600
-	echo "" >> throughput.csv
+    sleep 2s
 done
 
 #Rscript thput_aggr.R

@@ -33,9 +33,6 @@ sleep 2s
 sh run_clients.sh 300 300 $PACKET_SIZE sk
 sleep 2s
 
-sleep 10s
-
-cp *sk*.png ../experiments/symm_key
 cp *sk*.csv ../experiments/symm_key
 rm *sk*.png
 rm *sk*.csv
@@ -71,7 +68,6 @@ sleep 2s
 
 sh experiments_clean.sh
 
-cp *pk*.png ../experiments/public_key
 cp *pk*.csv ../experiments/public_key
 rm *pk*.png
 rm *pk*.csv

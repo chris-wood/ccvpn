@@ -207,7 +207,7 @@ _writeLink(AthenaTransportLink *athenaTransportLink, void *buffer, size_t length
     if (count <= 0) { // on error close the link, else return to retry a zero write
         if (count == -1) {
             if ((errno == EAGAIN) || (errno == EINTR)) {
-                parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "send retry (%s)", strerror(errno));
+                //parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "send retry (%s)", strerror(errno));
                 linkData->_stats.send_Retry++;
             } else {
                 athenaTransportLink_SetEvent(athenaTransportLink, AthenaTransportLinkEvent_Error);
@@ -217,7 +217,7 @@ _writeLink(AthenaTransportLink *athenaTransportLink, void *buffer, size_t length
             }
         } else {
             linkData->_stats.send_ShortWrite++;
-            parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "short write");
+            //parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "short write");
         }
         return -1;
     }
@@ -239,8 +239,7 @@ _TCPSend(AthenaTransportLink *athenaTransportLink, CCNxMetaMessage *ccnxMetaMess
     size_t length = parcBuffer_Limit(wireFormatBuffer);
     char *buffer = parcBuffer_Overlay(wireFormatBuffer, length);
 
-    parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink),
-                  "sending message (size=%d)", length);
+    //parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "sending message (size=%d)", length);
 
     int writeCount = 0;
     // If a short write, attempt to write the remainder of the message
@@ -307,7 +306,7 @@ _readLink(AthenaTransportLink *athenaTransportLink, void *buffer, size_t length)
             linkData->_stats.receive_ReadError++;
             athenaTransportLink_SetEvent(athenaTransportLink, AthenaTransportLinkEvent_Error);
         }
-        parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "read error (%s)", strerror(errno));
+        //parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "read error (%s)", strerror(errno));
     }
     return readCount;
 }
@@ -361,7 +360,7 @@ _TCPReceive(AthenaTransportLink *athenaTransportLink)
         }
         if (count == 0) { // on error or zero read, return to check at the top of TCPReceive for EOF
             linkData->_stats.receive_ReadHeaderFailure++;
-            parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "short read error (%s)", strerror(errno));
+            //parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "short read error (%s)", strerror(errno));
             parcBuffer_Release(&wireFormatBuffer);
             return NULL;
         }
@@ -413,14 +412,14 @@ _TCPReceive(AthenaTransportLink *athenaTransportLink)
         }
         if (count == 0) { // on error or zero read, return to check at the top of TCPReceive for EOF
             linkData->_stats.receive_ShortRead++;
-            parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "short read error (%s)", strerror(errno));
+            //parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "short read error (%s)", strerror(errno));
             parcBuffer_Release(&wireFormatBuffer);
             return NULL;
         }
         readCount += count;
     }
 
-    parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "received message (size=%d)", readCount);
+    //parcLog_Debug(athenaTransportLink_GetLogger(athenaTransportLink), "received message (size=%d)", readCount);
     parcBuffer_SetPosition(wireFormatBuffer, fixedHeaderLength + messageLength);
     parcBuffer_Flip(wireFormatBuffer);
 
@@ -442,8 +441,7 @@ _TCPReceive(AthenaTransportLink *athenaTransportLink)
 static void
 _TCPClose(AthenaTransportLink *athenaTransportLink)
 {
-    parcLog_Info(athenaTransportLink_GetLogger(athenaTransportLink),
-                 "link %s closed", athenaTransportLink_GetName(athenaTransportLink));
+    //parcLog_Info(athenaTransportLink_GetLogger(athenaTransportLink), "link %s closed", athenaTransportLink_GetName(athenaTransportLink));
     _TCPLinkData *linkData = athenaTransportLink_GetPrivateData(athenaTransportLink);
     close(linkData->fd);
     _TCPLinkData_Destroy(&linkData);

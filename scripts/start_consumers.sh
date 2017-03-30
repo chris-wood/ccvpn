@@ -26,7 +26,7 @@ StartConsumer() {
     IDENTITY_FILE=${IDENTITY_PREFIX}_${INDEX}
     IDENTITY_PASS=${IDENTITY_FILE}
     echo Starting consumer at ${PREFIX}
-    ${CLIENT_BINARY} -l ${PREFIX} -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} -i ${IDENTITY_FILE} -p ${IDENTITY_PASS} &
+    timeout 30s nice -n -10 ${CLIENT_BINARY} -l ${PREFIX} -c ${NUMBER_PACKETS} -s ${RESPONSE_SIZE} -f ${PACKET_RATE} -i ${IDENTITY_FILE} -p ${IDENTITY_PASS} &
 }
 
 for i in `seq 1 ${NUMBER_CLIENTS}`;
@@ -34,7 +34,8 @@ do
     StartConsumer ${i}
 done
 wait;
-
+echo "Done"
+echo $NUMBER_CLIENTS
 #echo "Press any key to quit..."
 #read killswitch
 

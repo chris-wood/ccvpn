@@ -46,8 +46,24 @@ barCenters <- barplot(as.matrix(data), ylab="Throughput per client (Mbps)",
 arrows(barCenters, means - errs, barCenters,
        means + errs, lwd = 1.5, angle = 90,
        code = 3, length = 0.05)
-
-
 dev.off()
 
+
+sk50 = read.csv("./public_key/throughput_pk_50_50.csv",sep=',')$thput
+pk50 = read.csv("./symm_key/throughput_sk_50_50.csv",sep=',')$thput
+
+sk100 = read.csv("./public_key/throughput_pk_100_100.csv",sep=',')$thput
+pk100 = read.csv("./symm_key/throughput_sk_100_100.csv",sep=',')$thput
+
+sk150 = read.csv("./public_key/throughput_pk_150_150.csv",sep=',')$thput
+pk150 = read.csv("./symm_key/throughput_sk_150_150.csv",sep=',')$thput
+
+sk200 = read.csv("./public_key/throughput_pk_200_200.csv",sep=',')$thput
+pk200 = read.csv("./symm_key/throughput_sk_200_200.csv",sep=',')$thput
+
+sk250 = read.csv("./public_key/throughput_pk_250_250.csv",sep=',')$thput
+pk250 = read.csv("./symm_key/throughput_sk_250_250.csv",sep=',')$thput
+
+sk300 = read.csv("./public_key/throughput_pk_300_300.csv",sep=',')$thput
+pk300 = read.csv("./symm_key/throughput_sk_300_300.csv",sep=',')$thput
 

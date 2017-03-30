@@ -192,8 +192,10 @@ ccnxVPNStats_Display(CCNxVPNStats *stats)
     fclose(fp);
 
     if (stats->totalReceived > 0) {
+
         parcDisplayIndented_PrintLine(0, "Sent = %zu : Received = %zu : AvgDelay %llu us",
                                       stats->totalSent, stats->totalReceived, stats->totalRtt / stats->totalReceived);
+
         return true;
     }
 
@@ -207,7 +209,7 @@ storeThroughput(CCNxVPNStats *stats, long long int payloadSize)
     FILE* fp = fopen("throughput.csv", "a");
     double thgp = (stats->totalReceived * payloadSize * 8) / delay;
     if (delay != 0) {
-        fprintf(fp, "%f,%f\n", delay, thgp);
+        fprintf(fp, "%f,%f,%d,%d\n", delay, thgp, stats->lastTime - stats->firstTime, stats->totalReceived * payloadSize * 8);
     }
     fclose(fp);
 }
