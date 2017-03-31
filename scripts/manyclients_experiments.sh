@@ -9,7 +9,7 @@ sleep 2s
 
 ##SETUP A NETOWORK WITH 1 producers in symm key  mode
 sh setup_network.sh 300 sk &
-sleep 5s
+sleep 10s
 ################################ N x 1 client servers experiments for symm key setup
 
 sh run_clients.sh 10 10 $PACKET_SIZE sk
@@ -41,7 +41,7 @@ rm *sk*.csv
 sh experiments_clean.sh
 sleep 2s
 sh setup_network.sh 300 pk &
-sleep 5s
+sleep 10s
 
 ################################ N x 1 client servers experiments for public key setup
 

@@ -320,6 +320,11 @@ _ccnxVPN_ParseCommandline(CCNxVPNConsumer *client, int argc, char *argv[argc])
                 if (client->mode != CCNxVPNConsumerMode_None) {
                     return false;
                 }
+                //sscanf(optarg, "%u", &(client->intervalInMs));
+                //TODO: check this
+                client->intervalInMs = 1000000/atoi(argv[8]);
+                printf("%d us period between two interests.",client->intervalInMs);
+                
                 client->mode = CCNxVPNConsumerMode_VPNPong;
                 break;
             case 'i':
@@ -392,7 +397,7 @@ _ccnxVPN_RunVPNPerformanceTest(CCNxVPNConsumer *client)
             break;
         case CCNxVPNConsumerMode_VPNPong:
             //TODO: check this
-            _ccnxVPN_RunVPN(client, client->count, client->intervalInMs * 0);
+            _ccnxVPN_RunVPN(client, client->count, client->intervalInMs);
             _ccnxVPN_DisplayStatistics(client);
             break;
         case CCNxVPNConsumerMode_None:
