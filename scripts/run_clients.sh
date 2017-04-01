@@ -16,7 +16,7 @@ for i in `seq 1 5`;
 do
 	echo "\nround $i $RESPONSE_SIZE\n"
     sleep 2s
-	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 10 $RESPONSE_SIZE 10
+	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 13 $RESPONSE_SIZE 1001
 #	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 25 $RESPONSE_SIZE 25
 #	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 50 $RESPONSE_SIZE 50
 #	sh start_consumers.sh ../b/ccnxVPN_Client ccnx:/producer $NUMBER_CLIENTS 100 $RESPONSE_SIZE 100

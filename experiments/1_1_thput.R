@@ -70,6 +70,8 @@ barCenters <- barplot(as.matrix(data), ylab="Avg. RTT [s]",
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.2),
     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
 
+grid(nx=NA, ny=NULL, lwd=1, lty=2)
+
 arrows(barCenters, means - errs, barCenters,
        means + errs, lwd = 1.5, angle = 90,
        code = 3, length = 0.05)
@@ -83,6 +85,8 @@ barCenters <- barplot(as.matrix(data), ylab="Avg. RTT [s]",
     xlab="Interests per second",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.2),
     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
+
+grid(nx=NA, ny=NULL, lwd=1, lty=2)
 
 arrows(barCenters, means - errs, barCenters,
        means + errs, lwd = 1.5, angle = 90,
@@ -109,8 +113,10 @@ for (x in 1:length(files)){
 pdf("1_1_thput.pdf")
 barCenters <- barplot(as.matrix(data), ylab="Throughput [mbps]",
     xlab="Interests per second",main="Content packet size = 10KBytes", col=c("lightblue","red"),
- 	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.2),
+ 	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.1),
     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
+
+grid(nx=NA, ny=NULL, lwd=1, lty=2)
 
 arrows(barCenters, means - errs, barCenters,
        means + errs, lwd = 1.5, angle = 90,
@@ -123,12 +129,13 @@ dev.off()
 png("1_1_thput.png")
 barCenters <- barplot(as.matrix(data), ylab="Throughput [mbps]",
     xlab="Interests per second",main="Content packet size = 10KBytes", col=c("lightblue","red"),
- 	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.2),
+ 	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.1),
     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
+
+grid(nx=NA, ny=NULL, lwd=1, lty=2)
 
 arrows(barCenters, means - errs, barCenters,
        means + errs, lwd = 1.5, angle = 90,
        code = 3, length = 0.05)
-
 
 dev.off()

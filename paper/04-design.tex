@@ -4,12 +4,12 @@ Traditional Virtual Private Networks (VPNs) extend private networks across the I
 
 In CCVPN, there are four main entities involved in the virtual private communication: \textit{Consumer}, \textit{Producer}, \textit{Consumer Side Gateway} ($G_c$), and \textit{Producer Side Gateway} ($G_p$). As in usual CCNs, the \textit{Consumer} is the network node that issues an interest for a given content (e.g., file, web page, video) that it wishes to retrieve. The Producer is the network node which originally created such content. $G_c$ and $G_p$ are the edge gateways responsible for ensuring the private communication among distinct domains. As we discuss later on, $G_c$ and $G_p$ can actually be implemented as a single network device, but we firstly present them as separate entities for the purpose of clarity.
 
-\begin{figure*}[!ht]
+\begin{figure}[!ht]
 \centering
-\includegraphics[width=1.9\columnwidth]{images/architecture.pdf}
+\includegraphics[width=\columnwidth]{images/architecture.pdf}
 \caption{CCVPN connectivity architecture}
 \label{fig:ccvpn}
-\end{figure*}
+\end{figure}
 
 As depicted in Fig.~\ref{fig:ccvpn}, the devices inside the \textit{Consumer} domain form a physically interconnected private network. Conversely, the devices in the \textit{Producer} domain also form a private network. Therefore, the goal is to create an overlay virtual network that unifies the \textit{Consumer} and the \textit{Producer} domains in way such that the original interests and contents are only visible to the devices inside these two domains. In other words, the interest $I_e$ and the content $C_e$, that are forwarded outside these domains, should give no information about the original interest $I_p$ and the actual content $C_p$.
 
