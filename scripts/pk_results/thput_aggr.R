@@ -1,6 +1,0 @@
-v = read.csv("throughput_pk_2x2.csv",sep=',')
-a=aggregate(v,by=list(v$n_pkt),FUN=mean)
-png("throughput_pk_2x2.png")
-barplot(8.0*(a$thput)/1000000,names=c(5,25,50,100,200,400,800),xlab="Number of interests issued per consumer",ylab="Througput [mbps]")
-grid(10,10)
-dev.off()
