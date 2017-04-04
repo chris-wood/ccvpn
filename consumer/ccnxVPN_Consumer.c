@@ -146,7 +146,8 @@ ccnxVPN_Create(void)
     client->stats = ccnxVPNStats_Create();
     client->interestCounter = 100;
     client->prefix = ccnxName_CreateFromCString(ccnxVPN_DefaultPrefix);
-    client->receiveTimeoutInUs = ccnxVPN_DefaultReceiveTimeoutInUs;
+    //TODO: check this
+    client->receiveTimeoutInUs = 1000000*60; //ccnxVPN_DefaultReceiveTimeoutInUs;
     client->count = 10;
     client->intervalInMs = 1000;
     client->nonce = rand();
@@ -323,7 +324,7 @@ _ccnxVPN_ParseCommandline(CCNxVPNConsumer *client, int argc, char *argv[argc])
                 //sscanf(optarg, "%u", &(client->intervalInMs));
                 //TODO: check this
                 client->intervalInMs = 1000000/atoi(argv[8]);
-                printf("%d us period between two interests.",client->intervalInMs);
+                printf("%d us period between two interests.\n",client->intervalInMs);
                 
                 client->mode = CCNxVPNConsumerMode_VPNPong;
                 break;

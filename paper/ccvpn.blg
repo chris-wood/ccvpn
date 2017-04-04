@@ -18,45 +18,45 @@ Warning--empty journal in shangndn
 Warning--empty year in shangndn
 
 Done.
-You've used 16 entries,
+You've used 18 entries,
             4039 wiz_defined-function locations,
-            893 strings with 9692 characters,
-and the built_in function-call counts, 8531 in all, are:
-= -- 633
-> -- 212
+            906 strings with 9913 characters,
+and the built_in function-call counts, 9233 in all, are:
+= -- 690
+> -- 220
 < -- 28
-+ -- 105
-- -- 44
-* -- 405
-:= -- 1365
-add.period$ -- 35
-call.type$ -- 16
-change.case$ -- 17
++ -- 109
+- -- 46
+* -- 425
+:= -- 1495
+add.period$ -- 39
+call.type$ -- 18
+change.case$ -- 19
 chr.to.int$ -- 66
-cite$ -- 19
-duplicate$ -- 695
-empty$ -- 813
-format.name$ -- 59
-if$ -- 1913
+cite$ -- 21
+duplicate$ -- 757
+empty$ -- 887
+format.name$ -- 61
+if$ -- 2066
 int.to.chr$ -- 0
-int.to.str$ -- 16
-missing$ -- 138
-newline$ -- 73
-num.names$ -- 15
-pop$ -- 369
+int.to.str$ -- 18
+missing$ -- 152
+newline$ -- 79
+num.names$ -- 17
+pop$ -- 407
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 2
-skip$ -- 644
+skip$ -- 704
 stack$ -- 0
-substring$ -- 172
-swap$ -- 445
+substring$ -- 174
+swap$ -- 479
 text.length$ -- 6
 text.prefix$ -- 0
 top$ -- 5
-type$ -- 16
+type$ -- 18
 warning$ -- 3
-while$ -- 27
-width$ -- 18
-write$ -- 156
+while$ -- 29
+width$ -- 20
+write$ -- 172
 (There were 5 warnings)

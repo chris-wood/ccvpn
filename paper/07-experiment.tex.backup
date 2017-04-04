@@ -1,12 +1,10 @@
-\section{Performance Assessment}
+\section{Performance Evaluation}
 
 \subsection{Implementation}
 
-CCVPN is implemented as a networking layer service running on the gateways of private networks (see Fig.\ref{fig:ccvpn}).
-Our implementation uses the CCNx software stack~\cite{CCNxGithub} and the cryptographic library Sodium~\cite{sodiumGithub}. They are both publicly available and written in C.
-The interest encapsulation routine (Alg.\ref{alg:interestEncap}) is implemented using 
+CCVPN is implemented as a networking layer service running on the gateways of private networks. 
 
-\subsection{Experimental Evaluation}
+\subsection{Experiments}
 
 In this section we empirically evaluate the CCVPN design paying special attention to the metrics that were earlier discussed in Sec.~\ref{sec:analysis}, i.e., processing overhead, network throughput, and state consumption. In our evaluation we consider the two versions of CCVPN: public key version, and symmetric key version. We here recall that the symmetric key version relies on the assumption that a secure key agreement protocol is performed between the domain's gateways prior to the CCVPN protocol execution.
 
@@ -50,27 +48,14 @@ $65536$B & 519$\mu s$        & 702$\mu s$        \\ \hline
 
 \begin{figure}[]
 \centering
-  \subfigure[Throughput]{\includegraphics[width=0.49\columnwidth]{images/1_1_thput.pdf}\label{1a}}
+  \subfigure[Throughput]{\includegraphics[width=0.49\textwidth]{images/1_1_thput.pdf}\label{1a}}
   \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.49\columnwidth]{images/1_1_rtt.pdf}\label{1b}}
+  \subfigure[Avg. RTT]{\includegraphics[width=0.49\textwidth]{images/1_1_rtt.pdf}\label{1b}}
 \caption{CCVPN performance with one consumer and one producer for increasing interest issuance rates.}\label{exp1}
 \end{figure}
 
-\begin{figure}[]
-\centering
-  \subfigure[Throughput]{\includegraphics[width=0.49\columnwidth]{images/n_1_thput.pdf}\label{1a}}
-  \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.49\columnwidth]{images/n_1_rtt.pdf}\label{1b}}
-\caption{CCVPN performance with multiple consumers and one producer. Each consumer requests with 1 mbps rate.}\label{exp1}
-\end{figure}
 
-\begin{figure}[]
-\centering
-  \subfigure[Throughput]{\includegraphics[width=0.49\columnwidth]{images/n_n_thput.pdf}\label{1a}}
-  \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.49\columnwidth]{images/n_n_rtt.pdf}\label{1b}}
-\caption{CCVPN performance with multiple consumers and multiple producers. Each consumer requests with 1 mbps rate.}\label{exp1}
-\end{figure}
+
 
 
 
