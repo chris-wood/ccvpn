@@ -8,10 +8,10 @@ rm *.csv
 SERVERS=1
 
 ### N x N ###
-for i in `seq 0 5`;
+for i in `seq 0 9`;
 do
-    CLIENTS=$((20 + 20 * i))
-    SERVERS=$((20 + 20 * i))
+    CLIENTS=$((10 + 10 * i))
+    SERVERS=$((10 + 10 * i))
     sh experiments_clean.sh
     sleep 2s
     sh setup_network.sh $SERVERS sk &
@@ -22,10 +22,10 @@ do
 done
 
 ### N x N ###
-for i in `seq 0 5`;
+for i in `seq 0 9`;
 do
-    CLIENTS=$((20 + 20 * i))
-    SERVERS=$((20 + 20 * i))
+    CLIENTS=$((10 + 10 * i))
+    SERVERS=$((10 + 10 * i))
 
     sh experiments_clean.sh
     sleep 2s

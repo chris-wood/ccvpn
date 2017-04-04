@@ -58,15 +58,15 @@ means = c(rbind(RTT_SYMM,RTT_PKE))
 data <- data.frame(rbind(RTT_SYMM,RTT_PKE))
 
 ips = c()
-increase = 10
+increase = 300
 for (x in 1:length(files)){
     ips = c(ips,increase*x)
 }
 
 
-pdf("n_1_rtt.pdf")
+pdf("1_1_rtt.pdf")
 barCenters <- barplot(as.matrix(data), ylab="Avg. RTT [s]",
-    xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
+    xlab="Interests per second",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.2),
     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
 
@@ -80,9 +80,9 @@ arrows(barCenters, means - errs, barCenters,
 dev.off()
 
 
-png("n_1_rtt.png")
+png("1_1_rtt.png")
 barCenters <- barplot(as.matrix(data), ylab="Avg. RTT [s]",
-    xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
+    xlab="Interests per second",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.2),
     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
 
@@ -104,15 +104,15 @@ means = c(rbind(SYMM,PKE))
 data <- data.frame(rbind(SYMM,PKE))
 
 ips = c()
-increase = 10
+increase = 300
 for (x in 1:length(files)){
     ips = c(ips,increase*x)
 }
 
 
-pdf("n_1_thput.pdf")
-barCenters <- barplot(as.matrix(data), ylab="Throughput per client [mbps]",
-    xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
+pdf("1_1_thput.pdf")
+barCenters <- barplot(as.matrix(data), ylab="Throughput [mbps]",
+    xlab="Interests per second",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.1),
     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
 
@@ -126,9 +126,9 @@ arrows(barCenters, means - errs, barCenters,
 dev.off()
 
 
-png("n_1_thput.png")
-barCenters <- barplot(as.matrix(data), ylab="Throughput per client [mbps]",
-    xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
+png("1_1_thput.png")
+barCenters <- barplot(as.matrix(data), ylab="Throughput [mbps]",
+    xlab="Interests per second",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.1),
     cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
 

@@ -64,7 +64,7 @@ for (x in 1:length(files)){
 }
 
 
-pdf("n_1_rtt.pdf")
+pdf("n_n_rtt.pdf")
 barCenters <- barplot(as.matrix(data), ylab="Avg. RTT [s]",
     xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.2),
@@ -80,7 +80,7 @@ arrows(barCenters, means - errs, barCenters,
 dev.off()
 
 
-png("n_1_rtt.png")
+png("n_n_rtt.png")
 barCenters <- barplot(as.matrix(data), ylab="Avg. RTT [s]",
     xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.2),
@@ -110,7 +110,7 @@ for (x in 1:length(files)){
 }
 
 
-pdf("n_1_thput.pdf")
+pdf("n_n_thput.pdf")
 barCenters <- barplot(as.matrix(data), ylab="Throughput per client [mbps]",
     xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.1),
@@ -126,7 +126,7 @@ arrows(barCenters, means - errs, barCenters,
 dev.off()
 
 
-png("n_1_thput.png")
+png("n_n_thput.png")
 barCenters <- barplot(as.matrix(data), ylab="Throughput per client [mbps]",
     xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.1),
