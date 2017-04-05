@@ -1,9 +1,14 @@
 \section{Implementation and Performance Assessment}
 
 
-CCVPN is implemented as a networking layer service running on the gateways of private networks (see Fig.\ref{fig:ccvpn}).
-Our implementation uses the CCNx software stack~\cite{CCNxGithub} and the cryptographic library Sodium~\cite{sodiumGithub}. These are both publicly available and are written in C.
-The interest encapsulation routine (Alg.\ref{alg:interestEncap}) is implemented using 
+CCVPN is implemented as a network layer service running on the gateways of private networks that compose the VPN (see Fig.\ref{fig:ccvpn}).
+Our implementation uses the CCNx software stack~\cite{CCNxGithub} and the cryptographic library Sodium~\cite{sodiumGithub}. These are both publicly available and written in C.
+For the PKE version of CCVPN, interest encapsulation and decapsulation routines (Alg.~\ref{alg:interestEncap}, and . Alg.~\ref{alg:interestDecap}) are implemented using \todo{check alg} as public key
+encryption (and decryption) algorithm. \todo{check alg} is used to encrypt-then-MAC the content reponses (Alg.~\ref{alg:contentEnc}, and Alg.~\ref{alg:contentDec}). Recall that the symmetric keys used by
+\todo{check alg} are generated and sent together with the encapsulated interest in Alg.~\ref{alg:interestEncap}.
+In the symmetric key version of the design, \todo{check alg} was used to encrypt-then-MAC both, interests and contents.
+
+
 
 In this section we empirically evaluate the CCVPN design paying special attention to the metrics that were earlier discussed in Sec.~\ref{sec:analysis}, i.e., processing overhead, network throughput, and state consumption. In our evaluation we consider the two versions of CCVPN: public key version, and symmetric key version. We here recall that the symmetric key version relies on the assumption that a secure key agreement protocol is performed between the domain's gateways prior to the CCVPN protocol execution.
 
