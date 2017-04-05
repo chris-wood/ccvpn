@@ -8,9 +8,9 @@ rm *.csv
 SERVERS=1
 
 ### N x N ###
-for i in `seq 0 4`;
+for i in `seq 0 9`;
 do
-    CLIENTS=$((20 + 20 * i))
+    CLIENTS=$((10 + 10 * i))
 
     sh experiments_clean.sh
     sleep 2s
@@ -22,9 +22,9 @@ do
 done
 
 ### N x N ###
-for i in `seq 0 4`;
+for i in `seq 0 9`;
 do
-    CLIENTS=$((20 + 20 * i))
+    CLIENTS=$((10 + 10 * i))
 
     sh experiments_clean.sh
     sleep 2s

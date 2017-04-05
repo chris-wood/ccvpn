@@ -1,12 +1,9 @@
-\section{Performance Assessment}
+\section{Implementation and Performance Assessment}
 
-\subsection{Implementation}
 
 CCVPN is implemented as a networking layer service running on the gateways of private networks (see Fig.\ref{fig:ccvpn}).
-Our implementation uses the CCNx software stack~\cite{CCNxGithub} and the cryptographic library Sodium~\cite{sodiumGithub}. They are both publicly available and written in C.
+Our implementation uses the CCNx software stack~\cite{CCNxGithub} and the cryptographic library Sodium~\cite{sodiumGithub}. These are both publicly available and are written in C.
 The interest encapsulation routine (Alg.\ref{alg:interestEncap}) is implemented using 
-
-\subsection{Experimental Evaluation}
 
 In this section we empirically evaluate the CCVPN design paying special attention to the metrics that were earlier discussed in Sec.~\ref{sec:analysis}, i.e., processing overhead, network throughput, and state consumption. In our evaluation we consider the two versions of CCVPN: public key version, and symmetric key version. We here recall that the symmetric key version relies on the assumption that a secure key agreement protocol is performed between the domain's gateways prior to the CCVPN protocol execution.
 
@@ -15,8 +12,6 @@ Our testbed network consists of a butterfly topology, in which the consumers' si
 To investigate the processing overhead we measure the average time demand for computing the interests' encapsulation (in public and symmetric key versions), interest decapsulation, content encryption, and content decryption for different content packet sizes (1024, 4096, 16384, and 65536 bytes). We also measure the state consumption for these same four functions.
 
 To compute the overall network throughput we measure the average data-rate for transmissions of 1 to 1,000,000 different interests issues per consumer. We also vary the number of consumers and producers from 1 to 10 of each. Finally, in addition to the network throughput, we also exhibit the total transmission delay for each of the experiments.
-
-\subsection{Results}
 
 \todo{TODO: Add results discussion}
 

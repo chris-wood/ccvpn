@@ -68,7 +68,7 @@ pdf("n_n_rtt.pdf")
 barCenters <- barplot(as.matrix(data), ylab="Avg. RTT [s]",
     xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.2),
-    cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
+    cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=1)
 
 grid(nx=NA, ny=NULL, lwd=1, lty=2)
 
@@ -84,7 +84,7 @@ png("n_n_rtt.png")
 barCenters <- barplot(as.matrix(data), ylab="Avg. RTT [s]",
     xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.2),
-    cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
+    cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=1)
 
 grid(nx=NA, ny=NULL, lwd=1, lty=2)
 
@@ -114,7 +114,7 @@ pdf("n_n_thput.pdf")
 barCenters <- barplot(as.matrix(data), ylab="Throughput per client [mbps]",
     xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.1),
-    cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
+    cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=1)
 
 grid(nx=NA, ny=NULL, lwd=1, lty=2)
 
@@ -130,7 +130,7 @@ png("n_n_thput.png")
 barCenters <- barplot(as.matrix(data), ylab="Throughput per client [mbps]",
     xlab="Simultaneous clients",main="Content packet size = 10KBytes", col=c("lightblue","red"),
  	legend = c("SYMM","PKE"), beside=TRUE, names.arg=ips,ylim=c(0,(max(means)+ max(errs))*1.1),
-    cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=0.75)
+    cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5,, cex.names=1)
 
 grid(nx=NA, ny=NULL, lwd=1, lty=2)
 
