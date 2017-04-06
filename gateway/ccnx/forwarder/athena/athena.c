@@ -394,7 +394,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
     time_stamp_before = current_time();
     // Type of time measurement variable
     uint8_t type = 0;
-
+    uint8_t isItPublicKey = 0;
     uint8_t hoplimit;
     //
     // *   (0) Hoplimit check, exclusively on interest messages
@@ -459,6 +459,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
         parcBuffer_SetPosition(secretKey, 1);
 
         if (keyFlag == '1') {
+            isItPublicKey = 1;
             int ciphertextSize = parcBuffer_Remaining(interestPayload);
             decrypted = parcBuffer_Allocate(ciphertextSize);
 
@@ -580,6 +581,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
                 parcBuffer_Flip(keyAndNonce);
 
                 bool isPublicKey = parcBuffer_GetAtIndex(keyBuffer, 0) == '1';
+                isItPublicKey = isPublicKey;
                 parcBuffer_SetPosition(keyBuffer, 1);
 
                 if (isPublicKey) {
@@ -670,13 +672,30 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
 
     // Compute total time
     time_stamp_after = current_time();
+/*
+    FILE* fp;
     switch (type) {
         case 1 :
+            if(isItPublicKey) {
+                fp = fopen("int_encap_pk.csv","a");
+            } else {
+                fp = fopen("int_encap_sk.csv","a");
+            }
+            fprintf(fp,"%d\n", time_stamp_after - time_stamp_before);
+            fclose(fp);
             athena->time.avg_vpn_enc_interest_time = updateAvg( athena->time.avg_vpn_enc_interest_time, athena->time.n_vpn_enc_interest_time, time_stamp_after - time_stamp_before );
             athena->time.n_vpn_enc_interest_time++;
             //printf("Avg. VPN Encap. interest computation time: %d\n\n", (int)athena->time.avg_vpn_enc_interest_time);    
             break;
         case 2 :
+            if(isItPublicKey) {
+                fp = fopen("int_decap_pk.csv","a");
+            } else {
+                fp = fopen("int_decap_sk.csv","a");
+            }
+            fprintf(fp,"%d\n", time_stamp_after - time_stamp_before);
+            fclose(fp);
+
             athena->time.avg_vpn_dec_interest_time = updateAvg(athena->time.avg_vpn_dec_interest_time, athena->time.n_vpn_dec_interest_time, time_stamp_after - time_stamp_before);
             athena->time.n_vpn_dec_interest_time++;
             //printf("Avg. VPN Decap. interest computation time: %d\n\n", (int)athena->time.avg_vpn_dec_interest_time);    
@@ -686,7 +705,7 @@ _processInterest(Athena *athena, CCNxInterest *interest, PARCBitVector *ingressV
             athena->time.n_interest_time++;
             //printf("Avg. Regular interest  computation time: %d\n\n", (int)athena->time.avg_interest_time);   
     }
-
+*/
     return newInterest;
 }
 static CCNxMetaMessage *
@@ -845,13 +864,24 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
 
     // Compute total time
     time_stamp_after = current_time();
+/*
+    FILE* fp;
+
     switch (type) {
         case 1 :
+            fp = fopen("cont_encap_sk.csv","a");
+            fprintf(fp,"%d\n", time_stamp_after - time_stamp_before);
+            fclose(fp);
+
             athena->time.avg_vpn_enc_content_time = updateAvg(athena->time.avg_vpn_enc_content_time, athena->time.n_vpn_enc_content_time, time_stamp_after - time_stamp_before);
             athena->time.n_vpn_enc_content_time++;
             //printf("Avg. VPN Encrypt. content computation time: %d\n\n", (int)athena->time.avg_vpn_enc_content_time);
             break;
         case 2 :
+            fp = fopen("cont_decap_sk.csv","a");
+            fprintf(fp,"%d\n", time_stamp_after - time_stamp_before);
+            fclose(fp);
+
             athena->time.avg_vpn_dec_content_time = updateAvg(athena->time.avg_vpn_dec_content_time, athena->time.n_vpn_dec_content_time, time_stamp_after - time_stamp_before);
             athena->time.n_vpn_dec_content_time++;
             //printf("Avg. VPN Decryp. content computation time: %d\n\n", (int)athena->time.avg_vpn_dec_content_time);    
@@ -861,7 +891,7 @@ _processContentObject(Athena *athena, CCNxContentObject *contentObject, PARCBitV
             athena->time.n_content_time++;
             //printf("Avg. Regular content computation time: %d\n\n", (int)athena->time.avg_content_time);    
     }
-
+*/
     return returnContent;
 }
 
@@ -969,6 +999,7 @@ athena_ForwarderEngine(void *arg) {
 
     if (athena) {
         while (athena->athenaState == Athena_Running) {
+
             CCNxMetaMessage *ccnxMessage;
             PARCBitVector *ingressVector;
             int receiveTimeout = -1; // block until message received
@@ -1019,9 +1050,9 @@ athena_ForwarderEngine(void *arg) {
 
             }
         }
-        FILE* fp = fopen("./times.csv","a");
-        printTimeCSV(athena,NULL);
-        fclose(fp);
+//        FILE* fp = fopen("./times.csv","a");
+//        printTimeCSV(athena,fp);
+//        fclose(fp);
         usleep(1000); // workaround for coordinating with test infrastructure
         athena_Release(&athena);
     }
