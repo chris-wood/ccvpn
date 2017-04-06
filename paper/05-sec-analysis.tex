@@ -21,13 +21,21 @@ In our model the adversary is allowed to perform the following actions (when out
 
 Suppose, for instance, that a content provider offers its contents to any host in the Internet but it also  wants such hosts to be able to anonymously request and receive such content. In this case, since any host in the Internet should be able to requests the contents, there is no need for the consumer-side $G_c$ to authenticate it self to $G_p$.
 
-Another use case for CCVPN is the traditional VPN use case, in which two physically separated local networks (for instances to offices of the same company in different countries) should virtually behave as a private local network. In that case, it is necessary to prevent that a given $G_c$, which is not part of that corporation's network to connect to $G_p$ and become part of the VPN. To that purpose, standard host-to-host CCN authentication mechanisms such as \cite{} can be used to authenticate $G_p$ and $G_c$ to each other. This must be performed before any VPN communication to make sure that only the appropriate parties are communicating under the CCVPN architecture. We discuss the evaluation and specification of gateway-to-gateway authetication protocols as future work (see Sec.~\ref{conclusion}).
+Another use case for CCVPN is the traditional VPN use case, in which two physically separated local networks (for instances to offices of the same company in different countries) should virtually behave as a private local network. In that case, it is necessary to prevent that a given $G_c$, which is not part of that corporation's network to connect to $G_p$ and become part of the VPN. To that purpose, standard host-to-host CCN authentication mechanisms such as \cite{} can be used to authenticate $G_p$ and $G_c$ to each other. This must be performed before any VPN communication to make sure that only the appropriate parties are communicating under the CCVPN architecture. We leave the evaluation and specification of gateway-to-gateway authentication protocols as future work (see Sec.~\ref{sec:conclusion}).
 
 \textbf{Denial of Service:} Since CCVPN gateways are connected to the public network they are clearly susceptible to DoS attacks. In the CCVPN architecture, both $G_c$ and $G_p$ are susceptible to DoS attacks. A DoS attack on $G_p$ would consist in flooding it with several fake encapsulated interests. Conversely, a DoS attack on $G_c$ would basically consist of flooding it with an enormous amount of encrypted content packets. In the case of $G_p$, such attacks are specially harmful since the interest decapsulation involves a public-key decryption operation.
 
 \subsection{Security Analysis}
 
-\todo{TODO: Introductory text about the sec analysis}
+In this section we analyze the security of CCVPN. Our main security goal is
+preventing an adversary from learning any information about the contents of
+packets traversing a CCVPN tunnel. Formally, this translates into semantic
+security of all traffic, modulo what can be inferred via traffic analysis.
+A consequence of this property is that an off-path adversary, i.e., one that is
+not in the consumer or producer domain, is unable to forge packets with
+non-negligible probability. Our analysis relies on arguments in the standard
+security model. It consists of assessing the security of the interest and
+content encapsulation algorithms.
 
 \begin{definition}\label{def1}
 \textit{
@@ -41,9 +49,7 @@ Let $Encapsulate_{pk}(I_p)$ denote the interest encapsulation routine described 
 }
 \end{theorem}
 
-\textit{\textbf{Proof--} Suppose that Claim~\ref{theo1} is false. Then there exists a polynomial adversary $Adv$ capable of guessing the bit $b$ of Definition~\ref{def1} with non-negligible advantage, when given $I_e^b = Encapsulate(I_p^b)$ with $b \leftarrow \{0,1\}$ chosen at random. We show that if such adversary exists he can be used to construct a polinomial adversary $AdvCPA$ which breaks the CPA-security of $Enc_{pk}$. $AdvCPA$ plays the CPA-security game with a challenger sending him two messages $m^0$ and $m^1$. Following the CPA-security game, the challenger randomly chooses a value for the bit $b' \leftarrow \{0,1\}$ and gives back $C = Enc_{pk}(m^{b'})$ to $AdvCPA$. To break the CPA-security $AdvCPA$ must be able to guess the value of the bit $b'$ with non-negligible advantage. To that purpose $AdvCPA$ can query the challenger for the encryptions of $m^0$ and $m^1$ ($c^0 = Enc_{pk}(m^0)$ and $c^1 = Enc_{pk}(m^1)$) and then construct two interests $I_e^0 = createNewInterest(Gp_{name}, c^0)$ and $I_e^1 = createNewInterest(Gp_{name}, c^1)$, using the same $createNewInterest$ function used by algorithm~\ref{alg:interestEncap}, which is public (notice that $Gp_{name}$ is also public). Finally, $AdvCPA$ gives $I_e^0$ and $I_e^1$ as input to $Adv$ and outputs whatever $Adv$ outputs. Since under our assumption $Adv$ guesses the bit $b$ with non-negligible advantage, then $AdvCPA$ breaks the CPA-security of $Enc_{pk}$. But this violates the hypothesis of Claim~\ref{theo1} and, therefore, such $Adv$ cannot exist.
-}
-
+\textbf{Proof--} Suppose that Claim~\ref{theo1} is false. Then there exists a polynomial adversary $Adv$ capable of guessing the bit $b$ of Definition~\ref{def1} with non-negligible advantage, when given $I_e^b = Encapsulate(I_p^b)$ with $b \leftarrow \{0,1\}$ chosen at random. We show that if such adversary exists he can be used to construct a polinomial adversary $AdvCPA$ which breaks the CPA-security of $Enc_{pk}$. $AdvCPA$ plays the CPA-security game with a challenger sending him two messages $m^0$ and $m^1$. Following the CPA-security game, the challenger randomly chooses a value for the bit $b' \leftarrow \{0,1\}$ and gives back $C = Enc_{pk}(m^{b'})$ to $AdvCPA$. To break the CPA-security $AdvCPA$ must be able to guess the value of the bit $b'$ with non-negligible advantage. To that purpose $AdvCPA$ can query the challenger for the encryptions of $m^0$ and $m^1$ ($c^0 = Enc_{pk}(m^0)$ and $c^1 = Enc_{pk}(m^1)$) and then construct two interests $I_e^0 = createNewInterest(Gp_{name}, c^0)$ and $I_e^1 = createNewInterest(Gp_{name}, c^1)$, using the same $createNewInterest$ function used by algorithm~\ref{alg:interestEncap}, which is public (notice that $Gp_{name}$ is also public). Finally, $AdvCPA$ gives $I_e^0$ and $I_e^1$ as input to $Adv$ and outputs whatever $Adv$ outputs. Since under our assumption $Adv$ guesses the bit $b$ with non-negligible advantage, then $AdvCPA$ breaks the CPA-security of $Enc_{pk}$. But this violates the hypothesis of Claim~\ref{theo1} and, therefore, such $Adv$ cannot exist.
 
 \begin{definition}
 \textit{
@@ -61,5 +67,5 @@ Let $ContentEnc_{k_r}(C_p)$ denote the content encapsulation routine described i
 }
 \end{theorem}
 
-\textbf{\textit{Proof--}}
-\todo{TODO}
+\textit{Proof--}This follows directly from the definition of CCA security and the
+argument in the above proof.

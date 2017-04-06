@@ -60,7 +60,7 @@ Content Centric Networking (CCN) is a future Internet architecture which is envi
 \end{abstract}
 
 \begin{IEEEkeywords}
-CCVPN
+Content-Centric Networking, VPN, Tunneling
 \end{IEEEkeywords}
 
 \IEEEpeerreviewmaketitle
@@ -73,8 +73,23 @@ CCVPN
 \input{06-perf-analysis}
 \input{07-experiment}
 
-\section{Conclusion}\label{conclusion}
-\todo{TODO}
+\section{Conclusion}\label{sec:conclusion}
+We presented the design, implementation, and assessment of CCVPN, a scheme and
+protocol for building secure and private tunnels in CCN. CCPN allows two namespaces
+to be bridged by a tunnel across a public network. Unlike point-to-point tunnels,
+such as those enabled by secure session protocols, CCVPN allows many consumers
+to share the tunnel to access the private namespace. CCVPN is designed with efficiency
+in mind: public-key cryptographic operations are kept to a minimum during normal
+operation; symmetric-key packet encapsulation algorithms are used to marshall
+packets between gateways. Our experimental evidence indicate that CCVPN offers
+modest performance in the presence of a variable number of consumers and producers.
+The results suggest that CCVPN could be deployed for private namespace tunneling
+in real world CCN deployments.
+
+For future work, we plan to implement the CCNxKE protocol from \ref{ccnxke} as a
+way to bootstrap symmetric-key tunnels in CCVPN. We will also integrate CCVPN into
+real world testbeds to assess its performance for real-world applications. These
+include video streaming and large-scale content dissemination applications.
 
 \ifCLASSOPTIONcaptionsoff
   \newpage

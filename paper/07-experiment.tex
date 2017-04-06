@@ -1,4 +1,4 @@
-\section{Implementation and Performance Assessment}
+\section{Implementation and Performance Assessment}\label{sec:exp}
 
 \begin{figure}[]
 \centering
@@ -25,7 +25,7 @@ Table~\ref{should_be_figure} (\todo{Should be a single figure w/ six boxplots}) 
 \begin{tabular}{|l|l|l|l|l|}
 \hline
 Encapsulation mode   & Encapsulation & Decapsulation \\ \hline
-Public Key  & 444$\mu s$           & 449$\mu s$           \\ \hline \cline{4-5} 
+Public Key  & 444$\mu s$           & 449$\mu s$           \\ \hline \cline{4-5}
 Symmetric Key & TODO          & TODO          \\ \hline
 \end{tabular}
 \end{table}
@@ -65,27 +65,24 @@ To compute the overall network throughput we measure the average data-rate for t
 
 \begin{figure}[]
 \centering
-  \subfigure[Throughput]{\includegraphics[width=0.49\columnwidth]{images/1_1_thput.pdf}\label{1a}}
+  \subfigure[Throughput]{\includegraphics[width=0.8\columnwidth]{images/1_1_thput.pdf}\label{1a}}
   \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.49\columnwidth]{images/1_1_rtt.pdf}\label{1b}}
+  \subfigure[Avg. RTT]{\includegraphics[width=0.8\columnwidth]{images/1_1_rtt.pdf}\label{1b}}
 \caption{CCVPN performance with one consumer and one producer for increasing interest issuance rates.}\label{exp1}
 \end{figure}
 
 \begin{figure}[]
 \centering
-  \subfigure[Throughput]{\includegraphics[width=0.49\columnwidth]{images/n_1_thput.pdf}\label{1a}}
+  \subfigure[Throughput]{\includegraphics[width=0.8\columnwidth]{images/n_1_thput.pdf}\label{1a}}
   \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.49\columnwidth]{images/n_1_rtt.pdf}\label{1b}}
+  \subfigure[Avg. RTT]{\includegraphics[width=0.8\columnwidth]{images/n_1_rtt.pdf}\label{1b}}
 \caption{CCVPN performance with multiple consumers and one producer. Each consumer requests with 1 mbps rate.}\label{exp1}
 \end{figure}
 
 \begin{figure}[]
 \centering
-  \subfigure[Throughput]{\includegraphics[width=0.49\columnwidth]{images/n_n_thput.pdf}\label{1a}}
+  \subfigure[Throughput]{\includegraphics[width=0.8\columnwidth]{images/n_n_thput.pdf}\label{1a}}
   \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.49\columnwidth]{images/n_n_rtt.pdf}\label{1b}}
+  \subfigure[Avg. RTT]{\includegraphics[width=0.8\columnwidth]{images/n_n_rtt.pdf}\label{1b}}
 \caption{CCVPN performance with multiple consumers and multiple producers. Each consumer requests with 1 mbps rate.}\label{exp1}
 \end{figure}
-
-
-

@@ -17,6 +17,7 @@ In order to achieve such anonymous communication, $G_c$ is introduced in the \te
 
 Upon the arrival of a new interest $I_p$, $G_c$ checks its Forwarding Information Base (FIB) to check if the interest prefix is in the list of prefixes for VPN communication. We assume that the FIB must be pre-configured with the list of prefixes which will trigger the VPN communication. Associated with such prefixes are $G_p$'s name and public key ($pk_e$). Therefore, if the prefix of $I_p$ is in the VPN prefixes list, $G_P$ runs Algorithm~\ref{alg:interestEncap} to generate a new interest $I_e$ which encapsulates the original interest $I_p$. Firstly, Algorithm~\ref{alg:interestEncap} generates a random symmetric key ($k_r$) which will be used later on to perform the \textit{Content} Encryption/Decryption. Next, it retrieves $G_p$'s name and public key from the FIB. It uses the public key to encrypt the symmetric key $k_r$ and the original interest $I_p$. Then it creates the new interest $I_e$ with $G_p$'s name as the interest name and the generated ciphertext as payload. Since $I_e$ has  the $G_p$'s name it will be routed towards $G_p$ and since the payload is singed with $G_p$'s public key, only $G_p$ can retrieve the original interest $I_p$ and the symmetric key $k_r$.
 
+% \begin{framed}
 \begin{algorithm}[]\label{alg:interestEncap}
 \SetKwInOut{Input}{input}
 \SetKwInOut{Output}{output}
@@ -33,6 +34,7 @@ storeToPIT($I_e$,$k_r$)\\
 \Return $I_e$;\\
 \caption{Interest encapsulation (runs on $G_c$)}
 \end{algorithm}
+% \end{framed}
 
 After the message is routed towards $G_p$, $G_p$ verifies if the incoming interest name prefix matches its own name and, if it does, $G_p$ runs Algorithm~\ref{alg:interestDecap}, using its own secret key ($sk_e$) to decrypt $I_e$'s payload, which results in the original interest $I_p$ and the symmetric key $k_r$. $G_p$ then stores $I_e$'s name and the symmetric key $k_r$ in its own PIT, within the entry for the pending interest $I_p$, and forwards $I_p$. $I_e$'s name and $k_r$ are stored so that they can be used later on to generate the encrypted content $C_e$.
 
@@ -88,4 +90,3 @@ $C_p$ = Dec($k_r$,$cipherText$)\\
 \end{algorithm}
 
 For clarity, we have defined a \textit{Consumer} and a \textit{Producer} domain. However, in reality, a single gateway can implement the functions of both $G_c$ and $G_p$. Therefore, consumers and producers can exist in both the domains and interests for contents can be issued from both sides. Also, it is worth to mention that, within the created CCVPNs, content caching would work just as it works in regular CCNs,  i.e., routers would be able to cache contents and respond to interests that were previously requested, enabling better resource usage and lower communication delays. Finally, we emphasize that $G_c$ encapsulation and decryption functions can also run inside the Consumer host. Conversely, $G_p$ can be implemented within the \textit{Producer} host. This enables its usage for one-to-one communication that would be completely anonymous to any  other entity in the network.
-
