@@ -618,19 +618,3 @@ publisher={ACM}
   journal={CCR},
   year={2014}
 }
-
-@book{dworkin2007recommendation,
-  title={Recommendation for block cipher modes of operation: Galois/Counter Mode (GCM) and GMAC},
-  author={Dworkin, Morris},
-  year={2007},
-  publisher={US Department of Commerce, National Institute of Standards and Technology}
-}
-
-@inproceedings{bernstein2006curve25519,
-  title={Curve25519: new Diffie-Hellman speed records},
-  author={Bernstein, Daniel J},
-  booktitle={International Workshop on Public Key Cryptography},
-  pages={207--228},
-  year={2006},
-  organization={Springer}
-}

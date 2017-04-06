@@ -1,24 +1,27 @@
 \section{Implementation and Performance Assessment}
 
+\begin{figure}[]
+\centering
+\includegraphics[width=\columnwidth]{images/testnet.eps}
+\caption{Testbed network topology. $M$ consumers and $N$ producers}\label{testnet}
+\end{figure}
 
-CCVPN is implemented as a networking layer service running on the gateways of private networks (see Fig.\ref{fig:ccvpn}).
-Our implementation uses the CCNx software stack~\cite{CCNxGithub} and the cryptographic library Sodium~\cite{sodiumGithub}. They are both publicly available and written in C.
-The interest encapsulation routine (Alg.\ref{alg:interestEncap}) is implemented using 
+CCVPN is implemented as a network layer service running on the gateways of the private networks that compose the VPN (see Fig.\ref{fig:ccvpn}).
+Our implementation uses the CCNx software stack~\cite{CCNxGithub} and the cryptographic library Sodium~\cite{sodiumGithub}. These are both publicly available and written in C.
+For the PKE version of CCVPN, we use Sodium Sealed-Boxes~\cite{bernstein2006curve25519}, implemented over X25519 elliptic curves, as the PKE algorithm for the interest encapsulation and decapsulation routines (Algorithm~\ref{alg:interestEncap}, and Algorithm~\ref{alg:interestDecap} of Sec.~\ref{metho}).
+AES256-GCM~\cite{dworkin2007recommendation} is used to encrypt-then-MAC content responses (Alg.~\ref{alg:contentEnc}, and Alg.~\ref{alg:contentDec} of Sec.~\ref{metho}).
+Recall that the symmetric keys used to encrypt-then-MAC the content packets are generated and sent together with the encapsulated interest in Alg.~\ref{alg:interestEncap}.
+In the symmetric key version of the design, both, interests and contents, are encapsulated using AES256-GCM under the assumption that the gateways already share symmetric key.
 
-In this section we empirically evaluate the CCVPN design paying special attention to the metrics that were earlier discussed in Sec.~\ref{sec:analysis}, i.e., processing overhead, network throughput, and state consumption. In our evaluation we consider the two versions of CCVPN: public key version, and symmetric key version. We here recall that the symmetric key version relies on the assumption that a secure key agreement protocol is performed between the domain's gateways prior to the CCVPN protocol execution.
 
-Our testbed network consists of a butterfly topology, in which the consumers' side and the producers' side gateways are directly interconnected. $N$ producers are connected to the producers' domain gateway and $M$ consumers are connected to the consumers' domain gateway (see Fig.~\ref{create_figure}).
-
-To investigate the processing overhead we measure the average time demand for computing the interests' encapsulation (in public and symmetric key versions), interest decapsulation, content encryption, and content decryption for different content packet sizes (1024, 4096, 16384, and 65536 bytes). We also measure the state consumption for these same four functions.
-
-To compute the overall network throughput we measure the average data-rate for transmissions of 1 to 1,000,000 different interests issues per consumer. We also vary the number of consumers and producers from 1 to 10 of each. Finally, in addition to the network throughput, we also exhibit the total transmission delay for each of the experiments.
-
-\todo{TODO: Add results discussion}
+The experiments presented throughout this section were executed in an Intel Core i7-3770 octacore CPU @3.40GHz, with 16GB of RAM. Content payload sizes were set to 10 kilobytes.
+On every experiment, each of the two gateway processes (i.e., consumer side gateway process, and producer side gateway process) were assigned as a high priority processes and each of them ran in a single core of the processor.
+Table~\ref{should_be_figure} (\todo{Should be a single figure w/ six boxplots}) presents boxplots for the execution times of the four algorithms involved in CCVPN's data transmission, including both, PKE and Symm. Key versions for interest encapsulation and decapsulation.
 
 \begin{table}[!h]
 \centering
 \caption{Interest encapsulation processing times}
-\label{my-label}
+\label{should_be_figure}
 \begin{tabular}{|l|l|l|l|l|}
 \hline
 Encapsulation mode   & Encapsulation & Decapsulation \\ \hline
@@ -26,8 +29,6 @@ Public Key  & 444$\mu s$           & 449$\mu s$           \\ \hline \cline{4-5}
 Symmetric Key & TODO          & TODO          \\ \hline
 \end{tabular}
 \end{table}
-
-
 
 \begin{table}[!h]
 \centering
@@ -42,6 +43,23 @@ $16384$B & 220$\mu s$        & 367$\mu s$        \\ \hline
 $65536$B & 519$\mu s$        & 702$\mu s$        \\ \hline
 \end{tabular}
 \end{table}
+
+With the goal of evaluating the impact of CCVPN on the overall network performance, we measure the network throughput and the request-response round trip time (RTT) under different settings.
+Our testbed network consists of a butterfly topology, in which the consumers' side and the producers' side gateways are directly interconnected. $N$ producers are connected to the producers' domain gateway and $M$ consumers are connected to the consumers' domain gateway (see Fig.~\ref{testnet}).
+Under such butterfly topology we consider three variations for the values of ${M,N}$:
+
+\begin{itemize}
+ \item \textbf{One consumer and one producer ${M,N} = {1,1}$}:
+\end{itemize}
+
+
+
+
+To investigate the processing overhead we measure the average time demand for computing the interests' encapsulation (in public and symmetric key versions), interest decapsulation, content encryption, and content decryption for different content packet sizes (1024, 4096, 16384, and 65536 bytes). We also measure the state consumption for these same four functions.
+
+To compute the overall network throughput we measure the average data-rate for transmissions of 1 to 1,000,000 different interests issues per consumer. We also vary the number of consumers and producers from 1 to 10 of each. Finally, in addition to the network throughput, we also exhibit the total transmission delay for each of the experiments.
+
+\todo{TODO: Add results discussion}
 
 \begin{figure}[]
 \centering
