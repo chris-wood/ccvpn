@@ -8,7 +8,6 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: references.bib
-Warning--I didn't find a database entry for "tor"
 -- IEEEtran.bst version 1.13 (2008/09/30) by Michael Shell.
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
@@ -17,45 +16,45 @@ Warning--empty journal in shangndn
 Warning--empty year in shangndn
 
 Done.
-You've used 20 entries,
+You've used 21 entries,
             4039 wiz_defined-function locations,
-            917 strings with 10265 characters,
-and the built_in function-call counts, 10399 in all, are:
-= -- 778
-> -- 236
+            920 strings with 10387 characters,
+and the built_in function-call counts, 10859 in all, are:
+= -- 817
+> -- 249
 < -- 37
-+ -- 119
-- -- 48
-* -- 470
-:= -- 1670
-add.period$ -- 44
-call.type$ -- 20
-change.case$ -- 20
++ -- 125
+- -- 51
+* -- 489
+:= -- 1753
+add.period$ -- 46
+call.type$ -- 21
+change.case$ -- 21
 chr.to.int$ -- 90
-cite$ -- 23
-duplicate$ -- 842
-empty$ -- 1012
-format.name$ -- 63
-if$ -- 2343
+cite$ -- 24
+duplicate$ -- 881
+empty$ -- 1047
+format.name$ -- 67
+if$ -- 2441
 int.to.chr$ -- 0
-int.to.str$ -- 20
-missing$ -- 165
-newline$ -- 85
-num.names$ -- 19
-pop$ -- 442
+int.to.str$ -- 21
+missing$ -- 176
+newline$ -- 88
+num.names$ -- 20
+pop$ -- 468
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 2
-skip$ -- 800
+skip$ -- 834
 stack$ -- 0
-substring$ -- 231
-swap$ -- 539
+substring$ -- 232
+swap$ -- 566
 text.length$ -- 7
 text.prefix$ -- 0
 top$ -- 5
-type$ -- 20
+type$ -- 21
 warning$ -- 3
-while$ -- 35
-width$ -- 22
-write$ -- 188
-(There were 4 warnings)
+while$ -- 36
+width$ -- 23
+write$ -- 197
+(There were 3 warnings)

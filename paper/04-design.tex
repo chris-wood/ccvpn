@@ -4,7 +4,7 @@ Traditional Virtual Private Networks (VPNs) extend private networks across the I
 
 In CCVPN, there are four main entities involved in the virtual private communication: \textit{Consumer}, \textit{Producer}, \textit{Consumer Side Gateway} ($G_c$), and \textit{Producer Side Gateway} ($G_p$). As in usual CCNs, the \textit{Consumer} is the network node that issues an interest for a given content (e.g., file, web page, video) that it wishes to retrieve. The Producer is the network node which originally created such content. $G_c$ and $G_p$ are the edge gateways responsible for ensuring the private communication among distinct domains. As we discuss later on, $G_c$ and $G_p$ can actually be implemented as a single network device, but we firstly present them as separate entities for the purpose of clarity.
 
-\begin{figure}[!ht]
+\begin{figure}
 \centering
 \includegraphics[width=\columnwidth]{images/architecture.pdf}
 \caption{CCVPN connectivity architecture}
@@ -18,7 +18,7 @@ In order to achieve such anonymous communication, $G_c$ is introduced in the \te
 Upon the arrival of a new interest $I_p$, $G_c$ checks its Forwarding Information Base (FIB) to check if the interest prefix is in the list of prefixes for VPN communication. We assume that the FIB must be pre-configured with the list of prefixes which will trigger the VPN communication. Associated with such prefixes are $G_p$'s name and public key ($pk_e$). Therefore, if the prefix of $I_p$ is in the VPN prefixes list, $G_P$ runs Algorithm~\ref{alg:interestEncap} to generate a new interest $I_e$ which encapsulates the original interest $I_p$. Firstly, Algorithm~\ref{alg:interestEncap} generates a random symmetric key ($k_r$) which will be used later on to perform the \textit{Content} Encryption/Decryption. Next, it retrieves $G_p$'s name and public key from the FIB. It uses the public key to encrypt the symmetric key $k_r$ and the original interest $I_p$. Then it creates the new interest $I_e$ with $G_p$'s name as the interest name and the generated ciphertext as payload. Since $I_e$ has  the $G_p$'s name it will be routed towards $G_p$ and since the payload is singed with $G_p$'s public key, only $G_p$ can retrieve the original interest $I_p$ and the symmetric key $k_r$.
 
 % \begin{framed}
-\begin{algorithm}[]\label{alg:interestEncap}
+\begin{algorithm}\label{alg:interestEncap}
 \SetKwInOut{Input}{input}
 \SetKwInOut{Output}{output}
 \Input{Original interest $I_p$;}
@@ -38,7 +38,7 @@ storeToPIT($I_e$,$k_r$)\\
 
 After the message is routed towards $G_p$, $G_p$ verifies if the incoming interest name prefix matches its own name and, if it does, $G_p$ runs Algorithm~\ref{alg:interestDecap}, using its own secret key ($sk_e$) to decrypt $I_e$'s payload, which results in the original interest $I_p$ and the symmetric key $k_r$. $G_p$ then stores $I_e$'s name and the symmetric key $k_r$ in its own PIT, within the entry for the pending interest $I_p$, and forwards $I_p$. $I_e$'s name and $k_r$ are stored so that they can be used later on to generate the encrypted content $C_e$.
 
-\begin{algorithm}[]\label{alg:interestDecap}
+\begin{algorithm}\label{alg:interestDecap}
 \SetKwInOut{Input}{input}
 \SetKwInOut{Output}{output}
 \Input{ Encapsulated interest $I_e$;}
@@ -55,7 +55,7 @@ storeToPIT($I_p$,$k_r$,$Ie_{name}$)\\
 The original interest $I_p$ is forwarded inside the \textit{Producer} domain until it reaches the \textit{Producer}. The \textit{Producer} responds with the content $C_p$ which is forwarded back to $G_p$.
 Upon receiving $C_p$, $G_p$ fetches for $C_p$'s name (which is equal to $I_p$'s name) on its PIT, retrieving $k_r$ and $Ie$'s name. Then it uses $k_r$ to encrypt-then-MAC the real content response $C_p$ and creates $C_e$ which must have the same name as $I_e$ and the encryption of $C_p$ as payload (Algorithm~\ref{alg:contentEnc}). Since only $G_c$ and $G_p$ share the symmetric key $k_r$, only $G_c$ will be able to decrypt $C_e$'s payload into $C_p$. Therefore nobody from outside the VPN is able to access the content nor the Producer's identity.
 
-\begin{algorithm}[]\label{alg:contentEnc}
+\begin{algorithm}\label{alg:contentEnc}
 \SetKwInOut{Input}{input}
 \SetKwInOut{Output}{output}
 \Input{Original content $C_p$;}
@@ -71,7 +71,7 @@ $C_e$ = createNewContent($Ie_{name}$,$payload$)\\
 
 Since $C_e$ and $I_e$ have the same name, $C_e$ will be forwarded all the way back to $G_c$. When $G_c$  receives $C_e$ $G_c$ will execute Algorithm~\ref{alg:contentDec}. It will match $C_e$'s name to the pending interest $I_e$ in its PIT, retrieving $k_r$. $k_r$ can then be used to verify the integrity of the received content and to decrypt it into the actual content $C_p$. After that, $C_p$ can be forwarded back to the \textit{Consumer}. If the MAC verification fails, it means that $C_e$ has been forged and $G_c$ ignores it.
 
-\begin{algorithm}[]\label{alg:contentDec}
+\begin{algorithm}\label{alg:contentDec}
 \SetKwInOut{Input}{input}
 \SetKwInOut{Output}{output}
 \Input{Encrypted content $C_e$;}

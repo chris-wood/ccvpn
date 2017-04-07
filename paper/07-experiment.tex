@@ -1,18 +1,18 @@
 \section{Implementation and Performance Assessment}\label{sec:exp}
 
-\begin{figure}[]
+\begin{figure}
 \centering
 \includegraphics[width=\columnwidth]{images/testnet.eps}
 \caption{Testbed network topology. $M$ consumers and $N$ producers}\label{testnet}
 \end{figure}
 
-\begin{figure}[]
+\begin{figure}
 \centering
 \includegraphics[width=\columnwidth]{images/times.pdf}
 \caption{Execution time of the algorithms in CCVPN design}\label{times}
 \end{figure}
 
-\begin{figure}[]
+\begin{figure}
 \centering
   \subfigure[Throughput]{\includegraphics[width=0.8\columnwidth]{images/1_1_thput.pdf}\label{1a}}
   \hfil
@@ -20,19 +20,19 @@
 \caption{CCVPN performance with one consumer and one producer for increasing interest issuance rates.}\label{exp1}
 \end{figure}
 
-\begin{figure}[]
+\begin{figure}
 \centering
-  \subfigure[Throughput]{\includegraphics[width=0.8\columnwidth]{images/n_1_thput.pdf}\label{2a}}
+  \subfigure[Throughput]{\includegraphics[width=0.7\columnwidth]{images/n_1_thput.pdf}\label{2a}}
   \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.8\columnwidth]{images/n_1_rtt.pdf}\label{2b}}
+  \subfigure[Avg. RTT]{\includegraphics[width=0.7\columnwidth]{images/n_1_rtt.pdf}\label{2b}}
 \caption{CCVPN performance with multiple consumers and one producer. Each consumer requests with 1 mbps rate.}\label{exp2}
 \end{figure}
 
-\begin{figure}[]
+\begin{figure}
 \centering
-  \subfigure[Throughput]{\includegraphics[width=0.8\columnwidth]{images/n_n_thput.pdf}\label{3a}}
+  \subfigure[Throughput]{\includegraphics[width=0.7\columnwidth]{images/n_n_thput.pdf}\label{3a}}
   \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.8\columnwidth]{images/n_n_rtt.pdf}\label{3b}}
+  \subfigure[Avg. RTT]{\includegraphics[width=0.7\columnwidth]{images/n_n_rtt.pdf}\label{3b}}
 \caption{CCVPN performance with multiple consumers and multiple producers. Each consumer requests with 1 mbps rate.}\label{exp3}
 \end{figure}
 
@@ -75,5 +75,20 @@ In such scenario, we see that the results are slightly better. The network offer
 
 \subsection{Discussion}
 
-\todo{TODO}
+CCVPN  exhibits moderately good results with respect to the network load capacity, considering the overheads implied by the deployment of secure tunnels over the CCN architecture.
+With gateways' processes running each on a single core of a single processor, the VPN was capable of providing reasonable throughput to up to 70 clients.
+This performance results are a lower bound that can be improved in several ways, among which we highlight:
+
+\begin{enumerate}
+ \item \textbf{Implementation optimization:} The CCNx software stack is an ongoing research project, and as such, the implementation focus on functionality rather than performance.
+ We believe that the results presented in this section could be significantly improved by optimizations that do not rely exclusively on CCVPN design, but also in CCNx software.
+ \item \textbf{Distributed and parallel processing:} In a real deployment scenario, we expect that a large scale organization, which wants to implement a VPN service, to have dedicated network devices running
+ the gateway service, possibly in multiple cores. Moreover, it is not hard to imagine multiple VPN gateways sharing the load in a large organization.
+ In such scenarios, we expect the network capacity (in terms throughput or number of simultaneous consumers) to scale linearly with the increase of dedicated computational resources.
+ \item \textbf{Caching:} Content caching is a major advantage of ICNs when compared to the IP model. In our experiments we wanted to evaluate the worst case scenario. Therefore, clients always request different contents
+ and content caching does not happen. In a real world deployment, contents that are popular (inside the VPN) would be potentially cached, significantly increasing the throughput and reducing the RTT.
+ 
+\end{enumerate}
+
+
 

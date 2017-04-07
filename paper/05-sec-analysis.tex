@@ -23,7 +23,7 @@ Suppose, for instance, that a content provider offers its contents to any host i
 
 Another use case for CCVPN is the traditional VPN use case, in which two physically separated local networks (for instances to offices of the same company in different countries) should virtually behave as a private local network. In that case, it is necessary to prevent that a given $G_c$, which is not part of that corporation's network to connect to $G_p$ and become part of the VPN. To that purpose, standard host-to-host CCN authentication mechanisms such as \cite{} can be used to authenticate $G_p$ and $G_c$ to each other. This must be performed before any VPN communication to make sure that only the appropriate parties are communicating under the CCVPN architecture. We leave the evaluation and specification of gateway-to-gateway authentication protocols as future work (see Sec.~\ref{sec:conclusion}).
 
-\textbf{Denial of Service:} Since CCVPN gateways are connected to the public network they are clearly susceptible to DoS attacks. In the CCVPN architecture, both $G_c$ and $G_p$ are susceptible to DoS attacks. A DoS attack on $G_p$ would consist in flooding it with several fake encapsulated interests. Conversely, a DoS attack on $G_c$ would basically consist of flooding it with an enormous amount of encrypted content packets. In the case of $G_p$, such attacks are specially harmful since the interest decapsulation involves a public-key decryption operation.
+\textbf{Denial of Service:} Since CCVPN gateways are connected to the public network they are clearly susceptible to DoS attacks. In the CCVPN architecture, both $G_c$ and $G_p$ are susceptible to DoS attacks. A DoS attack on $G_p$ would consist in flooding it with several fake encapsulated interests. Conversely, a DoS attack on $G_c$ would basically consist of flooding it with an enormous amount of encrypted content packets. In the case of $G_p$, such attacks are specially harmful since the interest decapsulation involves a public-key decryption operation. We plan to consider DoS countermeasures in future work.
 
 \subsection{Security Analysis}
 
@@ -67,5 +67,5 @@ Let $ContentEnc_{k_r}(C_p)$ denote the content encapsulation routine described i
 }
 \end{theorem}
 
-\textit{\textbf{Proof--}} This follows directly from the definition of CCA security and the
-argument in the above proof.
+\textit{\textbf{Proof--}} This follows directly from the definition of CCA-security and from the
+same argument in the previous proof.
