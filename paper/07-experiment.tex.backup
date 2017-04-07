@@ -1,4 +1,4 @@
-\section{Implementation and Performance Assessment}
+\section{Implementation and Performance Assessment}\label{sec:exp}
 
 \begin{figure}[]
 \centering
@@ -6,84 +6,69 @@
 \caption{Testbed network topology. $M$ consumers and $N$ producers}\label{testnet}
 \end{figure}
 
-CCVPN is implemented as a network layer service running on the gateways of the private networks that compose the VPN (see Fig.\ref{fig:ccvpn}).
-Our implementation uses the CCNx software stack~\cite{CCNxGithub} and the cryptographic library Sodium~\cite{sodiumGithub}. These are both publicly available and written in C.
-For the PKE version of CCVPN, we use Sodium Sealed-Boxes~\cite{bernstein2006curve25519}, implemented over X25519 elliptic curves, as the PKE algorithm for the interest encapsulation and decapsulation routines (Algorithm~\ref{alg:interestEncap}, and Algorithm~\ref{alg:interestDecap} of Sec.~\ref{metho}).
-AES256-GCM~\cite{dworkin2007recommendation} is used to encrypt-then-MAC content responses (Alg.~\ref{alg:contentEnc}, and Alg.~\ref{alg:contentDec} of Sec.~\ref{metho}).
-Recall that the symmetric keys used to encrypt-then-MAC the content packets are generated and sent together with the encapsulated interest in Alg.~\ref{alg:interestEncap}.
-In the symmetric key version of the design, both, interests and contents, are encapsulated using AES256-GCM under the assumption that the gateways already share symmetric key.
-
-
-The experiments presented throughout this section were executed in an Intel Core i7-3770 octacore CPU @3.40GHz, with 16GB of RAM. Content payload sizes were set to 10 kilobytes.
-On every experiment, each of the two gateway processes (i.e., consumer side gateway process, and producer side gateway process) were assigned as a high priority processes and each of them ran in a single core of the processor.
-Table~\ref{should_be_figure} (\todo{Should be a single figure w/ six boxplots}) presents boxplots for the execution times of the four algorithms involved in CCVPN's data transmission, including both, PKE and Symm. Key versions for interest encapsulation and decapsulation.
-
-\begin{table}[!h]
+\begin{figure}[]
 \centering
-\caption{Interest encapsulation processing times}
-\label{should_be_figure}
-\begin{tabular}{|l|l|l|l|l|}
-\hline
-Encapsulation mode   & Encapsulation & Decapsulation \\ \hline
-Public Key  & 444$\mu s$           & 449$\mu s$           \\ \hline \cline{4-5} 
-Symmetric Key & TODO          & TODO          \\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[!h]
-\centering
-\caption{Content encryption and decryption times for different payload sizes}
-\label{my-label}
-\begin{tabular}{|l|l|l|}
-\hline
-Packet size        & Encryption & Decryption \\ \hline
-$1024$B & 125$\mu s$        & 193$\mu s$        \\ \hline
-$4096$B & 141$\mu s$        & 220$\mu s$        \\ \hline
-$16384$B & 220$\mu s$        & 367$\mu s$        \\ \hline
-$65536$B & 519$\mu s$        & 702$\mu s$        \\ \hline
-\end{tabular}
-\end{table}
-
-With the goal of evaluating the impact of CCVPN on the overall network performance, we measure the network throughput and the request-response round trip time (RTT) under different settings.
-Our testbed network consists of a butterfly topology, in which the consumers' side and the producers' side gateways are directly interconnected. $N$ producers are connected to the producers' domain gateway and $M$ consumers are connected to the consumers' domain gateway (see Fig.~\ref{testnet}).
-Under such butterfly topology we consider three variations for the values of ${M,N}$:
-
-\begin{itemize}
- \item \textbf{One consumer and one producer ${M,N} = {1,1}$}:
-\end{itemize}
-
-
-
-
-To investigate the processing overhead we measure the average time demand for computing the interests' encapsulation (in public and symmetric key versions), interest decapsulation, content encryption, and content decryption for different content packet sizes (1024, 4096, 16384, and 65536 bytes). We also measure the state consumption for these same four functions.
-
-To compute the overall network throughput we measure the average data-rate for transmissions of 1 to 1,000,000 different interests issues per consumer. We also vary the number of consumers and producers from 1 to 10 of each. Finally, in addition to the network throughput, we also exhibit the total transmission delay for each of the experiments.
-
-\todo{TODO: Add results discussion}
+\includegraphics[width=\columnwidth]{images/times.pdf}
+\caption{Execution time of the algorithms in CCVPN design}\label{times}
+\end{figure}
 
 \begin{figure}[]
 \centering
-  \subfigure[Throughput]{\includegraphics[width=0.49\columnwidth]{images/1_1_thput.pdf}\label{1a}}
+  \subfigure[Throughput]{\includegraphics[width=0.8\columnwidth]{images/1_1_thput.pdf}\label{1a}}
   \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.49\columnwidth]{images/1_1_rtt.pdf}\label{1b}}
+  \subfigure[Avg. RTT]{\includegraphics[width=0.8\columnwidth]{images/1_1_rtt.pdf}\label{1b}}
 \caption{CCVPN performance with one consumer and one producer for increasing interest issuance rates.}\label{exp1}
 \end{figure}
 
 \begin{figure}[]
 \centering
-  \subfigure[Throughput]{\includegraphics[width=0.49\columnwidth]{images/n_1_thput.pdf}\label{1a}}
+  \subfigure[Throughput]{\includegraphics[width=0.8\columnwidth]{images/n_1_thput.pdf}\label{2a}}
   \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.49\columnwidth]{images/n_1_rtt.pdf}\label{1b}}
-\caption{CCVPN performance with multiple consumers and one producer. Each consumer requests with 1 mbps rate.}\label{exp1}
+  \subfigure[Avg. RTT]{\includegraphics[width=0.8\columnwidth]{images/n_1_rtt.pdf}\label{2b}}
+\caption{CCVPN performance with multiple consumers and one producer. Each consumer requests with 1 mbps rate.}\label{exp2}
 \end{figure}
 
 \begin{figure}[]
 \centering
-  \subfigure[Throughput]{\includegraphics[width=0.49\columnwidth]{images/n_n_thput.pdf}\label{1a}}
+  \subfigure[Throughput]{\includegraphics[width=0.8\columnwidth]{images/n_n_thput.pdf}\label{3a}}
   \hfil
-  \subfigure[Avg. RTT]{\includegraphics[width=0.49\columnwidth]{images/n_n_rtt.pdf}\label{1b}}
-\caption{CCVPN performance with multiple consumers and multiple producers. Each consumer requests with 1 mbps rate.}\label{exp1}
+  \subfigure[Avg. RTT]{\includegraphics[width=0.8\columnwidth]{images/n_n_rtt.pdf}\label{3b}}
+\caption{CCVPN performance with multiple consumers and multiple producers. Each consumer requests with 1 mbps rate.}\label{exp3}
 \end{figure}
 
 
+CCVPN is implemented as a network layer service running on the gateways of the private networks that compose the VPN (see Fig.\ref{fig:ccvpn}).
+Our implementation uses the CCNx software stack~\cite{CCNxGithub} and the cryptographic library Sodium~\cite{sodiumGithub}. These are both publicly available and written in C.
+For the PKE version of CCVPN, we use Sodium Sealed-Boxes~\cite{bernstein2006curve25519}, implemented over X25519 elliptic curves, as the PKE algorithm for the interest encapsulation and decapsulation routines (Algorithm~\ref{alg:interestEncap}, and Algorithm~\ref{alg:interestDecap} of Sec.~\ref{metho}).
+AES256-GCM~\cite{dworkin2007recommendation} is used to encrypt-then-MAC content responses (Alg.~\ref{alg:contentEnc}, and Alg.~\ref{alg:contentDec} of Sec.~\ref{metho}).
+Recall that the symmetric keys used to encrypt-then-MAC the content packets are generated and sent together with the encapsulated interest in Alg.~\ref{alg:interestEncap}.
+In the symmetric key version of the design, both, interests and contents, are encapsulated using AES256-GCM under the assumption that the gateways already share a symmetric key.
+
+
+The experiments presented throughout this section were executed in an Intel Core i7-3770 octacore CPU @3.40GHz, with 16GB of RAM, running Linux (Ubuntu 14.04LTS). Content payload sizes were set to 10 kilobytes.
+On every experiment, each of the two gateway processes (i.e., consumer side gateway process, and producer side gateway process) were assigned as a high priority processes and each of them ran in a single core of the processor.
+Fig.~\ref{times} presents box-plots for the execution times of the four algorithms involved in CCVPN's data transmission, including both, PKE and Symmetric Key versions for interest encapsulation and decapsulation.
+
+With the goal of evaluating the impact of CCVPN's cryptographic overhead on the overall network performance, we measure the network throughput and the request-response round trip time (RTT) under different topology settings.
+In our testbed network, the consumers' side and the producers' side gateways are directly interconnected. $N$ producers are connected to the producers' domain gateway and $M$ consumers are connected to the consumers' domain gateway, as illustrated in Fig.~\ref{testnet}.
+In such topology we consider three variations for the values of ${M,N}$:
+
+\begin{itemize}
+ \item \textbf{One consumer and one producer $[1,1]$}: We use this setting, with only one consumer and one producer, to slowly increase the interest issuance rate until we are able to determine the maximum network throughput and the impact on RTT as congestion increases.
+ \item \textbf{Multiple consumers and one producer $[M,1]$}: In this setting we fix the interest issuance rate so that each consumer requests approximately 1 mbps of data, and we gradually increase the number of consumers in the network, until the throughput per consumer starts to decrease, i.e., until congestion starts to occur. In this setting, the interests coming from all consumers are served by a single producer.  
+ \item \textbf{Multiple consumers and multiple producers $[M,N]$}: In this experiment we also gradually increase the number consumers, but we also increase the number of producers by the same amount at each round, i.e., $M=N$. The number of hosts is also increased until congestion is observed.
+\end{itemize}
+
+It is worth to mention that, in all of the considered settings, every interest is a unique request for a unique piece of content. Therefore, the experiments present the throughput and RTT in the worst case scenario of a CCN, i.e., when there is no content caching in the gateway.
+
+Fig.~\ref{exp1} shows the the network performance when $[M,N]=[1,1]$ as the consumer's request rate increases. The network achieves a maximum throughput of ~100 mbps in the PKE version and a
+slightly higher throughput of ~110 mbps in the symmetric key version. Conversely, the average RTT per message starts to increase as the interest issuance rate approaches the maximum network throughput, as a signal of congestion in the routers.
+
+The results for multiple consumers requesting to a single producer are depicted in Fig.~\ref{exp2}. In this setting each consumer receives close to the requested throughput (1 mbps) when less than 50 clients are requesting contents at the same time. 
+
+Fig.~\ref{exp3} ...
+
+\subsection{Discussion}
+
+\todo{TODO: Add results discussion}
 
