@@ -1,36 +1,79 @@
 \section{CCVPN Security}\label{sec:sec-analysis}
 
 
-\subsection{System and Security Model}
+\subsection{System and Security Model} \label{sec:goals}
 
-Our security analysis considers the worst case scenario, in which the consumer issues an interest that has not been cached in any of the routers from the consumer nor producer domains. Therefore, the interest must traverse the whole network until reaching the content producer. Conversely, the content needs to be forwarded all the way back though the same path satisfying the routers' PIT entries. A system that is secure in this worst case is also secure when the content has been previously cached in some router along the way.
+Our security analysis considers the worst case scenario, in which the consumer issues an
+interest that has not been cached in any of the routers from the consumer nor producer domains.
+Therefore, the interest must traverse the entire network until reaching the producer.
+Conversely, the content needs to be forwarded all the way back though the same path
+satisfying the routers' PIT entries. A system that is secure in this worst case is also
+secure when the content has been previously cached in some router along the way.
 
-\textbf{Adversary Goals and Capabilities.} The goal of the adversary is either 1) to retrieve any information associated with the original issued interest $I_p$ and/or the original content $C_p$ or 2) to retrieve the identities of the consumer and/or producer, thus violating the anonymity in the communication. An adversary is also considered successful if it is able to impersonate the content producer by faking a content response. Since the original interest and the original content are visible inside the consumer and producer domains, we here assume that the adversary cannot eavesdrop or compromise hosts inside such domains. It is also worth to emphasize that, by the conceptual design of the VPN, communication is anonymous to hosts from outside the VPN but not to hosts that belong to that VPN. Anyhow, one-to-one anonymous communication is still achievable sing the VPN paradigm if the communication must be anonymous to any other host in the network. This also means that, as components of the producer and consumer domains, we assume that the gateways $G_c$ and $G_p$ cannot be compromised.
+\textbf{Adversary Goals and Capabilities.} The goal of the adversary \adv\ is either 1) to
+retrieve any information associated with the original issued interest $I_p$ and/or the
+original content $C_p$ or 2) to retrieve the identities of the consumer and/or producer,
+thus violating the anonymity in the communication. \adv\ is also considered successful
+if it is able to impersonate the content producer by faking a content response. Since the
+original interest and the original content are visible inside the consumer and producer
+domains, we here assume that \adv\ cannot eavesdrop or compromise hosts inside
+such domains. It is also worth to emphasize that, by the conceptual design of the VPN,
+communication is anonymous to hosts from outside the VPN but not to hosts that belong to
+that VPN. Anyhow, one-to-one anonymous communication is still achievable sing the VPN
+paradigm if the communication must be anonymous to any other host in the network. This
+also means that, as components of the producer and consumer domains, we assume that the
+gateways $G_c$ and $G_p$ cannot be compromised.
 
-In our model the adversary is allowed to perform the following actions (when outside the consumer and producer domains):
+In our model \adv\ is allowed to perform the following actions (when outside the consumer and producer domains):
 
 \begin{itemize}
-	\item \textbf{Eavesdrop and replay traffic:} An adversary can eavesdrop on a link learning among other things the packet contents and traffic patterns.
-	\item \textbf{Deploy compromised routers or compromise existing routers:} An adversary is capable of deploying a compromised router ou compromised an existent router outside the VPN domains. By doing so the adversary becomes capable of maliciously injecting, delaying, altering, and dropping traffic. In addition, when an existing router is compromised, the adversary learns all of the private information contained in that router, such as private keys and cached content.
-	\item \textbf{Deploy compromised caches:} As a consequence of the ability to compromise and deploy compromised routers, an adversary is also able to deploy compromised caches. This includes monitoring the routers' cache contents and replying with corrupted or fake data.
+	\item \textbf{Eavesdrop and replay traffic:} \adv\ can eavesdrop on a link
+    learning among other things the packet contents and traffic patterns.
+	\item \textbf{Deploy compromised routers or compromise existing routers:} \adv\ is capable of
+    deploying a compromised router ou compromised an existent router outside the VPN domains. By doing
+    so \adv\ becomes capable of maliciously injecting, delaying, altering, and dropping traffic.
+    In addition, when an existing router is compromised, \adv\ learns all of the private
+    information contained in that router, such as private keys and cached content.
+	\item \textbf{Deploy compromised caches:} As a consequence of the ability to compromise and
+    deploy compromised routers, \adv\ is also able to deploy compromised caches. This
+    includes monitoring the routers' cache contents and replying with corrupted or fake data.
 \end{itemize}
 
 \subsection{Additional Considerations}
 
-\textbf{Gateway-to-Gateway Authentication:} At this point one might have noticed that, in the CCVPN design, any host that possesses the producer -side gateway ($G_p$) public-key is able to initiate an anonymous communication link with $G_p$. In other words, the design does not include any authentication between the consumer-side gateway $G_c$ and $G_p$. Indeed, authentication is not required in CCVPN because is in not needed in some application scenarios.
+\textbf{Gateway-to-Gateway Authentication:} At this point one might have noticed that,
+in the CCVPN design, any host that possesses the producer -side gateway ($G_p$) public-key
+is able to initiate an anonymous communication link with $G_p$. In other words, the design
+does not include any authentication between the consumer-side gateway $G_c$ and $G_p$.
+Indeed, authentication is not required in CCVPN because is in not needed in some application scenarios.
 
-Suppose, for instance, that a content provider offers its contents to any host in the Internet but it also  wants such hosts to be able to anonymously request and receive such content. In this case, since any host in the Internet should be able to requests the contents, there is no need for the consumer-side $G_c$ to authenticate it self to $G_p$.
+Suppose, for instance, that a content provider offers its contents to any host in the Internet
+but it also  wants such hosts to be able to anonymously request and receive such content. In
+this case, since any host in the Internet should be able to requests the contents, there is no
+need for the consumer-side $G_c$ to authenticate it self to $G_p$.
 
-Another use case for CCVPN is the traditional VPN use case, in which two physically separated local networks (for instance, offices of the same company in different countries) should virtually behave as a private local network. In that case, it is necessary to prevent that a given $G_c$, which is not part of that corporation's network to connect to $G_p$ and become part of the VPN. To that purpose, standard host-to-host CCN authentication mechanisms can be used to authenticate $G_p$ and $G_c$ to each other. This must be performed before any VPN communication, to make sure that only the appropriate parties are communicating under the CCVPN architecture. We leave the evaluation and specification of gateway-to-gateway authentication protocols as future work (see Sec.~\ref{sec:conclusion}).
+Another use case for CCVPN is the traditional VPN use case, in which two physically separated
+local networks (for instance, offices of the same company in different countries) should virtually
+behave as a private local network. In that case, it is necessary to prevent that a given $G_c$,
+which is not part of that corporation's network to connect to $G_p$ and become part of the VPN.
+To that purpose, standard host-to-host CCN authentication mechanisms can be used to authenticate
+$G_p$ and $G_c$ to each other. This must be performed before any VPN communication, to make sure
+that only the appropriate parties are communicating under the CCVPN architecture. We leave the
+evaluation and specification of gateway-to-gateway authentication protocols as future work (see Sec.~\ref{sec:conclusion}).
 
-\textbf{Denial of Service:} Since CCVPN gateways are connected to the public network they are clearly susceptible to DoS attacks. In the CCVPN architecture, both $G_c$ and $G_p$ are susceptible to DoS attacks. A DoS attack on $G_p$ would consist in flooding it with several fake encapsulated interests. Conversely, a DoS attack on $G_c$ would basically consist of flooding it with an enormous amount of encrypted content packets. In the case of $G_p$, such attacks are specially harmful since the interest decapsulation involves a public-key decryption operation. We plan to consider DoS countermeasures in future work.
+\textbf{Denial of Service:} Since CCVPN gateways are connected to the public network they are
+clearly susceptible to DoS attacks. In the CCVPN architecture, both $G_c$ and $G_p$ are
+susceptible to DoS attacks. A DoS attack on $G_p$ would consist in flooding it with several
+fake encapsulated interests. Conversely, a DoS attack on $G_c$ would basically consist
+of flooding it with an enormous amount of encrypted content packets. In the case of $G_p$,
+such attacks are specially harmful since the interest decapsulation involves a public-key
+decryption operation. We plan to consider DoS countermeasures in future work.
 
 \subsection{Security Analysis}
 
 In this section we analyze the security of CCVPN. Our main security goal is
-preventing an adversary from learning any information about the contents of
-packets traversing a CCVPN tunnel. Formally, this translates into semantic
-security of all traffic, modulo what can be inferred via traffic analysis.
+preventing \adv\ from achieving any of the goals outlined in Section \ref{sec:goals}.
+Formally, this translates into semantic security of all traffic, modulo what can be inferred via traffic analysis.
 A consequence of this property is that an off-path adversary, i.e., one that is
 not in the consumer or producer domain, is unable to forge packets with
 non-negligible probability. Our analysis relies on arguments in the standard
@@ -39,27 +82,58 @@ content encapsulation algorithms.
 
 \begin{definition}\label{def1}
 \textit{
-An interest encapsulation algorithm $Encapsulate(I_p)$ is an indistinguishable interest encapsulation iff, given any two interests $I_p^1$ and $I_p^2$, chosen by the adversary, and a randomly selected bit $b$, the adversary has only $1/2 + \epsilon$ probability of guessing the value of the bit $b$ when given $I_e^b = Encapsulate(I_p^b)$. Where $\epsilon$ is a negligible factor with regard to the security parameter $k$.
+An interest encapsulation algorithm $Encapsulate(I_p)$ is an indistinguishable
+interest encapsulation iff, given any two interests $I_p^1$ and $I_p^2$, chosen
+by the adversary, and a randomly selected bit $b$, the adversary has only $1/2 + \epsilon$
+probability of guessing the value of the bit $b$ when given $I_e^b = Encapsulate(I_p^b)$.
+Where $\epsilon$ is a negligible factor with regard to the security parameter $k$.
 }
 \end{definition}
 
 \begin{theorem}\label{theo1}
 \textit{
-Let $Encapsulate_{pk}(I_p)$ denote the interest encapsulation routine described in Algorithm~\ref{alg:interestEncap}. If $Enc_{pk}$, used to construct $Encapsulate_{pk}(I_p)$, is a CPA-secure public-key encryption scheme then $Encapsulate_{pk}(I_p)$ is an indistinguishable interest encapsulation algorithm.
+Let $Encapsulate_{pk}(I_p)$ denote the interest encapsulation routine described in
+Algorithm~\ref{alg:interestEncap}. If $Enc_{pk}$, used to construct $Encapsulate_{pk}(I_p)$,
+is a CPA-secure public-key encryption scheme then $Encapsulate_{pk}(I_p)$ is an
+indistinguishable interest encapsulation algorithm.
 }
 \end{theorem}
 
-\textit{\textbf{Proof--}} Suppose that Claim~\ref{theo1} is false. Then there exists a polynomial adversary $Adv$ capable of guessing the bit $b$ of Definition~\ref{def1} with non-negligible advantage, when given $I_e^b = Encapsulate(I_p^b)$ with $b \leftarrow \{0,1\}$ chosen at random. We show that if such adversary exists he can be used to construct a polinomial adversary $AdvCPA$ which breaks the CPA-security of $Enc_{pk}$. $AdvCPA$ plays the CPA-security game with a challenger sending him two messages $m^0$ and $m^1$. Following the CPA-security game, the challenger randomly chooses a value for the bit $b' \leftarrow \{0,1\}$ and gives back $C = Enc_{pk}(m^{b'})$ to $AdvCPA$. To break the CPA-security $AdvCPA$ must be able to guess the value of the bit $b'$ with non-negligible advantage. To that purpose $AdvCPA$ can query the challenger for the encryptions of $m^0$ and $m^1$ ($c^0 = Enc_{pk}(m^0)$ and $c^1 = Enc_{pk}(m^1)$) and then construct two interests $I_e^0 = createNewInterest(Gp_{name}, c^0)$ and $I_e^1 = createNewInterest(Gp_{name}, c^1)$, using the same $createNewInterest$ function used by algorithm~\ref{alg:interestEncap}, which is public (notice that $Gp_{name}$ is also public). Finally, $AdvCPA$ gives $I_e^0$ and $I_e^1$ as input to $Adv$ and outputs whatever $Adv$ outputs. Since under our assumption $Adv$ guesses the bit $b$ with non-negligible advantage, then $AdvCPA$ breaks the CPA-security of $Enc_{pk}$. But this violates the hypothesis of Claim~\ref{theo1} and, therefore, such $Adv$ cannot exist.
+\textit{\textbf{Proof--}} Suppose that Claim~\ref{theo1} is false. Then there exists a
+polynomial adversary $Adv$ capable of guessing the bit $b$ of Definition~\ref{def1}
+with non-negligible advantage, when given $I_e^b = Encapsulate(I_p^b)$ with
+$b \leftarrow \{0,1\}$ chosen at random. We show that if such adversary exists he can
+be used to construct a polinomial adversary $AdvCPA$ which breaks the CPA-security
+of $Enc_{pk}$. $AdvCPA$ plays the CPA-security game with a challenger sending him
+two messages $m^0$ and $m^1$. Following the CPA-security game, the challenger
+randomly chooses a value for the bit $b' \leftarrow \{0,1\}$ and gives back
+$C = Enc_{pk}(m^{b'})$ to $AdvCPA$. To break the CPA-security $AdvCPA$ must be
+able to guess the value of the bit $b'$ with non-negligible advantage. To that
+purpose $AdvCPA$ can query the challenger for the encryptions of $m^0$ and
+$m^1$ ($c^0 = Enc_{pk}(m^0)$ and $c^1 = Enc_{pk}(m^1)$) and then construct two
+interests $I_e^0 = createNewInterest(Gp_{name}, c^0)$ and $I_e^1 = createNewInterest(Gp_{name}, c^1)$,
+using the same $createNewInterest$ function used by algorithm~\ref{alg:interestEncap},
+which is public (notice that $Gp_{name}$ is also public). Finally, $AdvCPA$ gives $I_e^0$
+and $I_e^1$ as input to $Adv$ and outputs whatever $Adv$ outputs. Since under our
+assumption $Adv$ guesses the bit $b$ with non-negligible advantage, then $AdvCPA$ breaks
+the CPA-security of $Enc_{pk}$. But this violates the hypothesis of Claim~\ref{theo1}
+and, therefore, such $Adv$ cannot exist.
 
 \begin{definition}
 \textit{
-A content encapsulation algorithm $Encapsulate(C_p)$ is an indistinguishable content encapsulation iff, given any two contents $C_p^1$ and $C_p^2$, chosen by the adversary, and a randomly selected bit $b$, the adversary has only $1/2 + \epsilon$ probability of guessing the value of the bit $b$ when given $C_e^b = Encapsulate(C_p^b)$. Where $\epsilon$ is a negligible factor with regard to the security parameter $k$.
+A content encapsulation algorithm $Encapsulate(C_p)$ is an indistinguishable content
+encapsulation iff, given any two contents $C_p^1$ and $C_p^2$, chosen by the adversary,
+and a randomly selected bit $b$, the adversary has only $1/2 + \epsilon$ probability
+of guessing the value of the bit $b$ when given $C_e^b = Encapsulate(C_p^b)$. Where
+$\epsilon$ is a negligible factor with regard to the security parameter $k$.
 }
 \end{definition}
 
 \begin{theorem}
 \textit{
-Let $ContentEnc_{k_r}(C_p)$ denote the content encapsulation routine described in Algorithm~\ref{alg:contentEnc}. If $EncryptThenMAC_{k_r}$, used to construct $ContentEnc_{sk}$, is a CCA-secure symmetric-key encryption scheme, then:
+Let $ContentEnc_{k_r}(C_p)$ denote the content encapsulation routine described in
+Algorithm~\ref{alg:contentEnc}. If $EncryptThenMAC_{k_r}$, used to construct
+$ContentEnc_{sk}$, is a CCA-secure symmetric-key encryption scheme, then:
 \begin{enumerate}
 \item $ContentEnc_{k_r}(C_p)$ is an indistinguishable content encapsulation algorithm;
 \item An adversary has only negligible probability of generating a valid fake encapsulated content $I_c'$
@@ -67,5 +141,5 @@ Let $ContentEnc_{k_r}(C_p)$ denote the content encapsulation routine described i
 }
 \end{theorem}
 
-\textit{\textbf{Proof--}} This follows directly from the definition of CCA-security and from the
-same argument in the previous proof.
+\textit{\textbf{Proof (Sketch)--}} This follows directly from the definition of
+CCA-security and from the same argument in the previous proof.

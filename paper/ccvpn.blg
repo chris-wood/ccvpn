@@ -8,6 +8,7 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: references.bib
+Warning--I didn't find a database entry for "cicn"
 -- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
@@ -18,7 +19,7 @@ Warning--empty year in shangndn
 Done.
 You've used 21 entries,
             4087 wiz_defined-function locations,
-            931 strings with 10457 characters,
+            932 strings with 10461 characters,
 and the built_in function-call counts, 10923 in all, are:
 = -- 817
 > -- 249
@@ -57,4 +58,4 @@ warning$ -- 3
 while$ -- 36
 width$ -- 23
 write$ -- 197
-(There were 3 warnings)
+(There were 4 warnings)

@@ -17,7 +17,7 @@ $128$ links which, again, is a comfortable upper bound. Therefore, $F_S = 80N_F$
 Now consider the FIB size $F_G$ for a CCVPN gateway. Some entries in these FIBs will
 point to ``private'' prefixes, i.e., other domains, and therefore have a larger size
 to account for the corresponding prefix and key material that must be stored.
-For both public- and symmetric-key encryption, the key size is the same: $32$B \cite{sodiumGithub}. 
+For both public- and symmetric-key encryption, the key size is the same: $32$B \cite{sodiumGithub}.
 Therefore, by taking into account two both the FIB entry prefix key, translation
 prefix, encryption key, and corresponding bit vector, the total size of one ``private''
 FIB entry will be $176$B, meaning that $F_G = 176N_F$B. By comparing $F_S$ to $F_G$, we
@@ -40,7 +40,7 @@ a gateway PIT entry is of size $204$B. Therefore, in the worst case, the CCVPN P
 will be at most $P_G / P_S = 204/80 = 2.55$B larger than the standard PIT. Assuming
 a steady state size of approximately $1e^5$ entries \cite{carofiglio2015pending},
 this means that the PIT will be $20.4$MB, which is well within the capacity of
-modern memory systems.
+modern systems.
 
 \subsection{Processing Overhead}
 In terms of processing overhead, the gateway adds a number of new steps to the data
@@ -65,8 +65,10 @@ the number of private packets a gateway can process per second. This bound is en
 dependent on the system configuration and network conditions.
 
 Another performance deficiency comes from the fact that gateways cannot process packets
-without allocating memory. Specifically, since each packet requires either an encryption
-or decryption, which cannot be done entirely in-place, the gateway must allocate some amount
-of memory for every processed packet. This overhead can outweigh the cryptographic computations
-if the packet arrival rate is high enough. Therefore, when implementing CCVPN, special care
-must be taken to ensure that all cryptographic operations are performed in-place where possible.
+without allocating memory. Specifically, each packet requires either an encryption
+or decryption. However, this cannot be done entirely in-place, the gateway must allocate some amount
+of memory for every processed packet, e.g., to store the MAC tag, to account for
+ciphertext expansion, or to apply padding, if desired. This overhead can outweigh
+the cryptographic computations if the packet arrival rate is high enough. Therefore,
+when implementing CCVPN, special care must be taken to ensure that memory allocations
+are minimized or avoided where possible.

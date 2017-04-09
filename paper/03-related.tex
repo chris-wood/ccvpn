@@ -6,20 +6,20 @@ as ANDaNA \cite{dibenedetto2011andana} and AC3N \cite{tsudik2016ac3n}, and
 proof-of-concept application-layer anonymizing network for NDN. It works by
 creating single-use, ephemeral, and anonymizing circuits between a consumer
 and producer. Each hop in this circuit uses onion decryption to decapsulate
-interests and onion encryption to encrypt the result. A minimum of two hops are 
+interests and onion encryption to encrypt the result. A minimum of two hops are
 needed to guarantee consumer and producer unlinkability. CCVPN seeks to address
 a different threat: privacy instead of anonymity. Thus, only a single hop, which
 creates a tunnel between a source and a sink AS, is needed in CCVPN. Moreover,
-since these tunnels serve multiple traffic flows for \emph{all} consumers within 
+since these tunnels serve multiple traffic flows for \emph{all} consumers within
 the same source, they are long-lived and persistent. This reduces the per-packet
 and per-flow cryptographic operations needed to move packets between the source
 and sink domains. AC3N \cite{tsudik2016ac3n} is an optimized version of ANDaNA
-that keeps per-flow state in each hop of an anonymizing circuit to specify 
+that keeps per-flow state in each hop of an anonymizing circuit to specify
 ephemeral key identifiers for packets. This prevents intra-flow linkability
 while simultaneously enabling symmetric-key encryption and decryption for more
 efficient processing. However, since AC3N is still a per-consumer application,
 anonymizing circuits cannot be shared among multiple geolocated consumers
-in the same domain. 
+in the same domain.
 
 Content encryption seeks to solve the problem of data confidentiality rather than
 privacy or anonymity. This technique allows content to be disseminated throughout
@@ -40,7 +40,7 @@ NDN-ACE \cite{shangndn} is a recent access control framework for IoT environment
 which includes a key exchange protocol for distributing secret keys to sensors.
 All of these techniques, with few exceptions, use public-key cryptographic schemes
 to protect only the \emph{payload} of content packets. They do not encapsulate complete
-packets for private transmission between a source and sink domain. The exception is CCNxKE\cite{ccnxke}, 
+packets for private transmission between a source and sink domain. The exception is CCNxKE~\cite{ccnxke},
 which specifies a key exchange protocol that can bootstrap secure sessions between a source
-a sink. CCNxKE can be used in CCVPN to establish pairwise shared secrets between tunnel
+a sink. CCNxKE can be used by CCVPN to establish pairwise shared secrets between tunnel
 endpoints, even though this step is not strictly required.
