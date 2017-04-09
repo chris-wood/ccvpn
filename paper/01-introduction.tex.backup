@@ -6,10 +6,10 @@ by issuing an explicit request for the content by its name. The network is
 responsible for forwarding this request towards producers, based on the name.
 The producers then generate and return the content response. Since a name uniquely identifies
 a content response, routers may cache content responses and use them to respond
-to future requests for the same name. As a consequence, all content has an (implicit
+future requests for the same name. As a consequence, all content has an (implicit
 or explicit) authenticator that is used to verify the name-to-data binding. In
-order to prevent cache poisoning attacks, wherein a malicious producer supplies
-fake data in a content response that is propagated in the network, a router
+order to prevent cache poisoning attachs, wherein a malicious producer supplies
+fake data in a content response that is propogated in the network, a router
 should never serve (a) content with an invalid authenticator or (b) cached
 content that it cannot verify. To enable (b), content objects with a digital
 signature are expected to carry the public verification key or certificate. If the
@@ -20,14 +20,14 @@ One negative side effect of name-based requests is that any on-path or
 eavesdropping adversary between a consumer and producer can learn the identity
 and contents of all data in transit. In traditional IP-based networks, there are
 generally two types of mechanisms to solve this problem: (1) anonymity
-networks, such as Tor \cite{dingledine2004tor}, and (2) VPNs. As tools focused on anonymity,
-the former help prevent linkability of packets to their requesters without
+networks such as Tor \cite{dingledine2004tor} or (2) VPNs. As tools focused on anonymity,
+the former help prevent linkability of packets to their requestors without
 always protecting the identities or content themselves. In contrast, VPNs focus
 on packet confidentiality by creating a tunnel between two private networks
-or between a consumer and a single private network. All traffic over this tunnel is
+or a consumer and single private network. All traffic over this tunnel is
 encrypted and thereby opaque to an eavesdropper. VPNs differ from anonymity
 networks such as Tor in that they are \emph{network-layer} mechanisms that
-typically only introduce a single layer of encryption to protect traffic.
+typically only introduces a single layer of encryption to protect traffic.
 Thus, while Tor can be used to enable VPN-like functionality, it is often
 far more inefficient since it operates above the network layer.
 
@@ -43,9 +43,9 @@ useful for only a subset of ICN traffic, we believe it is a gap to be addressed
 for this emerging technology, for a variety of reasons. {\bf First}, privacy
 continues to be an elusive property for CCN applications. Tunneling will help
 permit some degree of privacy within trusted AS domains from external passive
-eavesdroppers. {\bf Second}, multi-hop circuits as used in ANDaNA are an overkill
+eavesdroppers. {\bf Second}, multi-hop circuits as used in ANDaNA are overkill
 when trying to retain privacy instead of anonymity. {\bf Third}, end-to-end
-sessions, such as those enabled by CCNxKE \cite{ccnxke} and similar protocols,
+sessions such as those enabled by CCNxKE \cite{ccnxke} and similar protocols
 only serve those engaged in the session. In contrast, since the threat model is
 different, tunneled traffic has the potential to serve any number of consumers
 within the same trusted domain. Thus, while tunneling may contrast the content-centric
