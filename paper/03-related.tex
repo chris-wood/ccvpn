@@ -1,5 +1,6 @@
 \section{Related Work} \label{sec:related}
-There are generally two classes of related work: (1) anonymity networks such
+
+There are generally two classes of related work: (1) anonymity networks, such
 as ANDaNA \cite{dibenedetto2011andana} and AC3N \cite{tsudik2016ac3n}, and
 (2) encryption-based access control techniques. ANDaNA was developed as a
 proof-of-concept application-layer anonymizing network for NDN. It works by
@@ -8,7 +9,7 @@ and producer. Each hop in this circuit uses onion decryption to decapsulate
 interests and onion encryption to encrypt the result. A minimum of two hops are 
 needed to guarantee consumer and producer unlinkability. CCVPN seeks to address
 a different threat: privacy instead of anonymity. Thus, only a single hop, which
-creates a tunnel between a source and sink AS, is needed in CCVPN. Moreover,
+creates a tunnel between a source and a sink AS, is needed in CCVPN. Moreover,
 since these tunnels serve multiple traffic flows for \emph{all} consumers within 
 the same source, they are long-lived and persistent. This reduces the per-packet
 and per-flow cryptographic operations needed to move packets between the source
@@ -22,9 +23,9 @@ in the same domain.
 
 Content encryption seeks to solve the problem of data confidentiality rather than
 privacy or anonymity. This technique allows content to be disseminated throughout
-the network since it cannot be decrypted by adversaries without the appropriate decryption key(s).
+the network, since it cannot be decrypted by adversaries without the appropriate decryption key(s).
 Many variations of this approach have been proposed based on general
-group-based encryption \cite{Smetters2010}, broadcast encryption \cite{Misra2013,Ion2013} and
+group-based encryption \cite{Smetters2010}, broadcast encryption \cite{Misra2013,Ion2013}, and
 proxy re-encryption \cite{Wood2014}. Kurihara et al. \cite{ifip15} generalized these specialized
 approaches in a framework called CCN-AC, an encryption-based access control framework
 that shows how to use manifests to explicitly specify and enforce other encryption-based
@@ -33,8 +34,8 @@ decryption keys and (2) use them to decrypt content object(s). The NDN NBAC \cit
 scheme is similar to \cite{ifip15} in that it allows decryption keys to be
 flexibly specified by a data owner. However, it does this based on name engineering rules instead of
 configuration. Interest-based access control \cite{ghali2015interest} is a different
-type of access control scheme wherein content was optionally encrypted. Access
-was protected by making the names of content derivable by only authorized consumers.
+type of access control scheme wherein content is optionally encrypted. Access
+is protected by making the names of contents derivable only by authorized consumers.
 NDN-ACE \cite{shangndn} is a recent access control framework for IoT environments
 which includes a key exchange protocol for distributing secret keys to sensors.
 All of these techniques, with few exceptions, use public-key cryptographic schemes
@@ -42,4 +43,4 @@ to protect only the \emph{payload} of content packets. They do not encapsulate c
 packets for private transmission between a source and sink domain. The exception is CCNxKE\cite{ccnxke}, 
 which specifies a key exchange protocol that can bootstrap secure sessions between a source
 a sink. CCNxKE can be used in CCVPN to establish pairwise shared secrets between tunnel
-endpoints. It is not a requirement for this step.
+endpoints, even though this step is not strictly required.
